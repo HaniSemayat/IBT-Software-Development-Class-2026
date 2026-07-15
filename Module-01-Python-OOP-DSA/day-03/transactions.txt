@@ -1,0 +1,12 @@
+Abebe,250.00
+Kalkidan,120.50
+Abebe,75.25
+Mekdes,300.00
+Yonas,45.00
+Kalkidan,60.00
+Abebe,10.00
+Mekdes,15.75
+Selam,500.00
+Yonas,22.50
+Selam,80.00
+Kalkidan,199.99
