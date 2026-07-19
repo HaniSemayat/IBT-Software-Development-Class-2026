@@ -1,6 +1,7 @@
 class Account:
 
     def __init__(self, owner, number, balance=0):
+
         self.owner = owner
         self.account_number = number
         self.__balance = balance
@@ -14,47 +15,42 @@ class Account:
     def deposit(self, amount):
 
         if amount <= 0:
-            print("Deposit amount must be positive.")
-            return
+            raise ValueError("Amount must be positive")
 
         self.__balance += amount
-        print(f"{amount} ETB deposited successfully.")
 
 
     def withdraw(self, amount):
 
         if amount <= 0:
-            print("Withdrawal amount must be positive.")
-            return
+            raise ValueError("Amount must be positive")
 
         if amount > self.__balance:
-            print("Insufficient balance.")
-            return
+            raise ValueError("Insufficient balance")
 
         self.__balance -= amount
-        print(f"{amount} ETB withdrawn successfully.")
 
 
     def statement(self):
 
-        print("--------------------")
+        print("----------------------")
         print(f"Owner: {self.owner}")
         print(f"Account Number: {self.account_number}")
         print(f"Balance: {self.balance} ETB")
-        print("--------------------")
+        print("----------------------")
 
 
-# Creating two accounts
-almaz = Account("Almaz Bekele", "1001", 5000)
-dawit = Account("Dawit Tesfaye", "1002", 3000)
 
+# Testing the class
+dejen = Account("Dejen Bekele", "1001", 5000)
+hayat = Account("Hayat Seid", "1002", 3000)
+hamnael = Account("Hamnael Dereje","1003", 1500 )
 # Transactions
-almaz.deposit(1000)
-dawit.withdraw(500)
+dejen.deposit(1000)
+hayat.withdraw(500)
+hamnael.withdraw(770)
 
 # Statements
-almaz.statement()
-dawit.statement()
-
-# Testing property
-print(almaz.balance)
+dejen.statement()
+hayat.statement()
+hamnael.statement()
