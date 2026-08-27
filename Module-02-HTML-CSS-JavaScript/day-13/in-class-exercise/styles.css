@@ -1,0 +1,146 @@
+/* Global Reset */
+
+/*
+    box-sizing: border-box makes width and height
+    include padding and borders.
+
+    This is part of the box-model requirement.
+*/
+* {
+    box-sizing: border-box;
+}
+
+
+/* Design Variables */
+
+/*
+    These are the three reusable design tokens.
+
+    We use var() instead of writing raw colors
+    inside the menu-card rules.
+*/
+:root {
+    --color-background: #f5f1e8;
+    --color-card: #fffdf8;
+    --color-gold: #c99a2e;
+}
+
+
+/* Base Page Typography */
+
+/* Set the base font for the entire page. */
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+    background-color: var(--color-background);
+}
+
+
+/* Menu Card */
+
+/*
+    This demonstrates the CSS box model:
+
+    - padding
+    - border
+    - width
+    - margin
+*/
+.menu-card {
+    position: relative;
+
+    width: 400px;
+    max-width: 90%;
+    margin: 50px auto;
+
+    padding: 30px;
+
+    border: 1px solid var(--color-gold);
+    border-top: 6px solid var(--color-gold);
+
+    background-color: var(--color-card);
+}
+
+
+/* Typography for the main heading. */
+.menu-card h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+
+
+/* Description styling. */
+.menu-card .description {
+    margin-bottom: 20px;
+}
+
+
+/*
+    Price styling.
+
+    The actual "ETB " prefix is added later
+    using the ::before pseudo-element.
+*/
+.menu-card .price {
+    margin: 15px 0;
+
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+
+/* Ingredients */
+
+.ingredients {
+    padding-left: 20px;
+}
+
+
+/*
+    Zebra striping.
+
+    :nth-child(even) selects every second
+    ingredient: 2nd, 4th, 6th, etc.
+*/
+.ingredients li:nth-child(even) {
+    background-color: var(--color-background);
+}
+
+
+/* Pseudo-element */
+
+/*
+    ::before inserts "ETB " before the price.
+
+    This satisfies the pseudo-element requirement.
+*/
+.menu-card .price::before {
+    content: "ETB ";
+}
+
+
+/* Pseudo-class */
+
+/*
+    :hover changes the card when the mouse
+    moves over it.
+
+    This satisfies the pseudo-class requirement.
+*/
+.menu-card:hover {
+    border-top-width: 10px;
+}
+
+
+/* Additional Typography */
+
+.menu-card h2 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.menu-card li {
+    padding: 5px 8px;
+}
