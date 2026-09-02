@@ -1,0 +1,141 @@
+/* CSS VARIABLES */
+
+:root {
+    --brand: hsl(187, 40%, 36%);
+    --brand-hover: hsl(175, 19%, 50%);
+
+    --background: hsl(40, 30%, 96%);
+    --text: hsl(0, 0%, 15%);
+    --muted-text: hsl(0, 11%, 44%);
+
+    --border: hsl(0, 1%, 53%);
+
+    --space-small: 8px;
+    --space: 16px;
+    --space-large: 24px;
+
+    --radius: 12px;
+
+    --font-family: "Inter", sans-serif;
+}
+
+
+/* GLOBAL RESET */
+
+* {
+    box-sizing: border-box;
+}
+
+
+/* BODY */
+
+body {
+    margin: 0;
+
+    background: var(--background);
+
+    font-family: var(--font-family);
+
+    color: var(--text);
+
+    line-height: 1.6;
+}
+
+
+/* CARD */
+
+.card {
+    max-width: 360px;
+
+    margin: 60px auto;
+
+    padding: var(--space-large);
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+}
+
+
+/*PSEUDO-ELEMENT*/
+
+.card::before {
+    content: "";
+
+    display: block;
+
+    width: 50px;
+    height: 5px;
+
+    margin-bottom: var(--space);
+
+    background: var(--brand);
+
+    border-radius: 5px;
+}
+
+
+/*TYPOGRAPHY */
+
+h1 {
+    margin: 0 0 var(--space-small);
+
+    font-size: 28px;
+
+    line-height: 1.2;
+}
+
+.tagline {
+    margin-top: 0;
+
+    color: var(--brand);
+
+    font-weight: 600;
+}
+
+.description {
+    color: var(--muted-text);
+
+    line-height: 1.7;
+}
+
+.location {
+    font-weight: 500;
+}
+
+
+/* BUTTON */
+
+.btn {
+    padding: var(--space-small) var(--space);
+
+    background: var(--brand);
+
+    color: white;
+
+    border: none;
+
+    border-radius: var(--radius);
+
+    font-family: var(--font-family);
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+
+/* Hover changes only the lightness */
+.btn:hover {
+    background: var(--brand-hover);
+}
+
+
+/* Keep keyboard focus visible */
+.btn:focus {
+    outline: 3px solid hsl(188, 21%, 55%);
+
+    outline-offset: 3px;
+}
