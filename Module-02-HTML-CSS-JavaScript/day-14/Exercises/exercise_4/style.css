@@ -1,0 +1,53 @@
+/* Exercise 4 */
+
+.layout {
+    min-height: 100vh;
+
+    display: grid;
+
+    grid-template-columns: 220px 1fr;
+
+    grid-template-areas:
+        "header header"
+        "sidebar main"
+        "footer footer";
+}
+
+header {
+    grid-area: header;
+    padding: 20px;
+    background: #bdf8a5;
+    color: black;
+}
+
+aside {
+    grid-area: sidebar;
+    padding: 20px;
+    background: #fdf3b6;
+}
+
+main {
+    grid-area: main;
+    padding: 20px;
+    background: rgb(179, 212, 250);
+}
+
+footer {
+    grid-area: footer;
+    padding: 20px;
+    background: #f79797;
+    color: white;
+}
+
+@media (max-width: 700px) {
+
+    .layout {
+        grid-template-columns: 1fr;
+
+        grid-template-areas:
+            "header"
+            "sidebar"
+            "main"
+            "footer";
+    }
+}
