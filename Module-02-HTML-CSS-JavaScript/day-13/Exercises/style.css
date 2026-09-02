@@ -1,0 +1,132 @@
+/* Exercise 1 */
+
+:root{
+    --primary-color: rgb(136, 222, 248);
+    --secondary-color: black;
+    --spacing: 10px;
+    --font-family: sans-serif, Arial;
+}
+
+button{
+    background:var(--primary-color);
+    color: var(--secondary-color);
+    padding: var(--spacing);
+    font-family: var(--font-family);
+}
+
+/* Exercise 2 */
+
+/* content-box: 300 + 48 padding + 4 border = 352px  */
+.card1{
+    width:300px;
+    padding:24px;
+    border: 2px solid black;
+}
+
+/* border-box: entire box = exactly 300px */
+.card2{
+    box-sizing:border-box;
+    width:300px;
+    padding:24px;
+    border:2px solid black;
+}
+
+
+/* Exercise 3 - Specificity */
+
+p {
+    color: red;
+}
+
+.paragraph {
+    color: blue;
+}
+
+#important {
+    color: green;
+}
+
+/* Here, p             → 0-0-1
+.paragraph    → 0-1-0
+#important    → 1-0-0
+
+The ID selector wins, so the paragraph is green. */
+
+
+
+/* Exercise 4 - Table */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #333;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+/* Zebra stripes */
+tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+/* Exercise 5 */
+
+.box1 {
+    color:black;
+    width:100px;
+    padding: 15px;
+    background-color: hsl(140, 90%, 28%);
+}
+
+.box2 {
+    color:black;
+    width:100px;
+    padding: 15px;
+    background-color: hsl(52, 98%, 51%);
+}
+
+.box3 {
+    color:black;
+    width:100px;
+    padding: 15px;
+    background-color: hsl(358, 85%, 46%);
+}
+
+/* Lighter hover shades */
+
+.box1:hover {
+    background-color: hsl(140, 90%, 38%);
+}
+
+.box2:hover {
+    background-color: hsl(52, 98%, 61%);
+}
+
+.box3:hover {
+    background-color: hsl(358, 85%, 56%);
+}
+
+/* HEX
+Green:  #078930
+Yellow: #FCDD09
+Red:    #DA121A
+
+RGB
+Green:  rgb(7, 137, 48)
+Yellow: rgb(252, 221, 9)
+Red:    rgb(218, 18, 26)
+
+HSL
+Green:  hsl(140, 90%, 28%)
+Yellow: hsl(52, 98%, 51%)
+Red:    hsl(358, 85%, 46%)
+*/
