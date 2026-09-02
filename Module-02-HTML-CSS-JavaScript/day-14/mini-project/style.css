@@ -1,0 +1,287 @@
+/* Reset */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #70b448;
+    background: #f5f6f8;
+}
+
+
+/* Page skeleton */
+
+.app {
+    min-height: 100vh;
+
+    display: grid;
+
+    grid-template-columns: 220px 1fr;
+
+    grid-template-areas:
+        "header header"
+        "sidebar main"
+        "footer footer";
+}
+
+
+/* Header */
+
+.header {
+    grid-area: header;
+
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 16px 30px;
+
+    background: rgb(164, 219, 74);
+
+    color: black;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.navbar {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+.navbar a {
+    color: black;
+
+    text-decoration: none;
+}
+
+.navbar button {
+    padding: 8px 14px;
+
+    border: none;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+    background:rgb(49, 48, 48);
+    color:white;
+}
+
+
+/* Sidebar */
+
+.sidebar {
+    grid-area: sidebar;
+
+    padding: 25px 20px;
+
+    background: white;
+
+    border-right: 1px solid #ddd;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+}
+
+.sidebar a {
+    display: block;
+
+    margin-bottom: 15px;
+
+    color: #333;
+
+    text-decoration: none;
+}
+
+
+/* Main */
+
+.main {
+    grid-area: main;
+
+    padding: 30px;
+}
+
+.welcome h1 {
+    margin-bottom: 5px;
+}
+
+.welcome p {
+    color: #666;
+}
+
+
+/* Responsive card grid */
+
+.cards {
+    display: grid;
+
+    gap: 20px;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px, 1fr));
+
+    margin-top: 30px;
+}
+
+
+/* Cards */
+
+.card {
+    display: flex;
+
+    flex-direction: column;
+
+    min-height: 180px;
+
+    padding: 20px;
+
+    background: white;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+}
+
+.card h2 {
+    margin-top: 0;
+}
+
+.amount {
+    font-size: 28px;
+
+    font-weight: bold;
+
+    margin: 10px 0;
+}
+
+.card span:not(.badge) {
+    color: #666;
+
+    margin-top: auto;
+}
+
+
+/* Badge */
+
+.popular {
+    position: relative;
+}
+
+.badge {
+    position: absolute;
+
+    top: 10px;
+    right: 10px;
+
+    padding: 5px 10px;
+
+    background: #e0a800;
+
+    color: white;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+}
+
+
+/* Quick actions */
+
+.actions {
+    margin-top: 35px;
+
+    padding: 20px;
+
+    background: white;
+
+    border-radius: 10px;
+}
+
+.action-buttons {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+}
+
+.action-buttons button {
+    padding: 10px 16px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+
+/* Footer */
+
+.footer {
+    grid-area: footer;
+
+    padding: 20px;
+
+    text-align: center;
+
+    background: #686565;
+
+    color: white;
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+    .app {
+        grid-template-columns: 1fr;
+
+        grid-template-areas:
+            "header"
+            "sidebar"
+            "main"
+            "footer";
+    }
+
+    .header {
+        flex-direction: column;
+
+        gap: 15px;
+
+        text-align: center;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+
+        justify-content: center;
+    }
+
+    .sidebar {
+        border-right: none;
+
+        border-bottom: 1px solid #ddd;
+    }
+
+    .main {
+        padding: 20px 15px;
+    }
+}
