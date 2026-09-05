@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Country Facts</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>🌍 Country Facts</h1>
+        <p>Search for information about a country.</p>
+    </header>
+
+
+    <main>
+
+        <!-- Search form -->
+        <form id="search-form">
+
+            <label for="country">Country name</label>
+
+            <input
+                type="text"
+                id="country"
+                value="Ethiopia"
+                placeholder="e.g. Japan"
+            >
+
+            <button type="submit">Search</button>
+
+        </form>
+
+
+        <!-- Country facts -->
+        <section>
+
+            <h2>Country Information</h2>
+
+            <div id="facts">
+                <!-- JavaScript will render the facts here -->
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>

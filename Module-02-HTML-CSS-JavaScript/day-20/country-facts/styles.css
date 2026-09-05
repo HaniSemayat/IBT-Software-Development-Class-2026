@@ -1,0 +1,99 @@
+/* General page */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f5f7;
+    color: #222;
+}
+
+
+/* Header */
+
+header {
+    text-align: center;
+    padding: 30px 20px;
+    background: #85bfe5;
+}
+
+header h1 {
+    margin: 0 0 5px;
+}
+
+header p {
+    margin: 0;
+    color: white;
+}
+
+
+/* Main content */
+
+main {
+    width: min(90%, 700px);
+    margin: 30px auto;
+}
+
+
+/* Search form */
+
+#search-form {
+    display: grid;
+    gap: 10px;
+    padding: 20px;
+    background: #ecfaff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+#search-form input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #8f8e8e;
+    border-radius: 5px;
+}
+
+#search-form button {
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background: #b5cbcf;
+}
+
+
+/* Country information */
+
+section {
+    margin-top: 25px;
+}
+
+#facts {
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+}
+
+#facts img {
+    width: 180px;
+    margin-bottom: 15px;
+}
+
+#facts h3 {
+    margin-top: 0;
+}
+
+.fact {
+    margin: 10px 0;
+}
+
+
+/* Loading and error messages */
+
+.message {
+    font-weight: bold;
+}
