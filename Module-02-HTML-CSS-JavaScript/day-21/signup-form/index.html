@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Signup Form</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Signup Form</h1>
+        <p>Create your account with your name and Ethiopian phone number.</p>
+    </header>
+
+
+    <main>
+
+        <form id="signup-form">
+
+            <label for="name">Full name</label>
+
+            <input
+                type="text"
+                id="name"
+                placeholder="e.g. Hani T."
+            >
+
+
+            <label for="phone">Phone number</label>
+
+            <input
+                type="tel"
+                id="phone"
+                placeholder="e.g. 0912345678"
+            >
+
+
+            <p id="error" role="alert"></p>
+
+
+            <button type="submit">
+                Sign Up
+            </button>
+
+        </form>
+
+
+        <section>
+
+            <h2>Saved Signups</h2>
+
+            <ul id="signups">
+                <!-- Saved signups will appear here -->
+            </ul>
+
+        </section>
+
+    </main>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
