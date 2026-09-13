@@ -1,0 +1,74 @@
+[
+    {
+        "id": 1,
+        "name": "Doro Wet",
+        "category": "Ethiopian",
+        "price": 650,
+        "description": "Traditional Ethiopian chicken stew served with injera",
+        "image": "data/images/doro-wet.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Tibs",
+        "category": "Ethiopian",
+        "price": 500,
+        "description": "Roasted beef with onions, peppers and Ethiopian spices",
+        "image": "data/images/tibs.jpg"
+    },
+    {
+        "id": 3,
+        "name": "Vegetable Pizza",
+        "category": "Pizza",
+        "price": 450,
+        "description": "Pizza topped with fresh vegetables and mozzarella",
+        "image": "data/images/pizza.jpg"
+    },
+    {
+        "id": 4,
+        "name": "Beef Burger",
+        "category": "Burgers",
+        "price": 380,
+        "description": "Juicy beef burger with lettuce, tomato and cheese",
+        "image": "data/images/beef-burger.jpg"
+    },
+    {
+        "id": 5,
+        "name": "Cheese Burger",
+        "category": "Burgers",
+        "price": 420,
+        "description": "Classic beef burger with melted cheese",
+        "image": "data/images/cheese-burger.jpg"
+    },
+    {
+        "id": 6,
+        "name": "Coffee",
+        "category": "Drinks",
+        "price": 70,
+        "description": "Ethiopian-style macchiato with rich espresso and milk",
+        "image": "data/images/coffee.jpg"
+    },
+    {
+        "id": 7,
+        "name": "Macchiato",
+        "category": "Drinks",
+        "price": 80,
+        "description": "Ethiopian-style macchiato with rich espresso and milk",
+        "image": "data/images/macchiato.jpg"
+    },
+    {
+        "id": 8,
+        "name": "Fresh Orange Juice",
+        "category": "Drinks",
+        "price": 120,
+        "description": "Freshly prepared seasonal fruit juice",
+        "image": "data/images/orange.jpg"
+    },
+    {
+        "id": 9,
+        "name": "Fresh Avocado Juice",
+        "category": "Drinks",
+        "price": 120,
+        "description": "Freshly prepared seasonal Avocado juice",
+        "image": "data/images/avocado.jpg"
+    }
+]

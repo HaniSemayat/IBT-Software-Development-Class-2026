@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Addis Eats</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Addis Eats</h1>
+
+        <p>Order delicious food from Addis Ababa</p>
+
+        <!-- Search -->
+        <label for="search">
+            Search menu
+        </label>
+
+        <input
+            type="search"
+            id="search"
+            placeholder="Search for a dish..."
+        >
+    </header>
+
+
+    <!-- Main content -->
+    <main>
+
+        <!-- Menu -->
+        <section id="menu" aria-label="Menu">
+
+            <h2>Menu</h2>
+
+            <!-- Category filter -->
+            <div class="categories">
+
+                <button
+                    class="category-btn active"
+                    data-category="All"
+                >
+                    All
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Ethiopian"
+                >
+                    Ethiopian
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Pizza"
+                >
+                    Pizza
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Burgers"
+                >
+                    Burgers
+                </button>
+
+                <button
+                    class="category-btn"
+                    data-category="Drinks"
+                >
+                    Drinks
+                </button>
+
+            </div>
+
+
+            <!-- Loading message -->
+            <p id="loading">
+                Loading menu...
+            </p>
+
+
+            <!-- Error message -->
+            <p id="error" class="hidden">
+                Could not load the menu.
+            </p>
+            <button id="retry-button" class="hidden">
+                Try Again
+            </button>
+
+
+            <!-- Empty search result -->
+            <p id="empty-menu" class="hidden">
+                No dishes found.
+            </p>
+
+
+            <!-- JavaScript will put dishes here -->
+            <div id="menu-container"></div>
+
+        </section>
+
+
+        <!-- Cart -->
+        <aside id="cart" aria-label="Your order">
+
+            <h2>Your Order</h2>
+
+            <!-- JavaScript will put cart items here -->
+            <div id="cart-container"></div>
+
+
+            <!-- Cart total -->
+            <div class="cart-total">
+
+                <strong>Total:</strong>
+
+                <span id="cart-total">
+                    0 ETB
+                </span>
+
+            </div>
+
+
+            <!-- Checkout button -->
+            <button id="checkout-button">
+                Checkout
+            </button>
+
+        </aside>
+
+
+        <!-- Checkout -->
+        <section
+            id="checkout-section"
+            class="hidden"
+            aria-label="Checkout"
+        >
+
+            <h2>Checkout</h2>
+
+            <form id="checkout-form">
+
+                <!-- Name -->
+                <label for="name">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Enter your full name"
+                >
+
+
+                <!-- Phone -->
+                <label for="phone">
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    placeholder="09XXXXXXXX"
+                >
+
+
+                <!-- Delivery area -->
+                <label for="area">
+                    Delivery Area
+                </label>
+
+                <select id="area">
+
+                    <option value="">
+                        Select your area
+                    </option>
+
+                    <option value="Bole">
+                        Bole
+                    </option>
+
+                    <option value="Kazanchis">
+                        Kazanchis
+                    </option>
+
+                    <option value="Megenagna">
+                        Megenagna
+                    </option>
+
+                </select>
+
+
+                <!-- Address -->
+                <label for="address">
+                    Delivery Address
+                </label>
+
+                <textarea
+                    id="address"
+                    placeholder="Enter your delivery address"
+                ></textarea>
+
+
+                <!-- Form error -->
+                <p id="form-error" class="error-text"></p>
+
+
+                <!-- Submit -->
+                <button type="submit">
+                    Place Order
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- Order confirmation -->
+        <section
+            id="confirmation"
+            class="hidden"
+            aria-label="Order confirmation"
+        >
+
+            <h2>Order Confirmed!</h2>
+
+            <p id="confirmation-message"></p>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer>
+
+        <p>
+            © 2026 Addis Eats
+        </p>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
