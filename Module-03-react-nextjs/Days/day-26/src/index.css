@@ -1,0 +1,54 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+}
+
+header {
+    background: #222;
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0 0 8px;
+}
+
+header p {
+    margin: 0;
+}
+
+main {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+main > h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.dish {
+    background: white;
+    padding: 20px;
+    /* border: 1px solid rgb(27, 27, 27); */
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgb(78, 58, 48);
+}
+
+.dish h2 {
+    margin-top: 0;
+}
+
+.dish p {
+    font-weight: bold;
+}
