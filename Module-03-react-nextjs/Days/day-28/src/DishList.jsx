@@ -1,0 +1,27 @@
+import Dish from "./Dish";
+import Card from "./Card";
+
+function DishList({ dishes, onAdd }) {
+    if (dishes.length === 0) {
+        return <p>No dishes in this category yet.</p>;
+    }
+
+    return (
+        <section className="menu">
+            {dishes.map(function (dish) {
+                return (
+                    <Card key={dish.id}>
+                        <Dish
+                            name={dish.name}
+                            price={dish.price}
+                            spicy={dish.spicy}
+                            onAdd={() => onAdd(dish.price)}
+                        />
+                    </Card>
+                );
+            })}
+        </section>
+    );
+}
+
+export default DishList;
