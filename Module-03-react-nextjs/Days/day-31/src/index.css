@@ -1,0 +1,242 @@
+* {
+  box-sizing: border-box;
+  }
+
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: #f5f5f5;
+color: #222;
+}
+
+header {
+padding: 24px;
+background: #222;
+color: white;
+}
+
+header h1 {
+margin: 0 0 6px;
+}
+
+header p {
+margin: 0 0 18px;
+}
+
+nav {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+margin-bottom: 16px;
+}
+
+nav a {
+padding: 8px 14px;
+color: white;
+text-decoration: none;
+border-radius: 6px;
+}
+
+nav a:hover {
+background: #444;
+}
+
+nav a.active {
+background: white;
+color: #222;
+font-weight: bold;
+}
+
+.cart-badge {
+display: inline-block;
+padding: 8px 12px;
+background: #e8e8e8;
+color: #222;
+border-radius: 6px;
+font-weight: bold;
+}
+
+main {
+width: min(1100px, 92%);
+margin: 30px auto;
+min-height: 65vh;
+}
+
+section {
+margin-bottom: 30px;
+}
+
+h2 {
+margin-top: 0;
+}
+
+.category-bar {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+margin: 20px 0;
+}
+
+.category-bar button {
+padding: 9px 15px;
+border: 1px solid #bbb;
+border-radius: 6px;
+background: #222;
+cursor: pointer;
+}
+
+.category-bar button:hover {
+background: #eee;
+color:#222;
+}
+
+.category-bar button.active {
+background: white;
+color: #222;
+}
+
+.menu {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+gap: 18px;
+}
+
+.card {
+padding: 20px;
+background: white;
+border: 1px solid #ddd;
+border-radius: 10px;
+}
+
+.card:hover {
+box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.dish h3 {
+margin-top: 0;
+}
+
+.dish p {
+margin: 8px 0 14px;
+}
+
+.dish button,
+button {
+padding: 9px 15px;
+border: 0;
+border-radius: 6px;
+background: #222;
+color: white;
+cursor: pointer;
+}
+
+button:hover {
+background: #444;
+}
+
+button:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+}
+
+.card > a {
+display: inline-block;
+margin-top: 12px;
+text-decoration: none;
+}
+
+.empty,
+.status,
+.error {
+padding: 16px;
+background: white;
+border-radius: 8px;
+}
+
+.error {
+color: #b00020;
+border: 1px solid #e0a0a0;
+}
+
+.checkout,
+.order-form {
+padding: 24px;
+background: white;
+border: 1px solid #ddd;
+border-radius: 10px;
+}
+
+.checkout ul {
+padding-left: 20px;
+}
+
+.checkout li {
+margin-bottom: 12px;
+}
+
+.checkout li button {
+margin-left: 12px;
+padding: 6px 10px;
+}
+
+form {
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+
+label {
+display: flex;
+flex-direction: column;
+gap: 6px;
+font-weight: bold;
+}
+
+input {
+width: 100%;
+max-width: 450px;
+padding: 10px;
+border: 1px solid #bbb;
+border-radius: 6px;
+font-size: 1rem;
+}
+
+footer {
+padding: 24px;
+text-align: center;
+background: #222;
+color: white;
+}
+
+footer p {
+margin: 0;
+}
+
+@media (max-width: 600px) {
+header {
+padding: 18px;
+}
+
+main {
+    width: 94%;
+    margin: 20px auto;
+}
+
+nav {
+    gap: 6px;
+}
+
+nav a {
+    padding: 7px 10px;
+}
+
+.menu {
+    grid-template-columns: 1fr;
+}
+
+.checkout,
+.order-form,
+.card {
+    padding: 16px;
+}
+}
