@@ -1,0 +1,437 @@
+* {
+  box-sizing: border-box;
+  }
+
+:root {
+font-family: Arial, sans-serif;
+color: #2b2118;
+background: #f7f3ed;
+}
+
+body {
+margin: 0;
+background: #f7f3ed;
+color: #2b2118;
+line-height: 1.6;
+}
+
+header {
+padding: 28px 5%;
+background: #3b2417;
+color: white;
+box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+}
+
+header h1 {
+margin: 0;
+font-size: 2rem;
+letter-spacing: 0.5px;
+}
+
+header p {
+margin: 4px 0 22px;
+color: #eadbc9;
+}
+
+nav {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+margin-bottom: 18px;
+}
+
+nav a {
+padding: 9px 16px;
+color: #f7eee4;
+text-decoration: none;
+border-radius: 8px;
+transition:
+background 0.2s ease,
+color 0.2s ease,
+transform 0.2s ease;
+}
+
+nav a:hover {
+background: #5a3825;
+transform: translateY(-1px);
+}
+
+nav a.active {
+background: #f5c76b;
+color: #3b2417;
+font-weight: bold;
+}
+
+.cart-badge {
+display: inline-block;
+padding: 8px 14px;
+background: #fff4dc;
+color: #3b2417;
+border-radius: 20px;
+font-weight: bold;
+font-size: 0.9rem;
+}
+
+main {
+width: min(1100px, 92%);
+margin: 40px auto;
+min-height: 65vh;
+}
+
+section {
+margin-bottom: 36px;
+}
+
+h2 {
+margin-top: 0;
+margin-bottom: 12px;
+color: #3b2417;
+font-size: 1.8rem;
+}
+
+h3 {
+color: #4a2d1b;
+}
+
+main > section:first-child {
+padding: 42px;
+background: white;
+border-radius: 16px;
+border: 1px solid #eadfd2;
+box-shadow: 0 5px 20px rgba(59, 36, 23, 0.07);
+}
+
+main > section:first-child h2 {
+font-size: 2.2rem;
+margin-bottom: 14px;
+}
+
+main > section:first-child p {
+max-width: 650px;
+color: #65584d;
+}
+
+main > section:first-child h3 {
+margin-top: 30px;
+}
+
+a {
+color: #8a4b25;
+font-weight: 600;
+}
+
+a:hover {
+color: #b3632e;
+}
+
+.category-bar {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+margin: 22px 0;
+}
+
+.category-bar button {
+padding: 9px 16px;
+border: 1px solid #d7c8b8;
+border-radius: 20px;
+background: white;
+color: #4a2d1b;
+cursor: pointer;
+transition:
+background 0.2s ease,
+color 0.2s ease,
+transform 0.2s ease,
+border-color 0.2s ease;
+}
+
+.category-bar button:hover {
+background: #fff0d2;
+border-color: #e2bd6b;
+color: #3b2417;
+transform: translateY(-1px);
+}
+
+.category-bar button.active {
+background: #3b2417;
+color: white;
+border-color: #3b2417;
+}
+
+.menu {
+display: grid;
+grid-template-columns: repeat(
+auto-fit,
+minmax(230px, 1fr)
+);
+gap: 20px;
+}
+
+.card {
+padding: 22px;
+background: white;
+border: 1px solid #eadfd2;
+border-radius: 14px;
+box-shadow: 0 3px 12px rgba(59, 36, 23, 0.05);
+transition:
+box-shadow 0.2s ease,
+transform 0.2s ease;
+}
+
+.card:hover {
+box-shadow: 0 8px 24px rgba(59, 36, 23, 0.11);
+transform: translateY(-3px);
+}
+
+.dish h3 {
+margin-top: 0;
+margin-bottom: 8px;
+}
+
+.dish p {
+margin: 7px 0 15px;
+color: #6c5d51;
+}
+
+.dish button,
+button {
+padding: 10px 16px;
+border: 0;
+border-radius: 8px;
+background: #3b2417;
+color: white;
+font: inherit;
+font-weight: 600;
+cursor: pointer;
+transition:
+background 0.2s ease,
+transform 0.2s ease,
+box-shadow 0.2s ease;
+}
+
+.dish button:hover,
+button:hover:not(:disabled) {
+background: #5a3825;
+transform: translateY(-1px);
+box-shadow: 0 3px 8px rgba(59, 36, 23, 0.18);
+}
+
+button:disabled {
+opacity: 0.55;
+cursor: not-allowed;
+transform: none;
+box-shadow: none;
+}
+
+.card > a {
+display: inline-block;
+margin-top: 12px;
+text-decoration: none;
+}
+
+.empty,
+.status,
+.error {
+padding: 18px;
+background: white;
+border-radius: 10px;
+border: 1px solid #eadfd2;
+}
+
+.error {
+color: #9b2020;
+border-color: #e4aaaa;
+background: #fff7f7;
+}
+
+.success {
+padding: 18px;
+color: #245b32;
+border: 1px solid #abd4b5;
+border-radius: 10px;
+background: #f3fbf5;
+}
+
+.checkout,
+.order-form {
+padding: 30px;
+background: white;
+border: 1px solid #eadfd2;
+border-radius: 16px;
+box-shadow: 0 5px 20px rgba(59, 36, 23, 0.07);
+}
+
+.checkout h2,
+.order-form h2 {
+margin-bottom: 22px;
+}
+
+.checkout ul {
+margin: 0 0 24px;
+padding-left: 0;
+list-style: none;
+}
+
+.checkout li {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 15px;
+padding: 14px 0;
+border-bottom: 1px solid #eee4da;
+}
+
+.checkout li:first-child {
+border-top: 1px solid #eee4da;
+}
+
+.checkout li button {
+margin-left: auto;
+padding: 7px 11px;
+font-size: 0.9rem;
+background: #7a3d25;
+}
+
+.checkout li button:hover {
+background: #963f22;
+}
+
+.checkout h3 {
+margin: 20px 0;
+font-size: 1.25rem;
+}
+
+form {
+display: flex;
+flex-direction: column;
+gap: 18px;
+}
+
+.form-field {
+margin-bottom: 2px;
+}
+
+.form-field label {
+display: block;
+margin-bottom: 7px;
+font-weight: bold;
+color: #3b2417;
+}
+
+.form-field input,
+.form-field textarea {
+width: 100%;
+max-width: 520px;
+padding: 12px 13px;
+border: 1px solid #cfc1b4;
+border-radius: 8px;
+background: white;
+color: #2b2118;
+font: inherit;
+transition:
+border-color 0.2s ease,
+box-shadow 0.2s ease;
+}
+
+.form-field textarea {
+min-height: 110px;
+resize: vertical;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+outline: none;
+border-color: #9a5b2f;
+box-shadow: 0 0 0 3px rgba(154, 91, 47, 0.13);
+}
+
+.form-field input[aria-invalid="true"],
+.form-field textarea[aria-invalid="true"] {
+border-color: #b00020;
+}
+
+.form-field p {
+margin: 6px 0 0;
+color: #b00020;
+font-size: 0.9rem;
+}
+
+form button {
+align-self: flex-start;
+margin-top: 4px;
+padding: 12px 20px;
+font-weight: bold;
+}
+
+footer {
+margin-top: 50px;
+padding: 28px;
+text-align: center;
+background: #3b2417;
+color: #eadbc9;
+}
+
+footer p {
+margin: 0;
+}
+
+@media (max-width: 600px) {
+header {
+padding: 22px 5%;
+}
+
+
+header h1 {
+    font-size: 1.7rem;
+}
+
+main {
+    width: 94%;
+    margin: 25px auto;
+}
+
+main > section:first-child {
+    padding: 26px 22px;
+}
+
+main > section:first-child h2 {
+    font-size: 1.8rem;
+}
+
+nav {
+    gap: 5px;
+}
+
+nav a {
+    padding: 8px 11px;
+    font-size: 0.95rem;
+}
+
+.menu {
+    grid-template-columns: 1fr;
+}
+
+.checkout,
+.order-form,
+.card {
+    padding: 20px;
+}
+
+.checkout li {
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.checkout li button {
+    margin-left: 0;
+}
+
+.category-bar {
+    gap: 7px;
+}
+
+.category-bar button {
+    padding: 8px 13px;
+}
+
+}
