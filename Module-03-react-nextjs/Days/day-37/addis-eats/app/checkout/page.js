@@ -1,24 +1,26 @@
-"use client";
-
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { cookies } from "next/headers";
 
-export default function CheckoutPage() {
-  const router = useRouter();
+export const dynamic = "force-dynamic";
+
+export default async function CheckoutPage() {
+  const cookieStore = await cookies();
+
+  // Reading the session cookie makes this route request-dependent.
+  const session = cookieStore.get("session");
 
   return (
-    <main>
-      <h1>Checkout</h1>
+    <main className="p-6">
+      <h1 className="text-2xl font-bold">Checkout</h1>
 
-      <p>Review your order before placing it.</p>
+      <p className="mt-2">
+        {session ? "Session found." : "No active session found."}
+      </p>
 
-      <button onClick={() => router.push("/menu")}>
-        Back to Menu
-      </button>
-
-      <br />
-
-      <Link href="/cart">Back to Cart</Link>
+      <div className="mt-4 flex gap-4">
+        <Link href="/cart">Back to Cart</Link>
+        <Link href="/menu">Back to Menu</Link>
+      </div>
     </main>
   );
 }
