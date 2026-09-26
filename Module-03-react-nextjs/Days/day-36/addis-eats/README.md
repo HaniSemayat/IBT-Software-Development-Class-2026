@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Addis Eats — Next.js
 
-## Getting Started
+This project is the Next.js version of the Addis Eats application built during Day 36 of the IBT CodeOps Advanced Digital Skills Training Program.
 
-First, run the development server:
+The main focus of this exercise is learning the Next.js App Router, file-based routing, dynamic routes, navigation, loading states, error boundaries, and not-found handling.
+
+## Routes
+
+| URL          | File                    | Purpose              |
+| ------------ | ----------------------- | -------------------- |
+| `/`          | `app/page.js`           | Home page            |
+| `/menu`      | `app/menu/page.js`      | Menu page            |
+| `/menu/[id]` | `app/menu/[id]/page.js` | Individual dish page |
+| `/cart`      | `app/cart/page.js`      | Cart page            |
+| `/checkout`  | `app/checkout/page.js`  | Checkout page        |
+
+## Next.js Special Files
+
+| File                  | Purpose                              |
+| --------------------- | ------------------------------------ |
+| `app/menu/loading.js` | Loading UI while the menu is loading |
+| `app/menu/error.js`   | Error boundary for the menu route    |
+| `app/not-found.js`    | Custom 404 page                      |
+
+## Menu Components
+
+The menu components are colocated inside `app/menu/`:
+
+* `DishList.jsx` — displays the available dishes
+* `CategoryBar.jsx` — displays the menu categories
+
+These files do not create routes because only `page.js` files create publicly reachable routes in the App Router.
+
+## Navigation
+
+The project uses:
+
+* `next/link` for normal navigation
+* `useRouter` from `next/navigation` for programmatic navigation
+
+## Dynamic Route
+
+The route:
+
+```text
+/menu/[id]
+```
+
+uses the `id` value from the URL to find a dish.
+
+For example:
+
+```text
+/menu/1
+```
+
+displays Doro Wot.
+
+If a dish does not exist, `notFound()` displays the custom 404 page.
+
+## Running the Project
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Production Build
 
-## Learn More
+The project can be checked with:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The production build successfully generates the required App Router routes.
