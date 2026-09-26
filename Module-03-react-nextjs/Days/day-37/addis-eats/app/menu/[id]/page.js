@@ -13,6 +13,12 @@ const dishes = [
   { id: 9, name: "Avocado Juice", price: 120 },
 ];
 
+export async function generateStaticParams() {
+  return dishes.map((dish) => ({
+    id: String(dish.id),
+  }));
+}
+
 export default async function DishPage({ params }) {
   const { id } = await params;
 
