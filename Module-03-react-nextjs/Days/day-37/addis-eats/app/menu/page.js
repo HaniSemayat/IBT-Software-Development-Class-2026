@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import DishList from "./DishList";
 import CategoryBar from "./CategoryBar";
@@ -31,7 +32,9 @@ export default function MenuPage() {
 
       <CategoryBar categories={categories} />
 
-      <DishList dishes={dishes} />
+      <Suspense fallback={<p>Loading dishes...</p>}>
+        <DishList dishes={dishes} />
+      </Suspense>
 
       <Link href="/">Back Home</Link>
     </main>

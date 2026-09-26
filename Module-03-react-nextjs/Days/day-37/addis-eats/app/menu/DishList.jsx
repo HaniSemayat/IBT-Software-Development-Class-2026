@@ -1,15 +1,20 @@
 import Link from "next/link";
 
-export default function DishList({ dishes }) {
+export default async function DishList({ dishes }) {
+
   return (
-    <ul>
+    <div>
       {dishes.map((dish) => (
-        <li key={dish.id}>
+        <article key={dish.id}>
+          <h2>{dish.name}</h2>
+          <p>{dish.category}</p>
+          <p>{dish.price} ETB</p>
+
           <Link href={`/menu/${dish.id}`}>
-            {dish.name} - {dish.price} ETB
+            View Dish
           </Link>
-        </li>
+        </article>
       ))}
-    </ul>
+    </div>
   );
 }
