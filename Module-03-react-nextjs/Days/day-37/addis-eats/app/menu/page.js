@@ -2,6 +2,8 @@ import Link from "next/link";
 import DishList from "./DishList";
 import CategoryBar from "./CategoryBar";
 
+export const revalidate = 3600;
+
 const dishes = [
   { id: 1, name: "Doro Wot", price: 650 },
   { id: 2, name: "Tibs", price: 500 },
