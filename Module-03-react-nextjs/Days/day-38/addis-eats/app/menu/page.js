@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import DishList from "./DishList";
 import CategoryBar from "./CategoryBar";
+import FilterShell from "./FilterShell";
 
 export const revalidate = 3600;
 
@@ -37,10 +38,11 @@ export default async function MenuPage() {
       <h1>Our Menu</h1>
 
       <CategoryBar categories={categories} />
-
-      <Suspense fallback={<p>Loading dishes...</p>}>
-        <DishList dishes={menuDishes} />
-      </Suspense>
+      <FilterShell>
+        <Suspense fallback={<p>Loading dishes...</p>}>
+          <DishList dishes={menuDishes} />
+        </Suspense>
+      </FilterShell>
 
       <Link href="/">Back Home</Link>
     </main>
