@@ -25,7 +25,13 @@ const categories = [
   "Drinks",
 ];
 
-export default function MenuPage() {
+async function getDishes() {
+  return dishes;
+}
+
+export default async function MenuPage() {
+  const menuDishes = await getDishes();
+
   return (
     <main>
       <h1>Our Menu</h1>
@@ -33,7 +39,7 @@ export default function MenuPage() {
       <CategoryBar categories={categories} />
 
       <Suspense fallback={<p>Loading dishes...</p>}>
-        <DishList dishes={dishes} />
+        <DishList dishes={menuDishes} />
       </Suspense>
 
       <Link href="/">Back Home</Link>
