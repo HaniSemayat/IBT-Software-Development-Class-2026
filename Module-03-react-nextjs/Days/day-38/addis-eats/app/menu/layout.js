@@ -1,11 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
+import MenuCounter from "./MenuCounter";
 
 export default function MenuLayout({ children }) {
-  const [count, setCount] = useState(0);
-
   return (
     <div className="flex min-h-screen">
       <aside className="w-48 border-r p-4">
@@ -19,16 +15,7 @@ export default function MenuLayout({ children }) {
           <Link href="/menu?category=drinks">Drinks</Link>
         </nav>
 
-        <div className="mt-8 border-t pt-4">
-          <p>Menu counter: {count}</p>
-
-          <button
-            onClick={() => setCount(count + 1)}
-            className="mt-2 border px-3 py-1"
-          >
-            +1
-          </button>
-        </div>
+        <MenuCounter />
       </aside>
 
       <section className="flex-1 p-6">
