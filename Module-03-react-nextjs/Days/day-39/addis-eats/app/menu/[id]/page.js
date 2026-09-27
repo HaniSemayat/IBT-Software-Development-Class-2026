@@ -1,19 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-
-const dishes = [
-  { id: 1, name: "Doro Wot", price: 650 },
-  { id: 2, name: "Tibs", price: 500 },
-  { id: 3, name: "Veg Pizza", price: 450 },
-  { id: 4, name: "Beef Burger", price: 380 },
-  { id: 5, name: "Cheese Burger", price: 420 },
-  { id: 6, name: "Coffee", price: 70 },
-  { id: 7, name: "Macchiato", price: 80 },
-  { id: 8, name: "Orange Juice", price: 120 },
-  { id: 9, name: "Avocado Juice", price: 120 },
-];
+import { getDish, getDishes } from "../../../lib/dishes";
 
 export async function generateStaticParams() {
+  const dishes = await getDishes();
+
   return dishes.map((dish) => ({
     id: String(dish.id),
   }));
@@ -22,7 +13,7 @@ export async function generateStaticParams() {
 export default async function DishPage({ params }) {
   const { id } = await params;
 
-  const dish = dishes.find((dish) => dish.id === Number(id));
+  const dish = await getDish(id);
 
   if (!dish) {
     notFound();
