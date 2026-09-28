@@ -14,6 +14,9 @@ export function validateOrder(order) {
   ) {
     fieldErrors.phone =
       "Enter a valid Ethiopian phone number.";
+  } else if (order.phone.trim() === "0911111111") {
+    fieldErrors.phone =
+      "This phone number cannot be used.";
   }
 
   if (!order.area?.trim()) {
