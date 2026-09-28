@@ -1,78 +1,162 @@
-# Day 39 — API Routes & Server Actions
+# Day 40 — Next.js Foundations Project
 
-## Project
+## Addis Eats — Next.js
 
-**Addis Eats — Next.js**
+This project brings together the Next.js concepts from Days 36–39 into one application.
 
-Day 39 extends Addis Eats with API Route Handlers, server-side validation, Server Actions, `useActionState`, authorization checks, and revalidation.
-
----
-
-## Objectives
-
-* Build API Route Handlers with Next.js App Router.
-* Handle `GET` and `POST` requests.
-* Read route parameters and JSON request bodies.
-* Return appropriate HTTP status codes.
-* Validate input on the server.
-* Return predictable validation errors.
-* Build checkout submission with a Server Action.
-* Use `useActionState` and pending UI.
-* Revalidate data after mutations.
-* Perform authorization checks on the server.
-* Keep server secrets out of client-side code.
+The original Addis Eats application was built with React. This version rebuilds the same food-ordering domain using Next.js App Router, file-based routing, nested layouts, Server Components, Client Components, Route Handlers, Server Actions, server-side validation, and deliberate rendering strategies.
 
 ---
 
-# Component Boundaries
+## Routes
 
-Day 39 continues the Server/Client boundaries from Day 38.
+| Route        | Strategy     | Purpose                                   |
+| ------------ | ------------ | ----------------------------------------- |
+| `/`          | Static       | Landing page                              |
+| `/menu`      | ISR — 1 hour | Menu with categories and dishes           |
+| `/menu/[id]` | Static / SSG | Individual dish                           |
+| `/cart`      | Client       | Interactive cart quantities and ETB total |
+| `/checkout`  | Dynamic      | Validated checkout using Server Action    |
 
-| File                            | Type   | Reason                     |
-| ------------------------------- | ------ | -------------------------- |
-| `app/layout.js`                 | Server | Root layout                |
-| `app/Providers.jsx`             | Client | Client boundary            |
-| `app/menu/page.js`              | Server | Menu data                  |
-| `app/menu/CategoryBar.jsx`      | Client | Interactive category state |
-| `app/menu/FilterShell.jsx`      | Client | Interactive UI             |
-| `app/menu/MenuCounter.jsx`      | Client | `useState`                 |
-| `app/menu/DishList.jsx`         | Server | Server-rendered dishes     |
-| `app/menu/error.js`             | Client | Error boundary             |
-| `app/checkout/page.js`          | Server | Page shell                 |
-| `app/checkout/CheckoutForm.jsx` | Client | `useActionState`           |
-| `app/actions.js`                | Server | Server Actions             |
+Special files:
 
-Server Components are the default. Client Components are used only where browser interaction or state is required.
+```text
+app/menu/loading.js
+app/menu/error.js
+app/not-found.js
+```
 
 ---
 
-# Rendering Strategies
+## Rendering Strategy
 
-| Route        | Strategy      | Reason                          |
-| ------------ | ------------- | ------------------------------- |
-| `/`          | Static        | No request-specific data        |
-| `/menu`      | ISR           | Revalidates every hour          |
-| `/menu/[id]` | SSG           | Uses `generateStaticParams`     |
-| `/cart`      | Static/Server | No client-only behavior         |
-| `/checkout`  | Dynamic       | Explicitly uses `force-dynamic` |
+### `/`
+
+Static because the landing page does not depend on request-specific data.
+
+### `/menu`
+
+ISR using:
+
+```js
+export const revalidate = 3600;
+```
+
+Menu data is fetched directly by the Server Component.
+
+### `/menu/[id]`
+
+Static generation using:
+
+```js
+generateStaticParams()
+```
+
+Unknown dishes call:
+
+```js
+notFound()
+```
+
+### `/cart`
+
+Client Component because the cart contains browser interaction:
+
+* quantity changes
+* item removal
+* running ETB total
+
+### `/checkout`
+
+Dynamic route with a Server Action for order submission and server-side validation.
+
+The full reasoning is documented in:
+
+```text
+STRATEGY.md
+```
+
+---
+
+## Server / Client Boundary
+
+Server Components are the default.
+
+Client Components are used only where browser interaction or client state is required.
+
+Current Client Components include:
+
+```text
+app/Providers.jsx
+app/menu/CategoryBar.jsx
+app/menu/FilterShell.jsx
+app/menu/MenuCounter.jsx
+app/menu/error.js
+app/cart/page.js
+app/checkout/CheckoutForm.jsx
+```
+
+The complete boundary map is documented in:
+
+```text
+BOUNDARY.md
+```
+
+---
+
+## Data Flow
+
+### Menu
+
+```text
+Server Component
+      ↓
+lib/dishes.js
+      ↓
+DishList
+      ↓
+Rendered menu
+```
+
+The menu Server Component reads the shared server data directly instead of making a request to its own API.
+
+### Cart
+
+```text
+Client Component
+      ↓
+React state
+      ↓
+Quantity changes
+      ↓
+Running ETB total
+```
+
+### Checkout
+
+```text
+CheckoutForm
+      ↓
+useActionState
+      ↓
+placeOrder Server Action
+      ↓
+Server validation
+      ↓
+createOrder()
+      ↓
+revalidatePath()
+```
 
 ---
 
 # API Route Handlers
 
-Route Handlers are located under:
+## GET `/api/dishes`
 
-```text
-app/api/
-```
+Returns all dishes.
 
-They use the standard Web `Request` and `Response` APIs.
-
-## `GET /api/dishes`
-
-Returns the complete menu.
-
-**Status:** `200 OK`
+**Success:** `200 OK`
 
 Implementation:
 
@@ -82,9 +166,9 @@ app/api/dishes/route.js
 
 ---
 
-## `GET /api/dishes/[id]`
+## GET `/api/dishes/[id]`
 
-Returns one dish using its dynamic route parameter.
+Returns one dish.
 
 Example:
 
@@ -97,6 +181,8 @@ GET /api/dishes/1
 Unknown dish:
 
 **Status:** `404 Not Found`
+
+Response:
 
 ```json
 {
@@ -112,15 +198,15 @@ app/api/dishes/[id]/route.js
 
 ---
 
-## `POST /api/orders`
+## POST `/api/orders`
 
-Creates an order and validates the request on the server.
+Accepts an order and validates it on the server.
 
 **Success:** `201 Created`
 
 **Validation failure:** `422 Unprocessable Entity`
 
-Example:
+Example validation response:
 
 ```json
 {
@@ -133,12 +219,11 @@ Example:
 
 Validation includes:
 
-* Name is required.
-* Name must contain at least 2 characters.
-* Phone is required.
-* Phone must match the Ethiopian format.
-* Delivery area is required.
-* `0911111111` is rejected as unavailable.
+* name required
+* minimum name length
+* Ethiopian phone format
+* delivery area required
+* unavailable phone rejection
 
 Implementation:
 
@@ -148,61 +233,35 @@ app/api/orders/route.js
 
 ---
 
-# HTTP Status Codes
+## HTTP Status Codes
 
-| Status | Usage                      |
-| -----: | -------------------------- |
-|  `200` | Successful GET             |
-|  `201` | Order successfully created |
-|  `404` | Resource not found         |
-|  `422` | Validation failed          |
-|  `500` | Unexpected server error    |
-
----
-
-# Shared Server Data
-
-Menu data is stored in:
-
-```text
-lib/dishes.js
-```
-
-It provides:
-
-* `dishes`
-* `getDishes()`
-* `getDish(id)`
-
-Both the UI and API use the same data source.
-
-Orders are stored in memory in:
-
-```text
-lib/orders.js
-```
-
-This is only for the learning project. It is **not a production database** and data can disappear when the server restarts.
+| Status | Meaning                 |
+| -----: | ----------------------- |
+|    200 | Successful request      |
+|    201 | Resource created        |
+|    404 | Resource not found      |
+|    422 | Validation failed       |
+|    500 | Unexpected server error |
 
 ---
 
 # Server-Side Validation
 
-Validation is kept in:
+Validation is shared in:
 
 ```text
 lib/schema.js
 ```
 
-The rules are based on the checkout validation from the earlier React project.
+The server validates requests independently of the browser.
 
-Validation happens on the server because client-side validation can be bypassed with tools such as `curl`.
+This prevents users from bypassing validation by sending requests directly with tools such as `curl`.
 
 ---
 
 # Server Actions
 
-The checkout submission uses:
+Checkout uses:
 
 ```text
 app/actions.js
@@ -214,122 +273,35 @@ with:
 "use server";
 ```
 
-The main action is:
+The `placeOrder()` action:
 
-```js
-placeOrder()
-```
+1. receives form data
+2. builds the order
+3. validates the data on the server
+4. returns field errors when invalid
+5. creates the order when valid
+6. revalidates the affected route
 
-It:
+The checkout UI uses `useActionState()` to handle:
 
-1. Receives form data.
-2. Builds the order.
-3. Validates it on the server.
-4. Returns validation errors when necessary.
-5. Creates the order when valid.
-6. Calls `revalidatePath()` after a successful write.
-
-The final checkout flow does **not** use client-side `fetch()`.
-
----
-
-# `useActionState`
-
-`CheckoutForm.jsx` uses:
-
-```js
-useActionState(placeOrder, initialState)
-```
-
-This provides:
-
-* Server Action state.
-* Form action.
-* Pending state.
-
-While submitting, the button changes from:
-
-```text
-Place Order
-```
-
-to:
-
-```text
-Placing order...
-```
-
-and becomes disabled.
+* action state
+* validation errors
+* pending state
+* success state
 
 ---
 
-# Checkout Flow
+# Authorization
 
-```text
-Checkout Page
-      ↓
-CheckoutForm
-      ↓
-<form action={formAction}>
-      ↓
-placeOrder()
-      ↓
-Server Validation
-   ↙       ↘
-Invalid    Valid
-   ↓         ↓
-Errors    createOrder()
-             ↓
-       revalidatePath()
-             ↓
-          Success
-```
+The `cancelOrder()` Server Action demonstrates server-side authorization.
 
-The API endpoint was tested independently, while the final checkout UI uses the Server Action directly.
+It checks:
 
----
+1. a session exists
+2. the order exists
+3. the order belongs to the current user
 
-# Cancel Order Authorization
-
-The project also demonstrates a protected Server Action:
-
-```js
-cancelOrder()
-```
-
-Before cancelling an order, it checks:
-
-1. A session exists.
-2. The order exists.
-3. The order belongs to the current user.
-
-Authorization is performed **inside the Server Action**, not just by hiding a button in the UI.
-
-For this exercise, the session/ownership mechanism is a simple demonstration rather than production authentication.
-
-After cancellation:
-
-```js
-revalidatePath("/orders");
-```
-
----
-
-# Revalidation
-
-After placing an order:
-
-```js
-revalidatePath("/checkout");
-```
-
-After cancelling an order:
-
-```js
-revalidatePath("/orders");
-```
-
-These tell Next.js to refresh affected route data after server-side mutations.
+Authorization is performed inside the Server Action rather than relying on a hidden or disabled client button.
 
 ---
 
@@ -341,89 +313,17 @@ Server-side environment variables belong in:
 .env.local
 ```
 
-`.env.local` is protected by `.gitignore` and is not committed to Git.
+`.env.local` is ignored by Git.
 
-Secrets should remain server-side and should not be exposed through Client Components or unnecessary `NEXT_PUBLIC_` variables.
-
----
-
-# Security Rules
-
-Day 39 demonstrates:
-
-* Never trust client-side validation.
-* Validate request data on the server.
-* Treat route parameters as user input.
-* Return appropriate HTTP status codes.
-* Avoid exposing internal server errors.
-* Keep secrets server-side.
-* Perform authorization inside Server Actions.
-* Do not rely on hiding UI controls for security.
+No server secret is intentionally exposed to Client Components or browser JavaScript.
 
 ---
 
-# Project Structure
+# Production Verification
+
+The project was built with:
 
 ```text
-addis-eats/
-├── app/
-│   ├── api/
-│   │   ├── dishes/
-│   │   │   ├── [id]/
-│   │   │   │   └── route.js
-│   │   │   └── route.js
-│   │   └── orders/
-│   │       └── route.js
-│   ├── actions.js
-│   ├── checkout/
-│   │   ├── CheckoutForm.jsx
-│   │   └── page.js
-│   ├── menu/
-│   ├── cart/
-│   ├── Providers.jsx
-│   ├── layout.js
-│   └── page.js
-│
-├── lib/
-│   ├── dishes.js
-│   ├── orders.js
-│   └── schema.js
-│
-├── .env.local
-├── .gitignore
-└── README.md
-```
-
----
-
-# Testing
-
-The API endpoints were tested independently.
-
-### Dishes
-
-```text
-GET /api/dishes       → 200
-GET /api/dishes/1     → 200
-GET /api/dishes/999   → 404
-```
-
-### Orders
-
-```text
-Invalid POST /api/orders → 422
-Valid POST /api/orders   → 201
-```
-
-The final checkout implementation uses the Server Action rather than `fetch()`.
-
----
-
-# Build Verification
-
-The project was verified with:
-
-```bash
 npm run build
 ```
 
@@ -436,58 +336,126 @@ Turbopack
 
 The production build completed successfully.
 
+Current build route categories:
+
+```text
+/             Static
+/menu         Static + 1 hour revalidation
+/menu/[id]    SSG
+/cart         Static route containing Client Component state
+/checkout     Dynamic
+/api/dishes   Route Handler
+/api/orders   Route Handler
+```
+
 ---
 
-# Day 39 Checklist
+# API Verification
 
-* [x] `GET /api/dishes`
-* [x] `GET /api/dishes/[id]`
-* [x] 404 response for unknown dish
-* [x] `POST /api/orders`
+The following endpoint behaviors are required:
+
+```text
+GET /api/dishes       → 200
+GET /api/dishes/1     → 200
+GET /api/dishes/999   → 404
+POST /api/orders      → 201 for valid input
+POST /api/orders      → 422 for invalid input
+```
+
+---
+
+# Project Structure
+
+```text
+addis-eats/
+├── app/
+│   ├── api/
+│   │   ├── dishes/
+│   │   │   └── route.js
+│   │   └── orders/
+│   │       └── route.js
+│   ├── actions.js
+│   ├── cart/
+│   │   └── page.js
+│   ├── checkout/
+│   │   ├── CheckoutForm.jsx
+│   │   └── page.js
+│   ├── menu/
+│   │   ├── [id]/
+│   │   │   └── page.js
+│   │   ├── CategoryBar.jsx
+│   │   ├── DishList.jsx
+│   │   ├── FilterShell.jsx
+│   │   ├── MenuCounter.jsx
+│   │   ├── error.js
+│   │   ├── layout.js
+│   │   ├── loading.js
+│   │   └── page.js
+│   ├── not-found.js
+│   ├── page.js
+│   ├── layout.js
+│   └── Providers.jsx
+│
+├── lib/
+│   ├── dishes.js
+│   ├── orders.js
+│   └── schema.js
+│
+├── BOUNDARY.md
+├── STRATEGY.md
+└── README.md
+```
+
+---
+
+# Day 40 Verification Checklist
+
+* [x] App Router folder routing
+* [x] Dynamic `/menu/[id]` route
+* [x] `loading.js`
+* [x] `error.js`
+* [x] `not-found.js`
+* [x] Nested menu layout
+* [x] Static home page
+* [x] ISR menu
+* [x] Static dish pages with `generateStaticParams`
+* [x] Client-side cart
+* [x] Dynamic checkout
+* [x] Server Components
+* [x] Client Components only where interaction requires them
+* [x] Route Handler
 * [x] Server-side validation
-* [x] 201 successful order response
-* [x] 422 validation response
-* [x] Checkout submission
 * [x] Server Action
 * [x] `useActionState`
 * [x] Pending state
+* [x] Authorization check
 * [x] `revalidatePath()`
-* [x] `cancelOrder` authorization
-* [x] Session check
-* [x] Order ownership check
-* [x] `.env.local` protected by `.gitignore`
-* [x] API documentation
-* [x] Production build verified
+* [x] `STRATEGY.md`
+* [x] `BOUNDARY.md`
+* [x] Production build
 
----
+## Final Goal
 
-# What Day 39 Demonstrates
-
-Day 39 moves Addis Eats from UI-focused React work into server-side Next.js architecture.
+Day 40 combines the week's architecture into one Next.js application:
 
 ```text
+Routing
+   +
+Layouts
+   +
+Rendering Strategies
+   +
 Server Components
-       +
+   +
 Client Components
-       +
+   +
 Route Handlers
-       +
-Server Validation
-       +
+   +
 Server Actions
-       +
-useActionState
-       +
+   +
+Server Validation
+   +
 Authorization
-       +
+   +
 Revalidation
 ```
-
-| Need                   | Approach           |
-| ---------------------- | ------------------ |
-| Render server data     | Server Component   |
-| Interactive UI         | Client Component   |
-| Public/API endpoint    | Route Handler      |
-| Own UI form mutation   | Server Action      |
-| Security/authorization | Server-side check  |
-| Refresh after mutation | `revalidatePath()` |
