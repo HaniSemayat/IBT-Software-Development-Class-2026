@@ -1,8 +1,17 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { validateOrder } from "../lib/schema";
-import { createOrder } from "../lib/orders";
+import { cookies } from "next/headers";
+
+import {
+  validateOrder,
+} from "../lib/schema";
+
+import {
+  createOrder,
+  getOrder,
+  markCancelled,
+} from "../lib/orders";
 
 export async function placeOrder(previousState, formData) {
   const order = {
@@ -31,4 +40,27 @@ export async function placeOrder(previousState, formData) {
     success: true,
     order: createdOrder,
   };
+}
+
+export async function cancelOrder(orderId) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("session");
+
+  if (!session) {
+    throw new Error("Not signed in");
+  }
+
+  const order = await getOrder(orderId);
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  if (order.userId !== session.value) {
+    throw new Error("Not yours");
+  }
+
+  await markCancelled(orderId);
+
+  revalidatePath("/orders");
 }
