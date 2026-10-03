@@ -32,19 +32,31 @@ export default function RootLayout({ children }) {
             </Link>
 
             <div className="flex items-center gap-6 text-sm font-medium">
-              <Link href="/" className="transition hover:text-orange-600">
+              <Link
+                href="/"
+                className="text-gray-800 transition hover:text-orange-600"
+              >
                 Home
               </Link>
 
-              <Link href="/menu" className="transition hover:text-orange-600">
+              <Link
+                href="/menu"
+                className="text-gray-800 transition hover:text-orange-600"
+              >
                 Menu
               </Link>
 
-              <Link href="/cart" className="transition hover:text-orange-600">
+              <Link
+                href="/cart"
+                className="text-gray-800 transition hover:text-orange-600"
+              >
                 Cart
               </Link>
 
-              <Link href="/checkout" className="transition hover:text-orange-600">
+              <Link
+                href="/checkout"
+                className="text-gray-800 transition hover:text-orange-600"
+              >
                 Checkout
               </Link>
             </div>
