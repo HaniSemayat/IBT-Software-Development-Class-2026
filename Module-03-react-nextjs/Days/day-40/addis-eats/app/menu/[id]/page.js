@@ -26,7 +26,7 @@ export default async function DishPage({ params }) {
         href="/menu"
         className="text-sm font-medium text-orange-600 hover:text-orange-700"
       >
-        ? Back to Menu
+         Back to Menu
       </Link>
 
       <section className="mt-8 rounded-2xl border bg-white p-8 shadow-sm">
