@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useActionState } from "react";
 import Link from "next/link";
@@ -17,94 +17,132 @@ export default function CheckoutForm() {
 
   if (state.success) {
     return (
-      <section className="mt-4">
-        <p role="alert">
-          Your order has been placed successfully!
-        </p>
+      <section className="text-center">
+        <div className="rounded-xl bg-green-50 p-6">
+          <h2 className="text-2xl font-bold text-green-800">
+            Order placed successfully!
+          </h2>
+
+          <p className="mt-2 text-green-700">
+            Thank you for ordering from Addis Eats.
+          </p>
+        </div>
 
         <Link
           href="/menu"
-          className="mt-4 inline-block border px-3 py-1"
+          className="mt-6 inline-block rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700"
         >
-          Order more food
+          Order More Food
         </Link>
       </section>
     );
   }
 
   return (
-    <form action={formAction} className="mt-4 max-w-md space-y-4">
+    <form action={formAction} className="space-y-6">
       {state.error && (
-        <p role="alert" className="border p-2">
+        <p
+          role="alert"
+          className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        >
           {state.error}
         </p>
       )}
 
       <div>
-        <label htmlFor="name">Name</label>
+        <label
+          htmlFor="name"
+          className="mb-2 block text-sm font-semibold text-gray-800"
+        >
+          Name
+        </label>
 
         <input
           id="name"
           name="name"
           type="text"
-          className="block w-full border p-2"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
 
         {state.fieldErrors?.name && (
-          <p role="alert">{state.fieldErrors.name}</p>
+          <p role="alert" className="mt-2 text-sm text-red-600">
+            {state.fieldErrors.name}
+          </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="phone">TeleBirr Phone</label>
+        <label
+          htmlFor="phone"
+          className="mb-2 block text-sm font-semibold text-gray-800"
+        >
+          TeleBirr Phone
+        </label>
 
         <input
           id="phone"
           name="phone"
           type="tel"
           placeholder="09XXXXXXXX"
-          className="block w-full border p-2"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
 
         {state.fieldErrors?.phone && (
-          <p role="alert">{state.fieldErrors.phone}</p>
+          <p role="alert" className="mt-2 text-sm text-red-600">
+            {state.fieldErrors.phone}
+          </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="area">Delivery Area</label>
+        <label
+          htmlFor="area"
+          className="mb-2 block text-sm font-semibold text-gray-800"
+        >
+          Delivery Area
+        </label>
 
         <input
           id="area"
           name="area"
           type="text"
           defaultValue="Bole"
-          className="block w-full border p-2"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
 
         {state.fieldErrors?.area && (
-          <p role="alert">{state.fieldErrors.area}</p>
+          <p role="alert" className="mt-2 text-sm text-red-600">
+            {state.fieldErrors.area}
+          </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="notes">Notes (optional)</label>
+        <label
+          htmlFor="notes"
+          className="mb-2 block text-sm font-semibold text-gray-800"
+        >
+          Notes <span className="font-normal text-gray-500">(optional)</span>
+        </label>
 
         <textarea
           id="notes"
           name="notes"
+          rows="4"
           placeholder="Any delivery instructions?"
-          className="block w-full border p-2"
+          className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
       </div>
 
       <button
         type="submit"
         disabled={pending}
-        className="border px-4 py-2"
+        className="w-full rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {pending ? "Placing order..." : "Place Order"}
+        {pending ? "Placing Order..." : "Place Order"}
       </button>
     </form>
   );
 }
+
+
