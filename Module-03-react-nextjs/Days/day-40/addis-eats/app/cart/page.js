@@ -45,7 +45,7 @@ export default function CartPage() {
                 className="flex items-center justify-between rounded-xl border bg-white p-5 shadow-sm"
               >
                 <div>
-                  <h2 className="text-lg font-bold">
+                  <h2 className="text-lg font-bold text-gray-900">
                     {item.name}
                   </h2>
 
@@ -98,3 +98,5 @@ export default function CartPage() {
     </main>
   );
 }
+
+
