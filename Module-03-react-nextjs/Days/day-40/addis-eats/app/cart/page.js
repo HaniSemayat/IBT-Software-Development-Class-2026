@@ -1,95 +1,100 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
 import Link from "next/link";
-
-const initialItems = [
-  { id: 1, name: "Doro Wot", price: 650, quantity: 1 },
-  { id: 2, name: "Tibs", price: 500, quantity: 1 },
-];
+import { useCart } from "../Providers";
 
 export default function CartPage() {
-  const [items, setItems] = useState(initialItems);
-
-  function increaseQuantity(id) {
-    setItems((currentItems) =>
-      currentItems.map((item) =>
-        item.id === id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      )
-    );
-  }
-
-  function decreaseQuantity(id) {
-    setItems((currentItems) =>
-      currentItems
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  }
-
-  const total = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const {
+    items,
+    increaseQuantity,
+    decreaseQuantity,
+    total,
+  } = useCart();
 
   return (
-    <main className="p-6">
-      <h1 className="text-2xl font-bold">Your Cart</h1>
+    <main className="mx-auto max-w-4xl px-6 py-12">
+      <div>
+        <p className="text-sm font-semibold uppercase tracking-wide text-orange-600">
+          Addis Eats
+        </p>
+
+        <h1 className="mt-2 text-4xl font-bold tracking-tight">
+          Your Cart
+        </h1>
+      </div>
 
       {items.length === 0 ? (
-        <p className="mt-4">Your cart is currently empty.</p>
+        <section className="mt-8 rounded-2xl border bg-white p-8 text-center shadow-sm">
+          <p className="text-lg text-gray-600">
+            Your cart is empty.
+          </p>
+
+          <Link
+            href="/menu"
+            className="mt-6 inline-block rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white hover:bg-orange-700"
+          >
+            Browse Menu
+          </Link>
+        </section>
       ) : (
-        <div className="mt-4 space-y-4">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center justify-between border p-4"
-            >
-              <div>
-                <h2 className="font-bold">{item.name}</h2>
-                <p>
-                  {item.price} ETB × {item.quantity}
-                </p>
+        <>
+          <div className="mt-8 space-y-4">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between rounded-xl border bg-white p-5 shadow-sm"
+              >
+                <div>
+                  <h2 className="text-lg font-bold">
+                    {item.name}
+                  </h2>
+
+                  <p className="mt-1 text-gray-600">
+                    {item.price} ETB x {item.quantity}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => decreaseQuantity(item.id)}
+                    className="rounded-lg border px-3 py-1 font-bold hover:bg-gray-100"
+                  >
+                    -
+                  </button>
+
+                  <span className="min-w-6 text-center font-semibold">
+                    {item.quantity}
+                  </span>
+
+                  <button
+                    onClick={() => increaseQuantity(item.id)}
+                    className="rounded-lg border px-3 py-1 font-bold hover:bg-gray-100"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={() => decreaseQuantity(item.id)}
-                  className="border px-3 py-1"
-                >
-                  -
-                </button>
-
-                <span className="px-2 py-1">{item.quantity}</span>
-
-                <button
-                  onClick={() => increaseQuantity(item.id)}
-                  className="border px-3 py-1"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          ))}
-
-          <div className="border-t pt-4">
-            <p className="text-xl font-bold">
-              Total: {total} ETB
-            </p>
+            ))}
           </div>
-        </div>
-      )}
 
-      <div className="mt-6 flex gap-4">
-        <Link href="/menu">Continue Shopping</Link>
-        <Link href="/checkout">Go to Checkout</Link>
-      </div>
+          <section className="mt-8 rounded-2xl bg-gray-900 p-6 text-white">
+            <div className="flex items-center justify-between">
+              <span className="text-lg">Total</span>
+
+              <span className="text-2xl font-bold">
+                {total} ETB
+              </span>
+            </div>
+
+            <Link
+              href="/checkout"
+              className="mt-5 block rounded-lg bg-orange-600 px-5 py-3 text-center font-semibold hover:bg-orange-700"
+            >
+              Go to Checkout
+            </Link>
+          </section>
+        </>
+      )}
     </main>
   );
 }
