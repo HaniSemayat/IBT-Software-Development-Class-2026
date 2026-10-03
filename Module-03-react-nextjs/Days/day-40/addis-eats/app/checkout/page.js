@@ -10,11 +10,11 @@ export default function CheckoutPage() {
           Addis Eats
         </p>
 
-        <h1 className="mt-2 text-4xl font-bold tracking-tight text-gray-900">
+        <h1 className="mt-2 text-4xl font-bold tracking-tight text-white">
           Checkout
         </h1>
 
-        <p className="mt-3 text-gray-600">
+        <p className="mt-3 text-gray-200">
           Enter your delivery details to place your order.
         </p>
       </div>
