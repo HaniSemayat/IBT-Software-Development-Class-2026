@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import DishList from "./DishList";
 import CategoryBar from "./CategoryBar";
+import SearchBox from "./SearchBox";
 import FilterShell from "./FilterShell";
 import { getDishes } from "../../lib/dishes";
 
@@ -15,7 +16,6 @@ const categories = [
   "Drinks",
 ];
 
-
 export default async function MenuPage() {
   const menuDishes = await getDishes();
 
@@ -24,6 +24,8 @@ export default async function MenuPage() {
       <h1>Our Menu</h1>
 
       <CategoryBar categories={categories} />
+      <SearchBox />
+
       <FilterShell>
         <Suspense fallback={<p>Loading dishes...</p>}>
           <DishList dishes={menuDishes} />
