@@ -9,6 +9,7 @@ export default function OrderStatus({ id, initial }) {
     fetcher,
     {
       fallbackData: initial,
+      refreshInterval: 5000,
     }
   );
 
