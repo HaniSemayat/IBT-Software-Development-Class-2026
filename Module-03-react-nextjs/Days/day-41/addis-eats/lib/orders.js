@@ -1,4 +1,8 @@
-let orders = [];
+const orders = globalThis.__addisEatsOrders ?? [];
+
+if (!globalThis.__addisEatsOrders) {
+  globalThis.__addisEatsOrders = orders;
+}
 
 export async function createOrder(order) {
   const newOrder = {

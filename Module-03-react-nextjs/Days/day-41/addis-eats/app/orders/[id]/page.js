@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getOrder } from "../../../lib/orders";
+import OrderStatus from "./OrderStatus";
 
 export default async function OrderPage({ params }) {
   const { id } = await params;
@@ -19,23 +20,7 @@ export default async function OrderPage({ params }) {
         Order #{order.id}
       </h1>
 
-      <section className="mt-8 rounded-2xl border bg-white p-6 text-gray-900 shadow-sm">
-        <p>
-          <strong>Name:</strong> {order.name}
-        </p>
-
-        <p className="mt-2">
-          <strong>Phone:</strong> {order.phone}
-        </p>
-
-        <p className="mt-2">
-          <strong>Delivery Area:</strong> {order.area}
-        </p>
-
-        <p className="mt-2">
-          <strong>Status:</strong> {order.status}
-        </p>
-      </section>
+      <OrderStatus id={id} initial={order} />
     </main>
   );
 }
