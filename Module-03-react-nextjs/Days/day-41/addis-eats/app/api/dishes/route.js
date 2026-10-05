@@ -2,7 +2,10 @@ import { getDishes } from "../../../lib/dishes";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
+
   const query = searchParams.get("q")?.trim().toLowerCase() || "";
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = 3;
 
   const dishes = await getDishes();
 
@@ -12,5 +15,12 @@ export async function GET(request) {
       )
     : dishes;
 
-  return Response.json(filteredDishes);
+  const start = (page - 1) * limit;
+  const paginatedDishes = filteredDishes.slice(start, start + limit);
+
+  return Response.json({
+    dishes: paginatedDishes,
+    page,
+    totalPages: Math.ceil(filteredDishes.length / limit),
+  });
 }
