@@ -1,365 +1,378 @@
-# Day 40 — Next.js Foundations Project
+# Day 41 — Data Fetching with SWR
 
 ## Addis Eats — Next.js
 
-This project brings together the Next.js concepts from Days 36–39 into one application.
+Day 41 builds on the Addis Eats Next.js application from Day 40 by introducing **SWR for browser-driven data fetching**.
 
-The original Addis Eats application was built with React. This version rebuilds the same food-ordering domain using Next.js App Router, file-based routing, nested layouts, Server Components, Client Components, Route Handlers, Server Actions, server-side validation, and deliberate rendering strategies.
+The focus is on knowing when to keep data fetching on the server and when a client-side data-fetching library provides a better experience through caching, revalidation, polling, debouncing, and pagination.
 
 ---
 
-## Routes
+## What We Built
 
-| Route        | Strategy     | Purpose                                   |
-| ------------ | ------------ | ----------------------------------------- |
-| `/`          | Static       | Landing page                              |
-| `/menu`      | ISR — 1 hour | Menu with categories and dishes           |
-| `/menu/[id]` | Static / SSG | Individual dish                           |
-| `/cart`      | Client       | Interactive cart quantities and ETB total |
-| `/checkout`  | Dynamic      | Validated checkout using Server Action    |
+Day 41 adds:
 
-Special files:
+* SWR
+* Shared fetcher
+* Server-rendered initial order data
+* Client-side order status updates
+* Automatic order-status polling
+* Debounced menu search
+* Paginated dish results
+* `keepPreviousData`
+* SWR caching and revalidation
+* Network-tab verification
+* Data-fetching documentation
+
+---
+
+# Why SWR?
+
+A simple `useEffect` + `fetch` implementation can work, but it does not provide features such as:
+
+* caching
+* request deduplication
+* revalidation
+* shared request state
+* polling
+* stale-while-revalidate behavior
+
+SWR provides these features while keeping the data-fetching API simple.
+
+---
+
+# Shared Fetcher
+
+The project uses a shared fetcher:
 
 ```text
-app/menu/loading.js
-app/menu/error.js
-app/not-found.js
+lib/fetcher.js
 ```
-
----
-
-## Rendering Strategy
-
-### `/`
-
-Static because the landing page does not depend on request-specific data.
-
-### `/menu`
-
-ISR using:
 
 ```js
-export const revalidate = 3600;
+export default async function fetcher(url) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch data");
+  }
+
+  return response.json();
+}
 ```
 
-Menu data is fetched directly by the Server Component.
-
-### `/menu/[id]`
-
-Static generation using:
-
-```js
-generateStaticParams()
-```
-
-Unknown dishes call:
-
-```js
-notFound()
-```
-
-### `/cart`
-
-Client Component because the cart contains browser interaction:
-
-* quantity changes
-* item removal
-* running ETB total
-
-### `/checkout`
-
-Dynamic route with a Server Action for order submission and server-side validation.
-
-The full reasoning is documented in:
-
-```text
-STRATEGY.md
-```
+All SWR requests use this fetcher.
 
 ---
 
-## Server / Client Boundary
+# Order Status
 
-Server Components are the default.
+## Server-Rendered Initial Data
 
-Client Components are used only where browser interaction or client state is required.
-
-Current Client Components include:
+The order page first loads the order on the server:
 
 ```text
-app/Providers.jsx
-app/menu/CategoryBar.jsx
-app/menu/FilterShell.jsx
-app/menu/MenuCounter.jsx
-app/menu/error.js
-app/cart/page.js
-app/checkout/CheckoutForm.jsx
+app/orders/[id]/page.js
 ```
 
-The complete boundary map is documented in:
-
-```text
-BOUNDARY.md
-```
-
----
-
-## Data Flow
-
-### Menu
+The Server Component gets the order and passes it to the client:
 
 ```text
 Server Component
-      ↓
-lib/dishes.js
-      ↓
-DishList
-      ↓
-Rendered menu
+       ↓
+getOrder()
+       ↓
+OrderStatus
 ```
 
-The menu Server Component reads the shared server data directly instead of making a request to its own API.
-
-### Cart
-
-```text
-Client Component
-      ↓
-React state
-      ↓
-Quantity changes
-      ↓
-Running ETB total
-```
-
-### Checkout
-
-```text
-CheckoutForm
-      ↓
-useActionState
-      ↓
-placeOrder Server Action
-      ↓
-Server validation
-      ↓
-createOrder()
-      ↓
-revalidatePath()
-```
+This gives the page useful data immediately.
 
 ---
 
-# API Route Handlers
+## SWR Order Status
 
-## GET `/api/dishes`
-
-Returns all dishes.
-
-**Success:** `200 OK`
-
-Implementation:
+The client component is:
 
 ```text
-app/api/dishes/route.js
+app/orders/[id]/OrderStatus.jsx
 ```
+
+It uses:
+
+```js
+useSWR(`/api/orders/${id}`, fetcher, {
+  fallbackData: initial,
+  refreshInterval: 5000,
+})
+```
+
+### `fallbackData`
+
+The server-rendered order is used as the initial SWR data.
+
+The user does not have to wait for the first browser request before seeing the order.
+
+### `refreshInterval`
+
+The order is automatically checked every 5 seconds.
+
+This allows the UI to detect status changes without manually refreshing the page.
 
 ---
 
-## GET `/api/dishes/[id]`
+# Order API
 
-Returns one dish.
+Day 41 adds:
+
+```text
+GET /api/orders/[id]
+```
 
 Example:
 
 ```text
-GET /api/dishes/1
+GET /api/orders/1
 ```
 
-**Success:** `200 OK`
+Successful response:
 
-Unknown dish:
+```text
+200 OK
+```
 
-**Status:** `404 Not Found`
+Unknown order:
 
-Response:
+```text
+404 Not Found
+```
+
+Example error:
 
 ```json
 {
-  "error": "No such dish"
+  "error": "Order not found"
 }
-```
-
-Implementation:
-
-```text
-app/api/dishes/[id]/route.js
 ```
 
 ---
 
-## POST `/api/orders`
+# Menu Search
 
-Accepts an order and validates it on the server.
+The menu now supports browser-driven search using SWR.
 
-**Success:** `201 Created`
+The search component is:
 
-**Validation failure:** `422 Unprocessable Entity`
+```text
+app/menu/SearchBox.jsx
+```
 
-Example validation response:
+The API supports a search query:
+
+```text
+GET /api/dishes?q=doro
+```
+
+The search waits **300ms after typing stops** before making a request.
+
+This prevents unnecessary requests for every individual keystroke.
+
+Example:
+
+```text
+User types:
+
+d → do → dor → doro
+
+        ↓
+   wait 300ms
+
+        ↓
+GET /api/dishes?q=doro
+```
+
+---
+
+# Pagination
+
+The menu API also supports pagination.
+
+Each request contains a page number:
+
+```text
+/api/dishes?q=&page=1
+/api/dishes?q=&page=2
+/api/dishes?q=&page=3
+```
+
+The API returns:
 
 ```json
 {
-  "error": "Validation failed",
-  "fieldErrors": {
-    "phone": "Enter a valid Ethiopian phone number."
-  }
+  "dishes": [],
+  "page": 1,
+  "totalPages": 3
 }
 ```
 
-Validation includes:
+The menu displays three dishes per page.
 
-* name required
-* minimum name length
-* Ethiopian phone format
-* delivery area required
-* unavailable phone rejection
-
-Implementation:
+Pagination is handled by client state, so the browser remains on:
 
 ```text
-app/api/orders/route.js
+/menu
 ```
+
+while SWR requests different API pages.
 
 ---
 
-## HTTP Status Codes
+# `keepPreviousData`
 
-| Status | Meaning                 |
-| -----: | ----------------------- |
-|    200 | Successful request      |
-|    201 | Resource created        |
-|    404 | Resource not found      |
-|    422 | Validation failed       |
-|    500 | Unexpected server error |
-
----
-
-# Server-Side Validation
-
-Validation is shared in:
-
-```text
-lib/schema.js
-```
-
-The server validates requests independently of the browser.
-
-This prevents users from bypassing validation by sending requests directly with tools such as `curl`.
-
----
-
-# Server Actions
-
-Checkout uses:
-
-```text
-app/actions.js
-```
-
-with:
+SWR uses:
 
 ```js
-"use server";
+keepPreviousData: true
 ```
 
-The `placeOrder()` action:
+When the user changes pages, the previous results remain visible while the next page is loading.
 
-1. receives form data
-2. builds the order
-3. validates the data on the server
-4. returns field errors when invalid
-5. creates the order when valid
-6. revalidates the affected route
-
-The checkout UI uses `useActionState()` to handle:
-
-* action state
-* validation errors
-* pending state
-* success state
+This prevents the interface from briefly becoming empty between pages.
 
 ---
 
-# Authorization
+# Query Keys
 
-The `cancelOrder()` Server Action demonstrates server-side authorization.
+SWR identifies cached data using its request key.
 
-It checks:
+## Order
 
-1. a session exists
-2. the order exists
-3. the order belongs to the current user
+```text
+/api/orders/${id}
+```
 
-Authorization is performed inside the Server Action rather than relying on a hidden or disabled client button.
+The order ID identifies the specific order.
+
+For example:
+
+```text
+/api/orders/1
+/api/orders/2
+```
+
+represent different cached resources.
+
+## Menu
+
+```text
+/api/dishes?q=${term}&page=${page}
+```
+
+The search term and page are both part of the key.
+
+Examples:
+
+```text
+/api/dishes?q=&page=1
+/api/dishes?q=&page=2
+/api/dishes?q=doro&page=1
+```
+
+Therefore, different searches and pages receive separate SWR cache entries.
 
 ---
 
-# Environment Variables
+# Server vs Client Data Fetching
 
-Server-side environment variables belong in:
+The project follows this rule:
 
-```text
-.env.local
-```
+> If the server can fetch the data, prefer a Server Component. If the browser needs repeated or interactive fetching, use SWR.
 
-`.env.local` is ignored by Git.
+### Server
 
-No server secret is intentionally exposed to Client Components or browser JavaScript.
+Used for:
 
----
+* initial order data
+* normal server-rendered page data
+* data that does not require browser interaction
 
-# Production Verification
+### Client + SWR
 
-The project was built with:
+Used for:
 
-```text
-npm run build
-```
-
-Build environment:
-
-```text
-Next.js 16.3.6
-Turbopack
-```
-
-The production build completed successfully.
-
-Current build route categories:
-
-```text
-/             Static
-/menu         Static + 1 hour revalidation
-/menu/[id]    SSG
-/cart         Static route containing Client Component state
-/checkout     Dynamic
-/api/dishes   Route Handler
-/api/orders   Route Handler
-```
+* order-status polling
+* debounced search
+* pagination
+* browser-driven updates
 
 ---
 
-# API Verification
+# SWR vs TanStack Query
 
-The following endpoint behaviors are required:
+TanStack Query provides concepts such as:
 
 ```text
-GET /api/dishes       → 200
-GET /api/dishes/1     → 200
-GET /api/dishes/999   → 404
-POST /api/orders      → 201 for valid input
-POST /api/orders      → 422 for invalid input
+staleTime
+gcTime
+queryKey
+queryFn
+```
+
+This project uses SWR instead.
+
+SWR provides caching and revalidation through options such as:
+
+```text
+refreshInterval
+keepPreviousData
+dedupingInterval
+revalidateOnFocus
+```
+
+For this project, SWR was chosen because the client-side requirements are relatively focused:
+
+* polling
+* search
+* pagination
+
+---
+
+# Network Verification
+
+The browser Network tab was used to verify the requests.
+
+### Order polling
+
+```text
+GET /api/orders/1
+GET /api/orders/1
+GET /api/orders/1
+...
+```
+
+The requests repeat approximately every 5 seconds.
+
+### Pagination
+
+```text
+GET /api/dishes?q=&page=1
+GET /api/dishes?q=&page=2
+GET /api/dishes?q=&page=3
+```
+
+The browser remains on:
+
+```text
+/menu
+```
+
+while the API page changes.
+
+### Search
+
+Example:
+
+```text
+GET /api/dishes?q=doro&page=1
 ```
 
 ---
@@ -371,19 +384,24 @@ addis-eats/
 ├── app/
 │   ├── api/
 │   │   ├── dishes/
+│   │   │   ├── [id]/
+│   │   │   │   └── route.js
 │   │   │   └── route.js
 │   │   └── orders/
+│   │       ├── [id]/
+│   │       │   └── route.js
 │   │       └── route.js
-│   ├── actions.js
-│   ├── cart/
-│   │   └── page.js
-│   ├── checkout/
-│   │   ├── CheckoutForm.jsx
-│   │   └── page.js
+│   │
+│   ├── orders/
+│   │   └── [id]/
+│   │       ├── OrderStatus.jsx
+│   │       └── page.js
+│   │
 │   ├── menu/
 │   │   ├── [id]/
 │   │   │   └── page.js
 │   │   ├── CategoryBar.jsx
+│   │   ├── SearchBox.jsx
 │   │   ├── DishList.jsx
 │   │   ├── FilterShell.jsx
 │   │   ├── MenuCounter.jsx
@@ -391,6 +409,14 @@ addis-eats/
 │   │   ├── layout.js
 │   │   ├── loading.js
 │   │   └── page.js
+│   │
+│   ├── cart/
+│   │   └── page.js
+│   ├── checkout/
+│   │   ├── CheckoutForm.jsx
+│   │   └── page.js
+│   │
+│   ├── actions.js
 │   ├── not-found.js
 │   ├── page.js
 │   ├── layout.js
@@ -398,64 +424,71 @@ addis-eats/
 │
 ├── lib/
 │   ├── dishes.js
+│   ├── fetcher.js
 │   ├── orders.js
 │   └── schema.js
 │
 ├── BOUNDARY.md
+├── DATA.md
 ├── STRATEGY.md
 └── README.md
 ```
 
 ---
 
-# Day 40 Verification Checklist
+# Production Verification
 
-* [x] App Router folder routing
-* [x] Dynamic `/menu/[id]` route
-* [x] `loading.js`
-* [x] `error.js`
-* [x] `not-found.js`
-* [x] Nested menu layout
-* [x] Static home page
-* [x] ISR menu
-* [x] Static dish pages with `generateStaticParams`
-* [x] Client-side cart
-* [x] Dynamic checkout
-* [x] Server Components
-* [x] Client Components only where interaction requires them
-* [x] Route Handler
-* [x] Server-side validation
-* [x] Server Action
-* [x] `useActionState`
-* [x] Pending state
-* [x] Authorization check
-* [x] `revalidatePath()`
-* [x] `STRATEGY.md`
-* [x] `BOUNDARY.md`
-* [x] Production build
+The project was verified with:
 
-## Final Goal
+```bash
+npm run build
+```
 
-Day 40 combines the week's architecture into one Next.js application:
+The production build completed successfully.
+
+---
+
+# Day 41 Verification Checklist
+
+* [x] Install SWR
+* [x] Create shared SWR fetcher
+* [x] Add order lookup API
+* [x] Server-render initial order data
+* [x] Use `fallbackData`
+* [x] Add order-status polling
+* [x] Verify polling in Network tab
+* [x] Add debounced menu search
+* [x] Add paginated dish API
+* [x] Add client-side pagination
+* [x] Use `keepPreviousData`
+* [x] Verify pagination requests
+* [x] Document query keys and caching decisions
+* [x] Compare SWR with TanStack Query
+* [x] Production build passes
+
+---
+
+# Key Lesson
+
+The main lesson from Day 41 is not simply how to use SWR.
+
+It is learning to choose **where data fetching belongs**.
 
 ```text
-Routing
-   +
-Layouts
-   +
-Rendering Strategies
-   +
-Server Components
-   +
-Client Components
-   +
-Route Handlers
-   +
-Server Actions
-   +
-Server Validation
-   +
-Authorization
-   +
-Revalidation
+Can the server fetch it?
+        │
+       Yes
+        ↓
+Server Component
+
+Does the browser need
+repeated or interactive data?
+        │
+       Yes
+        ↓
+Client Component + SWR
 ```
+
+The goal is not to put SWR everywhere.
+
+The goal is to use client-side data fetching when the browser actually benefits from it.
