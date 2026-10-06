@@ -7,7 +7,6 @@ if (!globalThis.__addisEatsOrders) {
 export async function createOrder(order) {
   const newOrder = {
     id: orders.length + 1,
-    userId: "demo-user",
     status: "placed",
     ...order,
   };
@@ -18,9 +17,23 @@ export async function createOrder(order) {
 }
 
 export async function getOrder(orderId) {
-  return orders.find(
-    (order) => order.id === Number(orderId)
+  return (
+    orders.find((order) => order.id === Number(orderId)) ?? null
   );
+}
+
+export async function getOrdersByUser(userId) {
+  return orders.filter((order) => order.userId === userId);
+}
+
+export async function getOrderForUser(orderId, userId) {
+  const order = await getOrder(orderId);
+
+  if (!order || order.userId !== userId) {
+    return null;
+  }
+
+  return order;
 }
 
 export async function markCancelled(orderId) {

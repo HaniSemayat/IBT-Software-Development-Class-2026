@@ -1,19 +1,22 @@
-﻿"use server";
+"use server";
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 
 import { validateOrder } from "../lib/schema";
 
 import {
   createOrder,
-  getOrder,
+  getOrderForUser,
   markCancelled,
 } from "../lib/orders";
 
 import { getUserByEmail } from "../lib/users";
-import { createSession } from "../lib/session";
+import {
+  createSession,
+  destroySession,
+  getSession,
+} from "../lib/session";
 
 export async function signIn(previousState, formData) {
   const email = formData.get("email");
@@ -43,8 +46,21 @@ export async function signIn(previousState, formData) {
   redirect(next);
 }
 
+export async function signOut() {
+  await destroySession();
+
+  redirect("/");
+}
+
 export async function placeOrder(previousState, formData) {
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error("Not signed in");
+  }
+
   const order = {
+    userId: session.id,
     name: formData.get("name"),
     phone: formData.get("phone"),
     area: formData.get("area"),
@@ -73,30 +89,20 @@ export async function placeOrder(previousState, formData) {
 }
 
 export async function cancelOrder(orderId) {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session");
+  const session = await getSession();
 
   if (!session) {
     throw new Error("Not signed in");
   }
 
+  const order = await getOrderForUser(orderId, session.id);
+
   if (!order) {
     throw new Error("Order not found");
   }
 
-  if (order.userId !== session.value) {
-    throw new Error("Not yours");
-  }
-
   await markCancelled(orderId);
 
+  revalidatePath(`/orders/${orderId}`);
   revalidatePath("/orders");
-}
-
-export async function signOut() {
-  const { destroySession } = await import("../lib/session");
-
-  await destroySession();
-
-  redirect("/");
 }

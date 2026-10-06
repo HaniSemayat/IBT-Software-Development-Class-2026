@@ -1,10 +1,18 @@
-import { notFound } from "next/navigation";
-import { getOrder } from "../../../lib/orders";
+﻿import { notFound, redirect } from "next/navigation";
+import { getSession } from "../../../lib/session";
+import { getOrderForUser } from "../../../lib/orders";
 import OrderStatus from "./OrderStatus";
 
 export default async function OrderPage({ params }) {
   const { id } = await params;
-  const order = await getOrder(id);
+
+  const session = await getSession();
+
+  if (!session) {
+    redirect(`/signin?next=/orders/${id}`);
+  }
+
+  const order = await getOrderForUser(id, session.id);
 
   if (!order) {
     notFound();
