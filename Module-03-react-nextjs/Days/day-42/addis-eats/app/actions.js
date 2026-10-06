@@ -2,6 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { getUserByPhone } from "../lib/users";
+import { createSession } from "../lib/session";
 
 import {
   validateOrder,
@@ -63,4 +66,31 @@ export async function cancelOrder(orderId) {
   await markCancelled(orderId);
 
   revalidatePath("/orders");
+}
+
+export async function signIn(previousState, formData) {
+  const phone = formData.get("phone");
+  const password = formData.get("password");
+  const next = formData.get("next") || "/";
+
+  const user = await getUserByPhone(phone);
+
+  if (!user || user.password !== password) {
+    return {
+      error: "Invalid phone number or password.",
+      success: false,
+    };
+  }
+
+  await createSession({
+    id: user.id,
+    name: user.name,
+    role: user.role,
+  });
+
+  if (!next.startsWith("/") || next.startsWith("//")) {
+    redirect("/");
+  }
+
+  redirect(next);
 }
