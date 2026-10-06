@@ -92,3 +92,11 @@ export async function cancelOrder(orderId) {
 
   revalidatePath("/orders");
 }
+
+export async function signOut() {
+  const { destroySession } = await import("../lib/session");
+
+  await destroySession();
+
+  redirect("/");
+}

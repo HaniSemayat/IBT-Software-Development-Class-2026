@@ -2,6 +2,8 @@
 import Link from "next/link";
 import "./globals.css";
 import Providers from "./Providers";
+import UserMenu from "./UserMenu";
+import { getSession } from "../lib/session";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +20,9 @@ export const metadata = {
   description: "Discover delicious food in Addis Ababa.",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const session = await getSession();
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="min-h-screen bg-gray-50 text-gray-900">
@@ -59,6 +63,8 @@ export default function RootLayout({ children }) {
               >
                 Checkout
               </Link>
+
+              <UserMenu session={session} />
             </div>
           </nav>
         </header>
