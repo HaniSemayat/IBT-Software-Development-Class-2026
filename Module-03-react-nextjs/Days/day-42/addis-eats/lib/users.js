@@ -1,20 +1,24 @@
-const users = [
+﻿const users = [
   {
     id: "user-1",
-    name: "Addis",
-    phone: "0911111111",
+    name: "Addis Tesfa",
+    email: "addistesfa@gmail.com",
     password: "123456",
     role: "customer",
   },
   {
     id: "staff-1",
-    name: "Kitchen Staff",
-    phone: "0922222222",
+    name: "Admin One",
+    email: "adminone@addiseats.com",
     password: "123456",
     role: "staff",
   },
 ];
 
-export async function getUserByPhone(phone) {
-  return users.find((user) => user.phone === phone) ?? null;
+export async function getUserByEmail(email) {
+  return (
+    users.find(
+      (user) => user.email.toLowerCase() === email.toLowerCase()
+    ) ?? null
+  );
 }

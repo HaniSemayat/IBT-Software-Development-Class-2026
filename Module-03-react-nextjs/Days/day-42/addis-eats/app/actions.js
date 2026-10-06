@@ -1,20 +1,47 @@
-"use server";
+﻿"use server";
 
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { getUserByPhone } from "../lib/users";
-import { createSession } from "../lib/session";
 
-import {
-  validateOrder,
-} from "../lib/schema";
+import { validateOrder } from "../lib/schema";
 
 import {
   createOrder,
   getOrder,
   markCancelled,
 } from "../lib/orders";
+
+import { getUserByEmail } from "../lib/users";
+import { createSession } from "../lib/session";
+
+export async function signIn(previousState, formData) {
+  const email = formData.get("email");
+  const password = formData.get("password");
+  const next = formData.get("next") || "/";
+
+  const user = await getUserByEmail(email);
+
+  if (!user || user.password !== password) {
+    return {
+      error: "Invalid email or password.",
+      success: false,
+    };
+  }
+
+  await createSession({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  });
+
+  if (!next.startsWith("/") || next.startsWith("//")) {
+    redirect("/");
+  }
+
+  redirect(next);
+}
 
 export async function placeOrder(previousState, formData) {
   const order = {
@@ -53,8 +80,6 @@ export async function cancelOrder(orderId) {
     throw new Error("Not signed in");
   }
 
-  const order = await getOrder(orderId);
-
   if (!order) {
     throw new Error("Order not found");
   }
@@ -66,31 +91,4 @@ export async function cancelOrder(orderId) {
   await markCancelled(orderId);
 
   revalidatePath("/orders");
-}
-
-export async function signIn(previousState, formData) {
-  const phone = formData.get("phone");
-  const password = formData.get("password");
-  const next = formData.get("next") || "/";
-
-  const user = await getUserByPhone(phone);
-
-  if (!user || user.password !== password) {
-    return {
-      error: "Invalid phone number or password.",
-      success: false,
-    };
-  }
-
-  await createSession({
-    id: user.id,
-    name: user.name,
-    role: user.role,
-  });
-
-  if (!next.startsWith("/") || next.startsWith("//")) {
-    redirect("/");
-  }
-
-  redirect(next);
 }

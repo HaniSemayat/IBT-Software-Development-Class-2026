@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useActionState } from "react";
 import { signIn } from "../actions";
@@ -27,17 +27,17 @@ export default function SignInForm({ next }) {
 
       <div>
         <label
-          htmlFor="phone"
+          htmlFor="email"
           className="mb-2 block text-sm font-semibold text-gray-800"
         >
-          Phone
+          Email
         </label>
 
         <input
-          id="phone"
-          name="phone"
-          type="tel"
-          placeholder="0911111111"
+          id="email"
+          name="email"
+          type="email"
+          placeholder="addistesfa@gmail.com"
           required
           className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
@@ -55,6 +55,7 @@ export default function SignInForm({ next }) {
           id="password"
           name="password"
           type="password"
+          placeholder="123456"
           required
           className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
