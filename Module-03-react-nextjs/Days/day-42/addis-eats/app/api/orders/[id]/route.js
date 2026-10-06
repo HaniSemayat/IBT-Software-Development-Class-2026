@@ -1,8 +1,19 @@
-import { getOrder } from "../../../../lib/orders";
+import { getSession } from "../../../../lib/session";
+import { getOrderForUser } from "../../../../lib/orders";
 
 export async function GET(request, { params }) {
+  const session = await getSession();
+
+  if (!session) {
+    return Response.json(
+      { error: "Not signed in" },
+      { status: 401 }
+    );
+  }
+
   const { id } = await params;
-  const order = await getOrder(id);
+
+  const order = await getOrderForUser(id, session.id);
 
   if (!order) {
     return Response.json(
@@ -11,5 +22,5 @@ export async function GET(request, { params }) {
     );
   }
 
-  return Response.json(order);
+  return Response.json(order, { status: 200 });
 }
