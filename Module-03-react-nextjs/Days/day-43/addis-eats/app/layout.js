@@ -1,4 +1,4 @@
-﻿import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import Providers from "./Providers";
@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
   title: "Addis Eats",
   description: "Discover delicious food in Addis Ababa.",
 };
