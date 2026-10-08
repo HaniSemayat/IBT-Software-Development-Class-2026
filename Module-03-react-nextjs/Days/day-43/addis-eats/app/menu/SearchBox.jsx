@@ -19,7 +19,7 @@ export default function SearchBox() {
     return () => clearTimeout(timer);
   }, [term]);
 
-  const { data, error, isLoading, isValidating } = useSWR(
+  const { data, error, isLoading } = useSWR(
     `/api/dishes?q=${encodeURIComponent(debouncedTerm)}&page=${page}`,
     fetcher,
     {
@@ -118,12 +118,6 @@ export default function SearchBox() {
               Next
             </button>
           </div>
-
-          {isValidating && (
-            <p className="mt-2 text-sm text-gray-500">
-              Updating...
-            </p>
-          )}
         </>
       )}
     </section>
