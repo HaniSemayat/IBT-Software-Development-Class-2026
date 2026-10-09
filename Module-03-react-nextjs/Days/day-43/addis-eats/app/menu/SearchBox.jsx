@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import useSWR from "swr";
 import fetcher from "../../lib/fetcher";
@@ -67,15 +68,21 @@ export default function SearchBox() {
             </p>
           ) : (
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {data.dishes.map((dish) => (
+              {data.dishes.map((dish, index) => (
                 <article
                   key={dish.id}
                   className="rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
-                  <div className="flex h-32 items-center justify-center rounded-xl bg-orange-50">
-                    <span className="text-sm font-bold uppercase tracking-widest text-orange-600">
-                      Addis Eats
-                    </span>
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-orange-50">
+                    <Image
+                      src={dish.image}
+                      alt={dish.imageAlt}
+                      width={800}
+                      height={600}
+                      sizes="(max-width: 640px) calc(100vw - 3rem), (max-width: 1024px) calc(50vw - 3rem), 33vw"
+                      priority={index === 0}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
 
                   <h2 className="mt-5 text-xl font-bold text-gray-900">
