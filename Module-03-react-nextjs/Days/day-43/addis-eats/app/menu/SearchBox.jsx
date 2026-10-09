@@ -80,7 +80,7 @@ export default function SearchBox() {
                       width={800}
                       height={600}
                       sizes="(max-width: 640px) calc(100vw - 3rem), (max-width: 1024px) calc(50vw - 3rem), 33vw"
-                      priority={index === 0}
+                      priority={page === 1 && debouncedTerm === "" && index === 0}
                       className="h-full w-full object-cover"
                     />
                   </div>
