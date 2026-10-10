@@ -45,8 +45,34 @@ export default async function DishPage({ params }) {
     notFound();
   }
 
+  const siteUrl = new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  );
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MenuItem",
+    name: dish.name,
+    description: `${dish.name} from Addis Eats.`,
+    image: new URL(dish.image, siteUrl).toString(),
+    offers: {
+      "@type": "Offer",
+      price: String(dish.price),
+      priceCurrency: "ETB",
+      availability: "https://schema.org/InStock",
+      url: new URL(`/menu/${dish.id}`, siteUrl).toString(),
+    },
+  };
+
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+
       <Link
         href="/menu"
         className="text-sm font-medium text-orange-600 hover:text-orange-700"
