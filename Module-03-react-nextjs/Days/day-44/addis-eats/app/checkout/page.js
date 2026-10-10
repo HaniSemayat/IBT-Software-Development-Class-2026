@@ -1,5 +1,14 @@
 ﻿import CheckoutForm from "./CheckoutForm";
 
+export const metadata = {
+  title: "Checkout",
+  description: "Enter your delivery details to complete your Addis Eats order.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export const dynamic = "force-dynamic";
 
 export default function CheckoutPage() {

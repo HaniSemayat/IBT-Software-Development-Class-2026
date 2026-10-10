@@ -19,8 +19,19 @@ export const metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ),
-  title: "Addis Eats",
-  description: "Discover delicious food in Addis Ababa.",
+  title: {
+    default: "Addis Eats | Ethiopian Food Delivery",
+    template: "%s | Addis Eats",
+  },
+  description:
+    "Discover Ethiopian favorites, fresh meals, and drinks on Addis Eats. Explore the menu and order your next meal.",
+  openGraph: {
+    type: "website",
+    siteName: "Addis Eats",
+    title: "Addis Eats | Ethiopian Food Delivery",
+    description:
+      "Discover Ethiopian favorites, fresh meals, and drinks on Addis Eats.",
+  },
 };
 
 export default async function RootLayout({ children }) {

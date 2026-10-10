@@ -1,5 +1,14 @@
 ﻿import Link from "next/link";
 
+export const metadata = {
+  title: "Home",
+  description:
+    "Discover Ethiopian favorites, pizzas, burgers, and drinks with Addis Eats food delivery.",
+  alternates: {
+    canonical: "/",
+  },
+};
+
 export default function HomePage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">

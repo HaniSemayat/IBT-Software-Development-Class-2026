@@ -4,6 +4,15 @@ import CategoryBar from "./CategoryBar";
 import SearchBox from "./SearchBox";
 import { getDishes } from "../../lib/dishes";
 
+export const metadata = {
+  title: "Menu",
+  description:
+    "Explore Ethiopian dishes, pizzas, burgers, and drinks on the Addis Eats menu.",
+  alternates: {
+    canonical: "/menu",
+  },
+};
+
 const categories = [
   "All",
   "Ethiopian",

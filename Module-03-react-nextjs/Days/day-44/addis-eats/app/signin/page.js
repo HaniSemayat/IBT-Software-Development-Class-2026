@@ -1,5 +1,14 @@
 import SignInForm from "./SignInForm";
 
+export const metadata = {
+  title: "Sign In",
+  description: "Sign in to your Addis Eats account.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function SignInPage({ searchParams }) {
   const params = await searchParams;
   const next = params.next ?? "/";
