@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-import { validateOrder } from "../lib/schema";
+import { validateOrder, validateCartItems } from "../lib/schema";
 
 import {
   createOrder,
@@ -56,7 +56,30 @@ export async function placeOrder(previousState, formData) {
   const session = await getSession();
 
   if (!session) {
-    throw new Error("Not signed in");
+    return {
+      error: "Please sign in before placing an order.",
+      fieldErrors: {},
+    };
+  }
+
+  let submittedItems;
+
+  try {
+    submittedItems = JSON.parse(formData.get("cartItems") || "[]");
+  } catch {
+    return {
+      error: "Your cart data is invalid. Please review your cart.",
+      fieldErrors: {},
+    };
+  }
+
+  const validatedCart = validateCartItems(submittedItems);
+
+  if (validatedCart.error) {
+    return {
+      error: validatedCart.error,
+      fieldErrors: {},
+    };
   }
 
   const order = {
@@ -65,8 +88,8 @@ export async function placeOrder(previousState, formData) {
     phone: formData.get("phone"),
     area: formData.get("area"),
     notes: formData.get("notes"),
-    items: [],
-    total: 0,
+    items: validatedCart.items,
+    total: validatedCart.total,
   };
 
   const fieldErrors = validateOrder(order);
@@ -81,10 +104,12 @@ export async function placeOrder(previousState, formData) {
   const createdOrder = await createOrder(order);
 
   revalidatePath("/checkout");
+  revalidatePath("/orders");
 
   return {
     success: true,
     order: createdOrder,
+    fieldErrors: {},
   };
 }
 

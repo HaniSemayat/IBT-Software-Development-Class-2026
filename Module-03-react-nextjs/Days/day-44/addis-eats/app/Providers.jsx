@@ -1,6 +1,11 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+} from "react";
 
 const CartContext = createContext(null);
 
@@ -49,6 +54,10 @@ export default function Providers({ children }) {
     );
   }
 
+  const clearCart = useCallback(() => {
+    setItems([]);
+  }, []);
+
   const total = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -62,6 +71,7 @@ export default function Providers({ children }) {
         increaseQuantity,
         decreaseQuantity,
         total,
+        clearCart,
       }}
     >
       {children}

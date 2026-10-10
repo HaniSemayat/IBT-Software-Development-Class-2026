@@ -1,5 +1,8 @@
 import { getSession } from "../../../lib/session";
-import { validateOrder } from "../../../lib/schema";
+import {
+  validateOrder,
+  validateCartItems,
+} from "../../../lib/schema";
 import { createOrder } from "../../../lib/orders";
 
 export async function POST(request) {
@@ -34,14 +37,31 @@ export async function POST(request) {
     );
   }
 
+  const validatedCart = validateCartItems(body.items);
+
+  if (validatedCart.error) {
+    return Response.json(
+      {
+        error: "Validation failed",
+        fieldErrors: {
+          items: validatedCart.error,
+        },
+      },
+      { status: 422 }
+    );
+  }
+
   const order = {
     userId: session.id,
     name: body.name,
     phone: body.phone,
     area: body.area,
-    notes: body.notes,
-    items: body.items ?? [],
-    total: body.total ?? 0,
+    notes:
+      typeof body.notes === "string"
+        ? body.notes
+        : "",
+    items: validatedCart.items,
+    total: validatedCart.total,
   };
 
   const fieldErrors = validateOrder(order);
@@ -59,7 +79,9 @@ export async function POST(request) {
   try {
     const createdOrder = await createOrder(order);
 
-    return Response.json(createdOrder, { status: 201 });
+    return Response.json(createdOrder, {
+      status: 201,
+    });
   } catch {
     return Response.json(
       { error: "Unable to create the order." },

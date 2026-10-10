@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
-
+import { useCart } from "../Providers";
 import { placeOrder } from "../actions";
 
 const initialState = {
@@ -12,8 +12,16 @@ const initialState = {
 };
 
 export default function CheckoutForm() {
+  const { items, total, clearCart } = useCart();
+
   const [state, formAction, pending] =
     useActionState(placeOrder, initialState);
+
+  useEffect(() => {
+    if (state.success) {
+      clearCart();
+    }
+  }, [state.success, clearCart]);
 
   if (state.success) {
     return (
@@ -22,15 +30,14 @@ export default function CheckoutForm() {
           <h2 className="text-2xl font-bold text-green-800">
             Order placed successfully!
           </h2>
-
           <p className="mt-2 text-green-700">
-            Thank you for ordering from Addis Eats.
+            Your order total was {state.order.total} ETB.
           </p>
         </div>
 
         <Link
           href="/menu"
-          className="mt-6 inline-block rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700"
+          className="mt-6 inline-block rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white"
         >
           Order More Food
         </Link>
@@ -49,95 +56,90 @@ export default function CheckoutForm() {
         </p>
       )}
 
-      <div>
-        <label
-          htmlFor="name"
-          className="mb-2 block text-sm font-semibold text-gray-800"
-        >
-          Name
-        </label>
-
-        <input
-          id="name"
-          name="name"
-          type="text"
-          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-        />
-
-        {state.fieldErrors?.name && (
-          <p role="alert" className="mt-2 text-sm text-red-600">
-            {state.fieldErrors.name}
+      {items.length === 0 ? (
+        <p className="rounded-lg bg-orange-50 p-4 text-orange-800">
+          Your cart is empty. Add dishes from the menu before checking out.
+        </p>
+      ) : (
+        <section className="rounded-xl border p-4">
+          <h2 className="font-bold">Order summary</h2>
+          {items.map((item) => (
+            <p key={item.id} className="mt-2 text-sm">
+              {item.name} × {item.quantity}
+            </p>
+          ))}
+          <p className="mt-3 font-bold">
+            Estimated total: {total} ETB
           </p>
+        </section>
+      )}
+
+      <input
+        type="hidden"
+        name="cartItems"
+        value={JSON.stringify(
+          items.map(({ id, quantity }) => ({ id, quantity }))
         )}
-      </div>
+      />
 
-      <div>
-        <label
-          htmlFor="phone"
-          className="mb-2 block text-sm font-semibold text-gray-800"
-        >
-          TeleBirr Phone
-        </label>
-
-        <input
-          id="phone"
-          name="phone"
-          type="tel"
-          placeholder="09XXXXXXXX"
-          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-        />
-
-        {state.fieldErrors?.phone && (
-          <p role="alert" className="mt-2 text-sm text-red-600">
-            {state.fieldErrors.phone}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label
-          htmlFor="area"
-          className="mb-2 block text-sm font-semibold text-gray-800"
-        >
-          Delivery Area
-        </label>
-
-        <input
-          id="area"
-          name="area"
-          type="text"
-          defaultValue="Bole"
-          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-        />
-
-        {state.fieldErrors?.area && (
-          <p role="alert" className="mt-2 text-sm text-red-600">
-            {state.fieldErrors.area}
-          </p>
-        )}
-      </div>
+      {[
+        { name: "name", label: "Name", type: "text" },
+        {
+          name: "phone",
+          label: "TeleBirr Phone",
+          type: "tel",
+          placeholder: "09XXXXXXXX",
+        },
+        {
+          name: "area",
+          label: "Delivery Area",
+          type: "text",
+          defaultValue: "Bole",
+        },
+      ].map((field) => (
+        <div key={field.name}>
+          <label
+            htmlFor={field.name}
+            className="mb-2 block text-sm font-semibold text-gray-800"
+          >
+            {field.label}
+          </label>
+          <input
+            id={field.name}
+            name={field.name}
+            type={field.type}
+            placeholder={field.placeholder}
+            defaultValue={field.defaultValue}
+            className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+          />
+          {state.fieldErrors?.[field.name] && (
+            <p role="alert" className="mt-2 text-sm text-red-600">
+              {state.fieldErrors[field.name]}
+            </p>
+          )}
+        </div>
+      ))}
 
       <div>
         <label
           htmlFor="notes"
           className="mb-2 block text-sm font-semibold text-gray-800"
         >
-          Notes <span className="font-normal text-gray-500">(optional)</span>
+          Notes (optional)
         </label>
-
         <textarea
           id="notes"
           name="notes"
-          rows="4"
+          rows={4}
           placeholder="Any delivery instructions?"
-          className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+          className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
       </div>
 
       <button
         type="submit"
-        disabled={pending}
-        className="w-full rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+        disabled={pending || items.length === 0}
+        className="w-full rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending ? "Placing Order..." : "Place Order"}
       </button>
