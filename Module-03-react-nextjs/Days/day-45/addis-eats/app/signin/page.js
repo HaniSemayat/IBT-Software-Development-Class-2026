@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SignInForm from "./SignInForm";
 
 export const metadata = {
@@ -30,6 +31,16 @@ export default async function SignInPage({ searchParams }) {
       <div className="mt-8">
         <SignInForm next={next} />
       </div>
+
+      <p className="mt-6 text-sm text-gray-600">
+        Do not have an account?{" "}
+        <Link
+          href="/signup"
+          className="font-semibold text-orange-600 hover:text-orange-700"
+        >
+          Create account
+        </Link>
+      </p>
     </main>
   );
 }

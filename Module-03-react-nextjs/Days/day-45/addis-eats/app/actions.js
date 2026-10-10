@@ -1,5 +1,6 @@
-﻿"use server";
+"use server";
 
+import { createUser, getUserByEmail } from "../lib/users";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -11,12 +12,55 @@ import {
   markCancelled,
 } from "../lib/orders";
 
-import { getUserByEmail } from "../lib/users";
 import {
   createSession,
   destroySession,
   getSession,
 } from "../lib/session";
+
+
+export async function signUp(previousState, formData) {
+  const name = formData.get("name");
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  if (
+    typeof name !== "string" ||
+    name.trim().length < 2 ||
+    name.trim().length > 80
+  ) {
+    return {
+      error: "Name must be between 2 and 80 characters.",
+      success: false,
+    };
+  }
+
+  if (
+    typeof email !== "string" ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+  ) {
+    return {
+      error: "Enter a valid email address.",
+      success: false,
+    };
+  }
+
+  if (typeof password !== "string" || password.length < 8) {
+    return {
+      error: "Password must contain at least 8 characters.",
+      success: false,
+    };
+  }
+
+  const result = await createUser({ name, email, password });
+
+  if (result.error) {
+    return { error: result.error, success: false };
+  }
+
+  redirect("/signin?registered=1");
+}
+
 
 export async function signIn(previousState, formData) {
   const email = formData.get("email");

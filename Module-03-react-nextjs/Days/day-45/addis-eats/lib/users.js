@@ -1,4 +1,5 @@
-﻿const users = [
+﻿
+const users = [
   {
     id: "user-1",
     name: "Addis Tesfa",
@@ -16,9 +17,31 @@
 ];
 
 export async function getUserByEmail(email) {
+  if (typeof email !== "string") return null;
+
   return (
     users.find(
-      (user) => user.email.toLowerCase() === email.toLowerCase()
+      (user) => user.email.toLowerCase() === email.trim().toLowerCase()
     ) ?? null
   );
+}
+
+export async function createUser({ name, email, password }) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (await getUserByEmail(normalizedEmail)) {
+    return { error: "An account with this email already exists." };
+  }
+
+  const user = {
+    id: `user-${crypto.randomUUID()}`,
+    name: name.trim(),
+    email: normalizedEmail,
+    password,
+    role: "customer",
+  };
+
+  users.push(user);
+
+  return { user };
 }
