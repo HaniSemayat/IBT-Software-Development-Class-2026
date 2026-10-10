@@ -1,7 +1,16 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import { getSession } from "../../lib/session";
 import { getOrdersByUser } from "../../lib/orders";
 import Link from "next/link";
+
+export const metadata = {
+  title: "My Orders",
+  description: "View your Addis Eats order history.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function OrdersPage() {
   const session = await getSession();

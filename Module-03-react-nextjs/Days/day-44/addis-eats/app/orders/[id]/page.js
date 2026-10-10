@@ -3,6 +3,15 @@ import { getSession } from "../../../lib/session";
 import { getOrderForUser } from "../../../lib/orders";
 import OrderStatus from "./OrderStatus";
 
+export const metadata = {
+  title: "Order Details",
+  description: "View the status of your Addis Eats order.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function OrderPage({ params }) {
   const { id } = await params;
 

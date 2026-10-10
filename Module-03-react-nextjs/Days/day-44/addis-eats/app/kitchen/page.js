@@ -1,5 +1,14 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import { getSession } from "../../lib/session";
+
+export const metadata = {
+  title: "Kitchen Dashboard",
+  description: "Staff-only Addis Eats kitchen dashboard.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function KitchenPage() {
   const session = await getSession();
