@@ -1,4 +1,6 @@
-﻿import CheckoutForm from "./CheckoutForm";
+﻿import { redirect } from "next/navigation";
+import { getSession } from "../../lib/session";
+import CheckoutForm from "./CheckoutForm";
 
 export const metadata = {
   title: "Checkout",
@@ -11,7 +13,13 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function CheckoutPage() {
+export default async function CheckoutPage() {
+  const session = await getSession();
+
+  if (!session) {
+    redirect("/signin?next=/checkout");
+  }
+
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
       <div className="mb-8">

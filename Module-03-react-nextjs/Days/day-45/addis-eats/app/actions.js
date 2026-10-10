@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -39,11 +39,16 @@ export async function signIn(previousState, formData) {
     role: user.role,
   });
 
-  if (!next.startsWith("/") || next.startsWith("//")) {
-    redirect("/");
-  }
+  const safeNext =
+    typeof next === "string" &&
+    next.startsWith("/") &&
+    !next.startsWith("//") &&
+    !next.includes("\\") &&
+    !/[\r\n]/.test(next)
+      ? next
+      : "/";
 
-  redirect(next);
+  redirect(safeNext);
 }
 
 export async function signOut() {
@@ -131,3 +136,4 @@ export async function cancelOrder(orderId) {
   revalidatePath(`/orders/${orderId}`);
   revalidatePath("/orders");
 }
+
