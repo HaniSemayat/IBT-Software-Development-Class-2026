@@ -1,6 +1,6 @@
-import Image from "next/image";
-import { notFound } from "next/navigation";
+﻿import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getDish, getDishes } from "../../../lib/dishes";
 import AddToCartButton from "../../../components/AddToCartButton";
 
@@ -10,6 +10,31 @@ export async function generateStaticParams() {
   return dishes.map((dish) => ({
     id: String(dish.id),
   }));
+}
+
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const dish = await getDish(id);
+
+  if (!dish) {
+    notFound();
+  }
+
+  const title = `${dish.name} — ${dish.price} ETB`;
+  const description = `${dish.name} is available from Addis Eats for ${dish.price} ETB. Explore the menu and order food in Addis Ababa.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/menu/${dish.id}`,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+    },
+  };
 }
 
 export default async function DishPage({ params }) {
