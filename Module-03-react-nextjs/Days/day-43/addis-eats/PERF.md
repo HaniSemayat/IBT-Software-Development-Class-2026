@@ -2,7 +2,7 @@
 
 ## Goal
 
-Measure the production application, document optimization experiments, and use Lighthouse evidence to identify future improvements.
+Measure the production application, document optimization experiments, and use Lighthouse evidence to identify further improvements.
 
 ## Test Setup
 
@@ -14,6 +14,8 @@ Measure the production application, document optimization experiments, and use L
 - Initial page load
 - URL: `http://localhost:3000/menu`
 - Production build: `npm run build`, followed by `npm run start`
+
+These measurements are individual runs, not a controlled benchmark. Simulated network conditions and main-thread activity can cause results to vary.
 
 ## Baseline
 
@@ -81,7 +83,7 @@ Findings:
 
 ## Image Optimization
 
-The menu now uses local WebP food images and Next.js `Image`.
+The menu uses local WebP food images and Next.js `Image`.
 
 The implementation includes:
 
@@ -95,9 +97,9 @@ The browser Network panel confirmed requests such as:
 
 `/_next/image?url=%2Fdishes%2Ftibs.webp&w=640&q=75`
 
-This confirms the image optimization endpoint is being used. It does not, by itself, prove an improvement in overall page performance.
+This confirms that the Next.js image optimization endpoint is being used. It does not, by itself, prove an improvement in overall page performance.
 
-Lighthouse's estimated 80 KiB image-delivery savings indicate that image delivery still deserves investigation. Review the specific images identified by the audit before making further changes.
+Lighthouse previously estimated 80 KiB in potential image-delivery savings. The exact resources identified by the audit should be reviewed before making further image changes.
 
 ## October 10 Experiments — Server Rendering and Image Priority
 
@@ -115,6 +117,7 @@ The menu page now fetches its initial dishes in the Server Component and passes 
 | SI | 1.5 s |
 
 Findings:
+
 - Unused JavaScript: estimated 26 KiB savings
 - Main-thread work: 4.2 s
 - JavaScript execution: 1.7 s
@@ -123,7 +126,7 @@ Findings:
 
 ### Run 5 — Explicit LCP image priority
 
-The first image on the default first page now receives `priority`, `fetchPriority="high"`, and `loading="eager"`. Other images use automatic fetch priority and lazy loading.
+The first image on the default first page receives `priority`, `fetchPriority="high"`, and `loading="eager"`. Other images use automatic fetch priority and lazy loading.
 
 | Metric | Result |
 |---|---:|
@@ -135,59 +138,65 @@ The first image on the default first page now receives `priority`, `fetchPriorit
 | SI | 1.8 s |
 
 LCP breakdown:
+
 - Time to First Byte: 70 ms
 - Resource load delay: 170 ms
 - Resource load duration: 130 ms
 - Element render delay: 440 ms
 
 Other findings:
+
 - Legacy JavaScript: estimated 13 KiB savings
 - Main-thread work: 3.9 s
 - JavaScript execution: 1.7 s
 - Unused JavaScript: estimated 26 KiB savings
 - 19 long main-thread tasks
-- Render-blocking requests remain an audit finding
+- Render-blocking requests remained an audit finding
 
-The resource-load delay was substantially lower in this run than the approximately 990 ms observed in an earlier breakdown. However, LCP increased from 3.1 s to 3.4 s, and the performance score increased by only one point. These measurements do not establish a consistent overall improvement.
+The resource-load delay was approximately 170 ms in this run, compared with approximately 990 ms in an earlier breakdown. However, LCP increased from 3.1 s to 3.4 s between Runs 4 and 5. The performance score increased by only one point. These results do not establish a consistent overall performance improvement.
 
+## Interpretation
 
-The measurements are mixed rather than evidence of a consistent performance improvement.
+The results are mixed.
 
 Compared with the original baseline, the latest run has:
 
-- Performance score lower by 18 points
-- FCP unchanged at 0.8 s
-- LCP slower by 1.6 s
-- TBT higher by 310 ms
-- CLS unchanged at 0
-- Speed Index slower by 0.6 s
+- Performance score: 15 points lower
+- FCP: 0.1 s slower
+- LCP: 0.8 s slower
+- TBT: 450 ms higher
+- CLS: unchanged at 0
+- Speed Index: 0.5 s slower
 
-The October 8 run had a lower LCP but substantially higher TBT than the baseline. The October 9 run reduced TBT compared with October 8, while LCP increased to 4.2 s.
+The October 8 run had a lower LCP than the baseline but substantially higher TBT. Later runs varied in both LCP and TBT.
 
-These runs are not a perfectly controlled experiment: the application content changed when real food images were introduced, and Lighthouse measurements vary under simulated network and device conditions. The results do not establish that one specific code change caused the differences.
+The reduced resource-load delay is promising, but LCP remains above the commonly recommended 2.5-second threshold for a good user experience. Main-thread work and the 440 ms element render delay are also worth investigating.
 
-INP was not measured in these initial-load reports. It requires interaction-based measurement and should not be inferred from TBT.
+These runs are not a perfectly controlled experiment. Application content changed as real food images and new rendering behavior were introduced, and Lighthouse results vary under simulated conditions. The measurements do not prove that one specific code change caused the differences.
+
+INP was not directly measured in these initial-load reports. TBT is a diagnostic metric and should not be presented as an INP measurement.
 
 ## Next Optimization Priorities
 
-1. Open Lighthouse's image-delivery and LCP audits to identify the exact resources involved.
-2. Verify which element is the LCP element and whether its image request is discovered promptly.
-3. Review image dimensions, responsive sizes, and delivered file sizes.
-4. Profile long main-thread tasks before removing client-side functionality or dependencies.
-5. Repeat Lighthouse runs under consistent conditions and compare more than one run before claiming an improvement.
+1. Inspect the LCP element and its render delay in Lighthouse.
+2. Review the exact image-delivery findings and delivered image sizes.
+3. Profile long main-thread tasks before removing client functionality or dependencies.
+4. Repeat Lighthouse runs under consistent conditions and compare multiple runs.
+5. Measure interaction responsiveness separately if reporting INP.
 
 ## Environment and Rendering Notes
 
-- `.env.example` documents the expected environment variable names.
+- `.env.example` documents expected environment variable names.
 - `.env.local` is intended for local values and must not be committed.
+- `.env*.local` is ignored by Git.
 - `NEXT_PUBLIC_SITE_URL` supplies the public site URL used by `metadataBase`.
-- `next/font` is already used for font optimization.
+- `next/font` is used for font optimization.
 - No third-party script was added without a genuine application requirement.
 
 ## Conclusion
 
-Day 43 includes local WebP images, Next.js Image optimization, responsive image sizing, an explicitly prioritized first menu image, server-rendered initial menu data, and repeated production Lighthouse measurements.
+Day 43 includes local WebP images, Next.js image optimization, responsive image sizing, explicit priority for the first menu image, server-rendered initial menu data, environment-variable documentation, and repeated production Lighthouse measurements.
 
-The latest recorded `/menu` run scored 73, with FCP 0.9 s, LCP 3.4 s, TBT 800 ms, CLS 0, and Speed Index 1.8 s. Results varied across runs. The reduced LCP resource-load delay is promising, but LCP remains above the commonly recommended 2.5-second good threshold, and main-thread work remains an area for investigation.
+The latest recorded `/menu` run scored 73, with FCP 0.9 s, LCP 3.4 s, TBT 800 ms, CLS 0, and Speed Index 1.8 s.
 
-The next step is to profile the LCP element's render delay and the long main-thread tasks, then repeat measurements under consistent conditions. Do not claim that overall performance has been conclusively improved based on these runs alone.
+The image-loading changes reduced the observed resource-load delay in the latest breakdown, but overall performance improvement is not conclusive. LCP and main-thread work remain areas for further investigation. The report records these limitations rather than claiming that the optimization work has definitively improved all metrics.
