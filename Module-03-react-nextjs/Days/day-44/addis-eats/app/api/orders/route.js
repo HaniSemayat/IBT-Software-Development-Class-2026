@@ -12,7 +12,27 @@ export async function POST(request) {
     );
   }
 
-  const body = await request.json();
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json(
+      { error: "Request body must contain valid JSON." },
+      { status: 400 }
+    );
+  }
+
+  if (
+    body === null ||
+    typeof body !== "object" ||
+    Array.isArray(body)
+  ) {
+    return Response.json(
+      { error: "Request body must be a JSON object." },
+      { status: 400 }
+    );
+  }
 
   const order = {
     userId: session.id,
@@ -36,7 +56,14 @@ export async function POST(request) {
     );
   }
 
-  const createdOrder = await createOrder(order);
+  try {
+    const createdOrder = await createOrder(order);
 
-  return Response.json(createdOrder, { status: 201 });
+    return Response.json(createdOrder, { status: 201 });
+  } catch {
+    return Response.json(
+      { error: "Unable to create the order." },
+      { status: 500 }
+    );
+  }
 }
