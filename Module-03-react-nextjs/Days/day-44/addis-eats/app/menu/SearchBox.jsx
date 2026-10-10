@@ -83,7 +83,6 @@ export default function SearchBox({ initialData }) {
                       width={800}
                       height={600}
                       sizes="(max-width: 640px) calc(100vw - 3rem), (max-width: 1024px) calc(50vw - 3rem), 33vw"
-                      priority={page === 1 && debouncedTerm === "" && index === 0}
                       fetchPriority={
                         page === 1 && debouncedTerm === "" && index === 0
                           ? "high"
