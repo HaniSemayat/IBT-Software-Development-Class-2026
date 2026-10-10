@@ -6,7 +6,7 @@ import Link from "next/link";
 import useSWR from "swr";
 import fetcher from "../../lib/fetcher";
 
-export default function SearchBox() {
+export default function SearchBox({ initialData }) {
   const [term, setTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [page, setPage] = useState(1);
@@ -20,11 +20,14 @@ export default function SearchBox() {
     return () => clearTimeout(timer);
   }, [term]);
 
+  const isInitialPage = debouncedTerm === "" && page === 1;
+
   const { data, error, isLoading } = useSWR(
     `/api/dishes?q=${encodeURIComponent(debouncedTerm)}&page=${page}`,
     fetcher,
     {
       keepPreviousData: true,
+      fallbackData: isInitialPage ? initialData : undefined,
     }
   );
 
@@ -81,6 +84,16 @@ export default function SearchBox() {
                       height={600}
                       sizes="(max-width: 640px) calc(100vw - 3rem), (max-width: 1024px) calc(50vw - 3rem), 33vw"
                       priority={page === 1 && debouncedTerm === "" && index === 0}
+                      fetchPriority={
+                        page === 1 && debouncedTerm === "" && index === 0
+                          ? "high"
+                          : "auto"
+                      }
+                      loading={
+                        page === 1 && debouncedTerm === "" && index === 0
+                          ? "eager"
+                          : "lazy"
+                      }
                       className="h-full w-full object-cover"
                     />
                   </div>

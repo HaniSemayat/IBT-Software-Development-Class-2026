@@ -99,7 +99,57 @@ This confirms the image optimization endpoint is being used. It does not, by its
 
 Lighthouse's estimated 80 KiB image-delivery savings indicate that image delivery still deserves investigation. Review the specific images identified by the audit before making further changes.
 
-## Interpretation
+## October 10 Experiments — Server Rendering and Image Priority
+
+### Run 4 — Server-rendered initial menu
+
+The menu page now fetches its initial dishes in the Server Component and passes the first page to the client search component as `initialData`. SWR uses this data for the initial unfiltered page, while subsequent searches and pagination still use the API.
+
+| Metric | Result |
+|---|---:|
+| Performance | 72 |
+| FCP | 0.9 s |
+| LCP | 3.1 s |
+| TBT | 1,000 ms |
+| CLS | 0 |
+| SI | 1.5 s |
+
+Findings:
+- Unused JavaScript: estimated 26 KiB savings
+- Main-thread work: 4.2 s
+- JavaScript execution: 1.7 s
+- 13 long main-thread tasks
+- Image delivery: estimated 80 KiB savings
+
+### Run 5 — Explicit LCP image priority
+
+The first image on the default first page now receives `priority`, `fetchPriority="high"`, and `loading="eager"`. Other images use automatic fetch priority and lazy loading.
+
+| Metric | Result |
+|---|---:|
+| Performance | 73 |
+| FCP | 0.9 s |
+| LCP | 3.4 s |
+| TBT | 800 ms |
+| CLS | 0 |
+| SI | 1.8 s |
+
+LCP breakdown:
+- Time to First Byte: 70 ms
+- Resource load delay: 170 ms
+- Resource load duration: 130 ms
+- Element render delay: 440 ms
+
+Other findings:
+- Legacy JavaScript: estimated 13 KiB savings
+- Main-thread work: 3.9 s
+- JavaScript execution: 1.7 s
+- Unused JavaScript: estimated 26 KiB savings
+- 19 long main-thread tasks
+- Render-blocking requests remain an audit finding
+
+The resource-load delay was substantially lower in this run than the approximately 990 ms observed in an earlier breakdown. However, LCP increased from 3.1 s to 3.4 s, and the performance score increased by only one point. These measurements do not establish a consistent overall improvement.
+
 
 The measurements are mixed rather than evidence of a consistent performance improvement.
 
@@ -136,6 +186,8 @@ INP was not measured in these initial-load reports. It requires interaction-base
 
 ## Conclusion
 
-Day 43 now includes WebP dish assets, Next.js image optimization, responsive image sizing, and repeated production Lighthouse measurements.
+Day 43 includes local WebP images, Next.js Image optimization, responsive image sizing, an explicitly prioritized first menu image, server-rendered initial menu data, and repeated production Lighthouse measurements.
 
-The current performance score is 70. The next step is to investigate the specific LCP and image-delivery findings rather than claiming success from the use of an optimization API alone.
+The latest recorded `/menu` run scored 73, with FCP 0.9 s, LCP 3.4 s, TBT 800 ms, CLS 0, and Speed Index 1.8 s. Results varied across runs. The reduced LCP resource-load delay is promising, but LCP remains above the commonly recommended 2.5-second good threshold, and main-thread work remains an area for investigation.
+
+The next step is to profile the LCP element's render delay and the long main-thread tasks, then repeat measurements under consistent conditions. Do not claim that overall performance has been conclusively improved based on these runs alone.
