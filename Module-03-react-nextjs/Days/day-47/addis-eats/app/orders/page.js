@@ -1,4 +1,4 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "../../lib/session";
 import { getOrdersByUser } from "../../lib/orders";
@@ -20,16 +20,21 @@ export default async function OrdersPage({ searchParams }) {
   }
 
   const params = await searchParams;
-  const requestedSort = Array.isArray(params?.sort) ? params.sort[0] : params?.sort;
-  const requestedDir = Array.isArray(params?.dir) ? params.dir[0] : params?.dir;
-  const requestedPage = Array.isArray(params?.page) ? params.page[0] : params?.page;
+  const requestedSort = Array.isArray(params?.sort)
+    ? params.sort[0]
+    : params?.sort;
+  const requestedDir = Array.isArray(params?.dir)
+    ? params.dir[0]
+    : params?.dir;
+  const requestedPage = Array.isArray(params?.page)
+    ? params.page[0]
+    : params?.page;
 
   const sort = validSorts.includes(requestedSort) ? requestedSort : "id";
   const dir = requestedDir === "asc" ? "asc" : "desc";
   const parsedPage = Number(requestedPage);
-  const safePage = Number.isSafeInteger(parsedPage) && parsedPage > 0
-    ? parsedPage
-    : 1;
+  const safePage =
+    Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
   const allOrders = await getOrdersByUser(session.id);
 
@@ -61,12 +66,24 @@ export default async function OrdersPage({ searchParams }) {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-12">
-      <h1 className="text-3xl font-bold tracking-tight text-gray-950">
-        My Orders
-      </h1>
-      <p className="mt-2 text-gray-700">
-        Orders belonging to {session.name}. Sort by selecting a table heading.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-950">
+            My Orders
+          </h1>
+          <p className="mt-2 text-gray-700">
+            Orders belonging to {session.name}. Sort by selecting a table heading.
+          </p>
+        </div>
+
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a
+          href="/api/orders/export"
+          className="..."
+        >
+          Export all orders (CSV)
+        </a>
+      </div>
 
       {allOrders.length === 0 ? (
         <section className="mt-8 rounded-xl border border-dashed border-gray-300 bg-white p-6">

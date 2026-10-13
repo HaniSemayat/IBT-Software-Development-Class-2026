@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import { formatETB } from "../../lib/format";
 
 const columns = [
   { key: "id", label: "Order" },
@@ -6,12 +7,6 @@ const columns = [
   { key: "status", label: "Status" },
   { key: "total", label: "Total (ETB)" },
 ];
-
-const money = new Intl.NumberFormat("en-ET", {
-  style: "currency",
-  currency: "ETB",
-  maximumFractionDigits: 0,
-});
 
 export default function OrderTable({ orders, sort, dir, page, totalPages }) {
   function sortHref(key) {
@@ -60,7 +55,10 @@ export default function OrderTable({ orders, sort, dir, page, totalPages }) {
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order.id} className="border-b border-gray-100 last:border-0">
+              <tr
+                key={order.id}
+                className="border-b border-gray-100 last:border-0"
+              >
                 <th scope="row" className="px-4 py-4 font-semibold text-gray-900">
                   <Link
                     href={`/orders/${order.id}`}
@@ -70,9 +68,11 @@ export default function OrderTable({ orders, sort, dir, page, totalPages }) {
                   </Link>
                 </th>
                 <td className="px-4 py-4 text-gray-800">{order.area}</td>
-                <td className="px-4 py-4 capitalize text-gray-800">{order.status}</td>
+                <td className="px-4 py-4 capitalize text-gray-800">
+                  {order.status.replaceAll("_", " ")}
+                </td>
                 <td className="px-4 py-4 text-right tabular-nums text-gray-900">
-                  {money.format(Number(order.total || 0))}
+                  {formatETB(order.total)}
                 </td>
               </tr>
             ))}
@@ -101,6 +101,7 @@ export default function OrderTable({ orders, sort, dir, page, totalPages }) {
               Previous
             </span>
           )}
+
           {page < totalPages ? (
             <Link
               href={pageHref(page + 1)}
