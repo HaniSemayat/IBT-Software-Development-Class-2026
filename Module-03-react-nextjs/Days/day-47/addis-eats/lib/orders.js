@@ -65,7 +65,27 @@ export async function getDashboardAnalytics() {
   const dailyOrders = new Map(days.map((day) => [day.date, day.orders]));
   const revenueByArea = new Map();
 
+  const statusLabels = [
+    { status: "placed", label: "Placed" },
+    { status: "preparing", label: "Preparing" },
+    { status: "ready", label: "Ready" },
+    { status: "out_for_delivery", label: "Out for delivery" },
+    { status: "delivered", label: "Delivered" },
+    { status: "cancelled", label: "Cancelled" },
+  ];
+
+  const statusCounts = new Map(
+    statusLabels.map(({ status }) => [status, 0])
+  );
+
   for (const order of orders) {
+    if (statusCounts.has(order.status)) {
+      statusCounts.set(
+        order.status,
+        statusCounts.get(order.status) + 1
+      );
+    }
+
     const orderDate = order.createdAt
       ? new Date(order.createdAt).toISOString().slice(0, 10)
       : null;
@@ -99,9 +119,16 @@ export async function getDashboardAnalytics() {
     orders: dailyOrders.get(day.date),
   }));
 
+  const statusBreakdown = statusLabels.map(({ status, label }) => ({
+    status,
+    label,
+    count: statusCounts.get(status),
+  }));
+
   return {
     revenue,
     ordersOverTime,
+    statusBreakdown,
     dateRange: {
       start: days[0].date,
       end: days[days.length - 1].date,

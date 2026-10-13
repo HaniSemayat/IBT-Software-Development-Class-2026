@@ -4,6 +4,7 @@ import { getSession } from "../../lib/session";
 import { getDashboardAnalytics } from "../../lib/orders";
 import RevenueChart from "./RevenueChart";
 import OrdersLineChart from "./OrdersLineChart";
+import StatusBreakdownChart from "./StatusBreakdownChart";
 
 export const metadata = {
   title: "Analytics Dashboard",
@@ -87,6 +88,7 @@ export default async function DashboardPage() {
       <div className="grid gap-6 xl:grid-cols-2">
         <RevenueChart data={analytics.revenue} />
         <OrdersLineChart data={analytics.ordersOverTime} />
+        <StatusBreakdownChart data={analytics.statusBreakdown} />
       </div>
 
       <p className="text-sm text-gray-600">
