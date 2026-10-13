@@ -1,6 +1,7 @@
-﻿import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 import Providers from "./Providers";
 import UserMenu from "./UserMenu";
 import CartNavLink from "../components/CartNavLink";
