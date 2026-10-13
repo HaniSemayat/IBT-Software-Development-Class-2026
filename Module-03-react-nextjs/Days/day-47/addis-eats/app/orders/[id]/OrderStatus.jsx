@@ -1,55 +1,120 @@
-﻿"use client";
+"use client";
 
-import useSWR from "swr";
-import fetcher from "../../../lib/fetcher";
+import { useEffect, useState } from "react";
 import MapPanel from "../../../components/tracking/MapPanel";
 
+const TERMINAL_STATUSES = ["delivered", "cancelled"];
+
+function isTerminalStatus(status) {
+  return TERMINAL_STATUSES.includes(String(status).toLowerCase());
+}
+
 export default function OrderStatus({ id, initial }) {
-  const { data, error, isLoading } = useSWR(
-    `/api/orders/${id}`,
-    fetcher,
-    {
-      fallbackData: initial,
-      refreshInterval: 5000,
-    }
-  );
+  const [order, setOrder] = useState(initial);
+  const [connection, setConnection] = useState("connecting");
+  const [streamError, setStreamError] = useState("");
 
-  if (error) {
-    return (
-      <p className="rounded-lg bg-red-50 p-4 text-red-700">
-        Failed to load order.
-      </p>
-    );
-  }
+  useEffect(() => {
+    const source = new EventSource(`/api/orders/${id}/stream`);
 
-  if (isLoading && !data) {
-    return <p>Loading order...</p>;
-  }
+    let finished = false;
+
+    source.onopen = () => {
+      if (!finished) {
+        setConnection("connected");
+        setStreamError("");
+      }
+    };
+
+    source.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+
+        if (message.type === "order" && message.order) {
+          setOrder(message.order);
+          setStreamError("");
+
+          if (isTerminalStatus(message.order.status)) {
+            finished = true;
+            source.close();
+            setConnection("complete");
+          }
+        }
+
+        if (message.type === "error") {
+          finished = true;
+          source.close();
+          setConnection("stopped");
+          setStreamError(message.message || "The update stream stopped.");
+        }
+      } catch {
+        setStreamError("Received an unreadable order update.");
+      }
+    };
+
+    source.onerror = () => {
+      if (!finished) {
+        // EventSource reconnects automatically. Keep it open.
+        setConnection("reconnecting");
+      }
+    };
+
+    return () => {
+      finished = true;
+      source.close();
+    };
+  }, [id]);
 
   return (
-    <>
-      <section className="mt-8 rounded-2xl border bg-white p-6 text-gray-900 shadow-sm">
-        <p>
-          <strong>Name:</strong> {data.name}
-        </p>
+    <section className="space-y-6">
+      <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Order #{order.id}
+          </h2>
 
-        <p className="mt-2">
-          <strong>Phone:</strong> {data.phone}
-        </p>
+          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium capitalize text-gray-800">
+            {order.status}
+          </span>
+        </div>
 
-        <p className="mt-2">
-          <strong>Delivery Area:</strong> {data.area}
-        </p>
+        <div className="space-y-2 text-sm text-gray-700">
+          <p>
+            <strong>Name:</strong> {order.name}
+          </p>
+          <p>
+            <strong>Phone:</strong> {order.phone}
+          </p>
+          <p>
+            <strong>Delivery Area:</strong> {order.area}
+          </p>
+          <p>
+            <strong>Last updated:</strong>{" "}
+            {new Date(order.createdAt).toLocaleString("en-ET", {
+              timeZone: "Africa/Addis_Ababa",
+            })}
+          </p>
+        </div>
 
-        <p className="mt-2">
-          <strong>Status:</strong> {data.status}
-        </p>
+        <div className="mt-4 border-t border-gray-100 pt-4 text-sm">
+          <p aria-live="polite">
+            <strong>Live updates:</strong>{" "}
+            {connection === "connected" && "Connected"}
+            {connection === "connecting" && "Connecting…"}
+            {connection === "reconnecting" && "Connection interrupted; reconnecting…"}
+            {connection === "complete" && "Tracking complete"}
+            {connection === "stopped" && "Updates stopped"}
+          </p>
+
+          {streamError && (
+            <p role="status" className="mt-2 text-amber-700">
+              {streamError}
+            </p>
+          )}
+        </div>
       </section>
 
-      <MapPanel
-        courier={{ lat: 9.0192, lng: 38.7525 }}
-        destination={{ lat: 9.0054, lng: 38.7636 }}
-      />
-    </>
+      <MapPanel order={order} />
+    </section>
   );
 }

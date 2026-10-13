@@ -1,4 +1,4 @@
-﻿const orders = globalThis.__addisEatsOrders ?? [];
+const orders = globalThis.__addisEatsOrders ?? [];
 
 if (!globalThis.__addisEatsOrders) {
   globalThis.__addisEatsOrders = orders;
@@ -9,6 +9,7 @@ export async function createOrder(order) {
     id: orders.length + 1,
     status: "placed",
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     ...order,
   };
 
@@ -39,6 +40,7 @@ export async function markCancelled(orderId) {
 
   if (order) {
     order.status = "cancelled";
+    order.updatedAt = new Date().toISOString();
   }
 
   return order;
@@ -107,4 +109,35 @@ export async function getDashboardAnalytics() {
     totalOrders: orders.length,
     totalRevenue: revenue.reduce((sum, item) => sum + item.total, 0),
   };
+}
+
+
+export async function getAllOrders() {
+  return [...orders].sort((a, b) => b.id - a.id);
+}
+
+export async function setOrderStatus(orderId, status) {
+  const allowedStatuses = [
+    "placed",
+    "preparing",
+    "ready",
+    "out_for_delivery",
+    "delivered",
+    "cancelled",
+  ];
+
+  if (!allowedStatuses.includes(status)) {
+    throw new Error("Invalid order status.");
+  }
+
+  const order = await getOrder(orderId);
+
+  if (!order) {
+    return null;
+  }
+
+  order.status = status;
+  order.updatedAt = new Date().toISOString();
+
+  return order;
 }

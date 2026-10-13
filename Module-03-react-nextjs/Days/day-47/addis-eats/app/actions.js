@@ -10,6 +10,7 @@ import {
   createOrder,
   getOrderForUser,
   markCancelled,
+  setOrderStatus,
 } from "../lib/orders";
 
 import {
@@ -181,3 +182,32 @@ export async function cancelOrder(orderId) {
   revalidatePath("/orders");
 }
 
+
+
+export async function updateOrderStatus(formData) {
+  const session = await getSession();
+
+  if (!session || session.role !== "staff") {
+    throw new Error("Only authorized staff can update order status.");
+  }
+
+  const orderId = formData.get("orderId");
+  const status = formData.get("status");
+
+  if (typeof orderId !== "string" || !/^\d+$/.test(orderId)) {
+    throw new Error("Invalid order ID.");
+  }
+
+  await setOrderStatus(orderId, status);
+
+  const { getOrder } = await import("../lib/orders");
+  const updatedOrder = await getOrder(orderId);
+
+  if (!updatedOrder) {
+    throw new Error("Order not found.");
+  }
+
+  revalidatePath("/kitchen");
+  revalidatePath("/orders");
+  revalidatePath(`/orders/${orderId}`);
+}
