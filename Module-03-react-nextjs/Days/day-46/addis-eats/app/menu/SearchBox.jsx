@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import useSWR from "swr";
 import fetcher from "../../lib/fetcher";
+import AddToCartButton from "../../components/AddToCartButton";
 
 export default function SearchBox({ initialData }) {
   const [term, setTerm] = useState("");
@@ -32,19 +33,12 @@ export default function SearchBox({ initialData }) {
   );
 
   if (error) {
-    return (
-      <p className="mt-4 text-red-600">
-        Failed to load dishes.
-      </p>
-    );
+    return <p className="mt-4 text-red-600">Failed to load dishes.</p>;
   }
 
   return (
     <section className="mt-8">
-      <label
-        htmlFor="dish-search"
-        className="block text-sm font-semibold"
-      >
+      <label htmlFor="dish-search" className="block text-sm font-semibold">
         Search dishes
       </label>
 
@@ -58,23 +52,19 @@ export default function SearchBox({ initialData }) {
       />
 
       {isLoading && !data && (
-        <p className="mt-4 text-gray-600">
-          Loading...
-        </p>
+        <p className="mt-4 text-gray-600">Loading...</p>
       )}
 
       {data && (
         <>
           {data.dishes.length === 0 ? (
-            <p className="mt-6 text-gray-600">
-              No dishes found.
-            </p>
+            <p className="mt-6 text-gray-600">No dishes found.</p>
           ) : (
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {data.dishes.map((dish, index) => (
                 <article
                   key={dish.id}
-                  className="rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                  className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-orange-50">
                     <Image
@@ -105,12 +95,16 @@ export default function SearchBox({ initialData }) {
                     {dish.price} ETB
                   </p>
 
-                  <Link
-                    href={`/menu/${dish.id}`}
-                    className="mt-5 inline-block rounded-lg bg-gray-900 px-4 py-2 font-medium text-white transition hover:bg-gray-800"
-                  >
-                    View Dish
-                  </Link>
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    <Link
+                      href={`/menu/${dish.id}`}
+                      className="rounded-lg border border-gray-300 px-4 py-3 font-medium text-gray-800 transition hover:bg-gray-50"
+                    >
+                      View Dish
+                    </Link>
+
+                    <AddToCartButton dish={dish} />
+                  </div>
                 </article>
               ))}
             </div>

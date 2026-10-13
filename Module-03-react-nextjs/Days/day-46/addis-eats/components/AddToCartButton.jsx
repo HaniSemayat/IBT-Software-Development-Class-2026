@@ -1,23 +1,32 @@
-"use client";
+﻿"use client";
 
+import { useEffect, useState } from "react";
 import { useCart } from "../app/Providers";
-import { useRouter } from "next/navigation";
 
 export default function AddToCartButton({ dish }) {
   const { addToCart } = useCart();
-  const router = useRouter();
+  const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    if (!added) return;
+
+    const timer = setTimeout(() => setAdded(false), 1800);
+    return () => clearTimeout(timer);
+  }, [added]);
 
   function handleAddToCart() {
     addToCart(dish);
-    router.push("/cart");
+    setAdded(true);
   }
 
   return (
     <button
+      type="button"
       onClick={handleAddToCart}
-      className="rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700"
+      className="cursor-pointer rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700 active:scale-95"
+      aria-live="polite"
     >
-      Add to Cart
+      {added ? "Added to Cart ✓" : "Add to Cart"}
     </button>
   );
 }
