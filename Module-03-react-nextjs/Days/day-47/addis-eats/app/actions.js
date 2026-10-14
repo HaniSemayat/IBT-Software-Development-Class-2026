@@ -84,16 +84,21 @@ export async function signIn(previousState, formData) {
     role: user.role,
   });
 
-  const safeNext =
-    typeof next === "string" &&
-    next.startsWith("/") &&
-    !next.startsWith("//") &&
-    !next.includes("\\") &&
-    !/[\r\n]/.test(next)
-      ? next
-      : "/";
+    const safeNext =
+      typeof next === "string" &&
+      next.startsWith("/") &&
+      !next.startsWith("//") &&
+      !next.includes("\\") &&
+      !/[\r\n]/.test(next)
+        ? next
+        : "/";
 
-  redirect(safeNext);
+    const destination =
+      user.role === "staff" && safeNext === "/"
+        ? "/admin"
+        : safeNext;
+
+    redirect(destination);
 }
 
 export async function signOut() {
