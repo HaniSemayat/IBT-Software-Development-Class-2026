@@ -1,10 +1,11 @@
-import { Geist, Geist_Mono } from "next/font/google";
+﻿import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import Providers from "./Providers";
 import UserMenu from "./UserMenu";
 import CartNavLink from "../components/CartNavLink";
+import FavoritesNavLink from "../components/FavoritesNavLink";
 import { getSession } from "../lib/session";
 
 const geistSans = Geist({
@@ -64,6 +65,7 @@ export default async function RootLayout({ children }) {
                   Menu
                 </Link>
 
+                <FavoritesNavLink />
                 <CartNavLink />
 
                 <Link

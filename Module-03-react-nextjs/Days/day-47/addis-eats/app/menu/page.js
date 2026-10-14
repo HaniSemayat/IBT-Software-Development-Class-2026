@@ -1,28 +1,13 @@
+﻿"use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import CategoryBar from "./CategoryBar";
 import SearchBox from "./SearchBox";
-import { getDishes } from "../../lib/dishes";
+import { dishes } from "../../lib/dishes";
 
-export const metadata = {
-  title: "Menu",
-  description:
-    "Explore Ethiopian dishes, pizzas, burgers, and drinks on the Addis Eats menu.",
-  alternates: {
-    canonical: "/menu",
-  },
-};
-
-const categories = [
-  "All",
-  "Ethiopian",
-  "Pizza",
-  "Burgers",
-  "Drinks",
-];
-
-export default async function MenuPage() {
-  const dishes = await getDishes();
+export default function MenuPage() {
+  const [category, setCategory] = useState("All");
   const limit = 3;
 
   const initialData = {
@@ -31,14 +16,35 @@ export default async function MenuPage() {
     totalPages: Math.ceil(dishes.length / limit),
   };
 
+  const categories = ["All", "Ethiopian", "Pizza", "Burgers", "Drinks"];
+
   return (
-    <main>
-      <h1>Our Menu</h1>
+    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <header className="mb-8">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-600">
+          Addis Eats / Made for your cravings
+        </p>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          Explore our menu
+        </h1>
+        <p className="mt-3 max-w-2xl text-gray-600">
+          From Ethiopian favorites to quick bites and refreshing drinks, find your next favorite.
+        </p>
+      </header>
 
-      <CategoryBar categories={categories} />
-      <SearchBox initialData={initialData} />
+      <CategoryBar
+        categories={categories}
+        selectedCategory={category}
+        onSelect={setCategory}
+      />
 
-      <Link href="/">Back Home</Link>
+      <SearchBox initialData={initialData} category={category} />
+
+      <div className="mt-8">
+        <Link href="/" className="text-sm font-semibold text-orange-700 hover:text-orange-800">
+          &larr; Back home
+        </Link>
+      </div>
     </main>
   );
 }

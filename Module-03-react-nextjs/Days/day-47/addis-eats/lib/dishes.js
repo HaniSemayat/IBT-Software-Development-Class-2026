@@ -1,7 +1,8 @@
-export const dishes = [
+﻿export const dishes = [
   {
     id: 1,
     name: "Doro Wot",
+    category: "Ethiopian",
     price: 650,
     image: "/dishes/doro-wot.webp",
     imageAlt: "Traditional Ethiopian Doro Wot served with injera",
@@ -9,13 +10,15 @@ export const dishes = [
   {
     id: 2,
     name: "Tibs",
+    category: "Ethiopian",
     price: 500,
     image: "/dishes/tibs.webp",
-    imageAlt: "Ethiopian-style Tibs with sautéed meat and vegetables",
+    imageAlt: "Ethiopian-style Tibs with sauteed meat and vegetables",
   },
   {
     id: 3,
     name: "Veg Pizza",
+    category: "Pizza",
     price: 450,
     image: "/dishes/veg-pizza.webp",
     imageAlt: "Vegetable pizza topped with fresh ingredients",
@@ -23,6 +26,7 @@ export const dishes = [
   {
     id: 4,
     name: "Beef Burger",
+    category: "Burgers",
     price: 380,
     image: "/dishes/beef-burger.webp",
     imageAlt: "Beef burger served in a bun",
@@ -30,6 +34,7 @@ export const dishes = [
   {
     id: 5,
     name: "Cheese Burger",
+    category: "Burgers",
     price: 420,
     image: "/dishes/cheese-burger.webp",
     imageAlt: "Cheeseburger with melted cheese in a bun",
@@ -37,6 +42,7 @@ export const dishes = [
   {
     id: 6,
     name: "Coffee",
+    category: "Drinks",
     price: 70,
     image: "/dishes/coffee.webp",
     imageAlt: "Freshly brewed coffee",
@@ -44,6 +50,7 @@ export const dishes = [
   {
     id: 7,
     name: "Macchiato",
+    category: "Drinks",
     price: 80,
     image: "/dishes/macchiato.webp",
     imageAlt: "Macchiato coffee topped with milk foam",
@@ -51,6 +58,7 @@ export const dishes = [
   {
     id: 8,
     name: "Orange Juice",
+    category: "Drinks",
     price: 120,
     image: "/dishes/orange-juice.webp",
     imageAlt: "Glass of fresh orange juice",
@@ -58,6 +66,7 @@ export const dishes = [
   {
     id: 9,
     name: "Avocado Juice",
+    category: "Drinks",
     price: 120,
     image: "/dishes/avocado-juice.webp",
     imageAlt: "Glass of creamy avocado juice",
