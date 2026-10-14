@@ -1,84 +1,50 @@
-"use client";
+﻿"use client";
 
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { formatETB } from "../../lib/format";
 
-const formatETB = (value) =>
-  new Intl.NumberFormat("en-ET", {
-    style: "currency",
-    currency: "ETB",
-    maximumFractionDigits: 0,
-  }).format(value);
+export default function RevenueChart({ data = [] }) {
+  const max = Math.max(...data.map((item) => Number(item.total) || 0), 1);
 
-export default function RevenueChart({ data }) {
   return (
-    <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="text-xl font-bold text-gray-950">
-        Revenue by neighbourhood
-      </h2>
-      <p className="mt-1 text-sm text-gray-600">
-        Net order value, excluding cancelled orders · Ethiopian birr (ETB)
-      </p>
-
-      <div className="mt-5 h-72 w-full" role="img" aria-label="Bar chart of revenue by neighbourhood. The same figures are available in the table below.">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 12, left: 12, bottom: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="area" tick={{ fontSize: 12 }} />
-            <YAxis
-              width={95}
-              tickFormatter={(value) => formatETB(Number(value))}
-              tick={{ fontSize: 11 }}
-            />
-            <Tooltip
-              formatter={(value) => [formatETB(Number(value)), "Revenue"]}
-              labelFormatter={(label) => `Neighbourhood: ${label}`}
-            />
-            <Bar dataKey="total" name="Revenue" fill="#6b4eff" />
-          </BarChart>
-        </ResponsiveContainer>
+    <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-gray-950">Revenue by neighbourhood</h2>
+          <p className="mt-1 text-sm text-gray-500">Order value excluding cancellations</p>
+        </div>
+        <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">ETB</span>
       </div>
 
-      <div className="mt-5 overflow-x-auto">
-        <table className="w-full border-collapse text-left text-sm">
-          <caption className="mb-3 text-left font-semibold text-gray-800">
-            Revenue by neighbourhood (ETB)
-          </caption>
-          <thead>
-            <tr className="border-b border-gray-300">
-              <th scope="col" className="py-3 pr-4 font-semibold">Neighbourhood</th>
-              <th scope="col" className="py-3 text-right font-semibold">Revenue (ETB)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.length === 0 ? (
-              <tr>
-                <td colSpan={2} className="py-4 text-gray-600">
-                  No completed revenue data yet.
-                </td>
-              </tr>
-            ) : (
-              data.map((item) => (
-                <tr key={item.area} className="border-b border-gray-100">
-                  <th scope="row" className="py-3 pr-4 font-medium text-gray-800">
-                    {item.area}
-                  </th>
-                  <td className="py-3 text-right tabular-nums text-gray-800">
-                    {formatETB(item.total)}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {data.length === 0 ? (
+        <div className="mt-8 rounded-xl bg-gray-50 px-4 py-10 text-center">
+          <p className="font-semibold text-gray-700">No revenue data yet</p>
+          <p className="mt-1 text-sm text-gray-500">Revenue will appear here when orders are placed.</p>
+        </div>
+      ) : (
+        <div className="mt-8 space-y-6">
+          {data.map((item) => {
+            const amount = Math.max(0, Number(item.total) || 0);
+            const width = amount === 0 ? 0 : Math.max(3, (amount / max) * 100);
+
+            return (
+              <div key={item.area}>
+                <div className="mb-2 flex items-center justify-between gap-4 text-sm">
+                  <span className="font-semibold text-gray-700">{item.area}</span>
+                  <span className="font-bold tabular-nums text-gray-950">{formatETB(amount)}</span>
+                </div>
+                <div className="h-3 overflow-hidden rounded-full bg-gray-100">
+                  <div
+                    className="h-full rounded-full bg-violet-600 transition-all duration-500"
+                    style={{ width: `${width}%` }}
+                    role="img"
+                    aria-label={`${item.area}: ${formatETB(amount)}`}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
