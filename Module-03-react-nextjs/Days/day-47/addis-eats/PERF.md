@@ -323,3 +323,113 @@ These values come from the earlier local production-build test. They are not Day
 - [ ] Record new measurements without replacing historical results.
 
 The Day 46 features are implemented, but their performance impact remains unverified until new measurements are collected.
+
+## Day 47 — Integrated Application Performance and Verification
+
+Day 47 brings together the existing rendering, image optimization, cart, checkout, and administrative features within the Next.js App Router application.
+
+No new Lighthouse measurements are recorded in this section. The previous local measurements remain historical results and must not be presented as Day 47 or deployed-site measurements.
+
+### Rendering and Performance Strategy
+
+The intended architecture uses:
+
+- Static rendering for pages that do not require request-specific data.
+- Revalidation for the menu where configured.
+- Static generation for eligible individual dish pages.
+- Server Components for initial data retrieval and server-side rendering.
+- Client Components for cart interaction, search, and other browser-dependent behavior.
+- Route Handlers for API requests.
+- Server Actions for supported mutations.
+
+The actual route rendering classifications should be checked against the latest production build output.
+
+### Cart and Dashboard Considerations
+
+Day 46 introduced shared client-side cart state, Add to Cart controls, a live navbar quantity, and dashboard analytics.
+
+These features may affect JavaScript execution and rendering work. Their impact must be measured rather than assumed.
+
+The menu and dashboard should be evaluated separately because they have different rendering, data, and interaction requirements.
+
+### Historical Local Baseline
+
+The previously recorded baseline remains:
+
+| Metric | Baseline |
+|---|---:|
+| Performance | 88 |
+| First Contentful Paint | 0.8 s |
+| Largest Contentful Paint | 2.6 s |
+| Total Blocking Time | 350 ms |
+| Cumulative Layout Shift | 0 |
+| Speed Index | 1.3 s |
+
+### Latest Recorded Local Measurement
+
+The latest recorded local `/menu` run remains the earlier image-priority experiment:
+
+| Metric | Result |
+|---|---:|
+| Performance | 73 |
+| First Contentful Paint | 0.9 s |
+| Largest Contentful Paint | 3.4 s |
+| Total Blocking Time | 800 ms |
+| Cumulative Layout Shift | 0 |
+| Speed Index | 1.8 s |
+
+This result is not a new Day 47 measurement and does not represent the deployed site.
+
+### Day 47 Verification Checklist
+
+- [ ] Build the current application with `npm run build`.
+- [ ] Confirm the resulting route classifications.
+- [ ] Run Lighthouse against the current production build.
+- [ ] Record the exact test date, URL, Lighthouse version, device, and throttling settings.
+- [ ] Inspect the LCP element and its render delay.
+- [ ] Verify the first menu image's loading behavior.
+- [ ] Inspect image sizes in the browser Network panel.
+- [ ] Verify the `/menu` First Load JS size using build output.
+- [ ] Measure dashboard performance separately.
+- [ ] Compare new measurements against the historical baseline.
+- [ ] Run a separate Lighthouse test against the deployed domain.
+- [ ] Record deployment results independently from local results.
+
+### Production Verification
+
+A successful production build confirms that the application compiles and the build process completes. It does not establish that the deployed application has met its performance targets.
+
+The deployed site must be tested separately. Do not copy local Lighthouse values into the deployed-results table.
+
+| Metric | Latest historical local result | Day 47 result | Deployed result |
+|---|---:|---|---|
+| Performance | 73 | Not measured | Not measured |
+| FCP | 0.9 s | Not measured | Not measured |
+| LCP | 3.4 s | Not measured | Not measured |
+| TBT | 800 ms | Not measured | Not measured |
+| CLS | 0 | Not measured | Not measured |
+| Speed Index | 1.8 s | Not measured | Not measured |
+
+### Performance Targets
+
+The existing targets remain:
+
+| Metric | Target |
+|---|---|
+| Mobile LCP | Under 2.5 seconds |
+| CLS | Under 0.1 |
+| `/menu` First Load JS | Under 120 kB |
+| Largest delivered image | Under 150 kB |
+| Lighthouse Performance | At least 90 |
+
+The latest historical local run did not meet the LCP or Performance targets. JavaScript bundle size, image size, and deployed performance still require verification.
+
+### Final Assessment
+
+Addis Eats has a documented rendering strategy, server-rendered initial menu data, Next.js image optimization, and interactive cart and dashboard functionality.
+
+The recorded Lighthouse experiments show mixed results. The image-priority experiment reduced the observed resource-load delay, but overall performance improvement was not conclusive.
+
+Day 47's performance work is therefore to verify the integrated application, measure the current build, and document the results without claiming improvements that have not been demonstrated.
+
+
