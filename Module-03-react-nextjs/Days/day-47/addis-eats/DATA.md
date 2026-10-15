@@ -251,3 +251,159 @@ Verify the current dashboard implementation before treating specific authorizati
 - Unauthorized users cannot access protected dashboard data.
 - In-memory storage limitations remain documented.
 
+## Day 47 — Integrated Data Architecture
+
+### Overview
+
+Day 47 brings the application's menu, cart, checkout, authentication, orders, and administrative workspace together under the Next.js App Router architecture.
+
+Server Components read server-side data directly where appropriate. Client Components manage browser interaction, Route Handlers expose HTTP endpoints, and Server Actions handle supported mutations.
+
+The architecture demonstrates data flow and server-side enforcement, but the current in-memory implementation is not production-grade persistence.
+
+### Integrated Data Flow
+
+#### Menu
+
+```text
+Menu Server Component
+        |
+        v
+    lib/dishes.js
+        |
+        v
+ Server-rendered menu
+        |
+        v
+ Client search and filtering
+        |
+        v
+   GET /api/dishes
+```
+
+The server can read the shared dish module directly instead of making an HTTP request to its own API. Client-side search and filtering may use the dishes endpoint, depending on the interaction.
+
+#### Cart and Checkout
+
+```text
+Menu
+ |
+ v
+Shared client-side cart state
+ |
+ v
+Cart review
+ |
+ v
+Checkout form
+ |
+ v
+Server Action
+ |
+ v
+Server-side validation
+ |
+ v
+Trusted dish prices and total
+ |
+ v
+Order creation
+```
+
+The cart is client-side state, while an order is a separate server-side record. The server must validate dish IDs and quantities, derive ownership from the authenticated session, and calculate totals using trusted dish data.
+
+#### Authentication and Authorization
+
+```text
+Sign-in form
+     |
+     v
+ Server Action
+     |
+     v
+User lookup and credential verification
+     |
+     v
+ Session creation
+     |
+     v
+HTTP-only session cookie
+     |
+     v
+Protected server operation
+```
+
+Private operations must independently verify authentication and authorization. Hiding a link or disabling a button in the browser is not sufficient.
+
+### Current Storage Model
+
+The current demonstration implementation uses in-memory data modules:
+
+| Module | Current responsibility | Limitation |
+|---|---|---|
+| `lib/dishes.js` | Menu catalogue | Changes are not necessarily durable |
+| `lib/users.js` | Demo user records and lookup | Demo data; password handling needs production hardening |
+| `lib/session.js` | Session creation and lookup | Process-local session storage |
+| `lib/orders.js` | Order creation and retrieval | Process-local order storage |
+| `lib/schema.js` | Input validation | Validation does not replace authorization |
+
+In-memory storage may be reset when the process restarts. Separate application instances may not share users, sessions, or orders. A production deployment needs persistent storage and a suitable shared session strategy.
+
+### Server-Side Data Rules
+
+The following rules apply throughout the integrated application:
+
+- Derive the current user's identity from a validated session.
+- Check permissions inside protected Server Actions and Route Handlers.
+- Validate incoming values on the server even when the browser validates them first.
+- Calculate order totals using trusted server-side dish prices.
+- Validate item identifiers and quantities before creating orders.
+- Check order ownership before returning private order data or changing its status.
+- Protect administrative data with server-side role checks.
+- Avoid exposing secrets or sensitive user records to Client Components.
+
+These are required security properties. Verify each against the current implementation and test results before claiming it is fully enforced.
+
+### Cart Persistence
+
+The current cart uses shared React state through `app/Providers.jsx`. The navbar count and cart interface respond to state changes.
+
+The cart is separate from server-side orders. According to the documented implementation, cart state resets when the page reloads. Persistent carts would require an intentional storage design, such as browser storage for an anonymous cart or database-backed storage for an authenticated user.
+
+### Order and Dashboard Data
+
+Order records supply checkout results, order details, and dashboard analytics.
+
+The dashboard displays summaries such as order counts, revenue, neighbourhood breakdowns, daily order counts, and a sortable, paginated order table. These calculations depend on the available order records.
+
+Because order storage is currently in memory, these summaries are demonstration data rather than durable business reporting. Production analytics require persistent records, defined calculation rules, and authorization for staff-only data.
+
+### Day 47 Verification Checklist
+
+- [ ] The menu reads shared dish data through the intended server-side path.
+- [ ] Client search and filtering work as expected.
+- [ ] Cart state and navbar quantity remain synchronized.
+- [ ] Checkout rejects invalid input on the server.
+- [ ] Submitted prices and totals are not trusted.
+- [ ] Order ownership is derived from the authenticated session.
+- [ ] Private order access checks authentication and ownership.
+- [ ] Staff-only data is protected by server-side authorization.
+- [ ] Session behavior is tested across restarts and deployed instances.
+- [ ] Production persistence limitations are documented.
+- [ ] Any unverified security behavior is marked pending rather than assumed.
+
+### Production Readiness
+
+Before the application handles real customers and orders, replace demonstration storage with a persistent database, store passwords using a suitable password-hashing algorithm, and use a secure session design appropriate for the deployment environment.
+
+Also add appropriate error handling, access controls, rate limiting where needed, and tests for unauthorized access and invalid input.
+
+A successful build does not by itself prove that authentication, ownership checks, persistence, or production data flows work correctly.
+
+### Summary
+
+Day 47 documents the integrated data architecture across Server Components, Client Components, Route Handlers, and Server Actions.
+
+The central rule remains: **the server must enforce authentication, authorization, validation, order ownership, and trusted price calculation.** Client-side behavior improves usability but cannot replace server-side enforcement.
+
+
