@@ -2,7 +2,7 @@
 
 ## Overview
 
-Day 45 consolidates authentication and authorization concepts from Days 42–44 into the Addis Eats Next.js application.
+Days 42–47 develop and integrate authentication and authorization concepts into the Addis Eats Next.js application.
 
 The authentication system demonstrates:
 
@@ -511,3 +511,56 @@ The exact implementation should be verified against the current `/dashboard` pag
 Dashboard analytics currently use the application's demo order data. Order storage is in memory, so records may disappear when the server restarts and may not be shared across multiple instances.
 
 The dashboard is a learning feature, not a production financial reporting system. Production deployment requires persistent storage, trusted server-side authorization, and appropriate auditing and access controls.
+
+## Day 47 — Integration and Production Authentication Status
+
+Day 47 integrates the application's authentication and authorization features with the broader Next.js App Router architecture, including Server Components, Client Components, Route Handlers, Server Actions, and protected administrative functionality.
+
+### Current implementation
+
+The authentication-related implementation includes:
+
+- `app/actions.js` for sign-in, sign-out, registration, and protected mutations.
+- `lib/users.js` for the current in-memory user store.
+- `lib/session.js` for session creation, lookup, and destruction.
+- `proxy.js` for navigation guards on configured protected routes.
+- Server-side checks for sensitive operations and role-restricted functionality.
+
+Verify the actual route matchers and server-side checks in the current source before relying on them as a security boundary.
+
+### Production sign-in limitation
+
+The production sign-in flow has not yet been confirmed to work reliably.
+
+The current session implementation stores session data in an in-memory `Map`. A later request may reach a different server instance or a restarted process that does not contain the session created by the sign-in request. In that situation, the user may be redirected to sign in again.
+
+The user store and order store also use in-memory data. Registered accounts and orders are therefore not reliable persistent records across restarts or separate instances.
+
+A successful local production build does not prove that deployed authentication works correctly.
+
+### Required improvements before production use
+
+1. Move users and other persistent application data to a database.
+2. Replace plain-text password storage with a suitable password-hashing algorithm.
+3. Use persistent session storage or another properly designed production session architecture.
+4. Review session expiration, invalidation, and cookie security.
+5. Add rate limiting and protections against repeated sign-in attempts.
+6. Test sign-in, sign-out, registration, role checks, and order ownership against the deployed application.
+7. Verify that protected Server Actions and Route Handlers enforce authorization independently of navigation guards.
+
+### Verification status
+
+The following are outstanding until they are actually tested:
+
+- [ ] Production sign-in remains authenticated across subsequent requests.
+- [ ] Sign-out invalidates the active session.
+- [ ] Newly registered accounts persist and can sign in after a restart.
+- [ ] Sessions behave correctly across deployed server instances.
+- [ ] Customer and staff permissions are enforced server-side.
+- [ ] Order ownership checks reject unauthorized access.
+- [ ] Invalid credentials and invalid registration data are rejected.
+- [ ] No production password is stored or exposed in plain text.
+
+This remains a learning project. Do not treat the current in-memory authentication implementation as production-ready.
+
+
