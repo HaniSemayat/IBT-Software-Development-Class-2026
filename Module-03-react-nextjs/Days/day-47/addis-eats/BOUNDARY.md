@@ -381,3 +381,77 @@ Shared Providers
 ```
 
 This diagram describes the architectural responsibilities. Verify the dashboard's actual component boundaries and authorization checks in source before treating them as tested guarantees.
+
+## Day 47 — Next.js Integration Boundaries
+
+Day 47 brings routing, rendering, data access, and security together in one Next.js App Router application.
+
+### App Router and Rendering
+
+The application uses file-based routing, nested layouts, and special route files.
+
+| Route | Intended rendering strategy | Responsibility |
+|---|---|---|
+| `/` | Static | Landing page |
+| `/menu` | Revalidated | Menu data |
+| `/menu/[id]` | Static generation | Individual dish pages |
+| `/cart` | Client interaction | Cart quantities and totals |
+| `/checkout` | Dynamic | Checkout and order submission |
+
+These are intended strategies. Confirm actual route classifications with `npm run build`, because data dependencies and route configuration can change the resulting behavior.
+
+### Route Handlers
+
+Route Handlers under `app/api/` provide HTTP endpoints for dish and order operations.
+
+They should validate incoming data and enforce authentication, authorization, and ownership checks where required. Server-side data access should not depend on the browser being the only caller.
+
+### Server Actions
+
+Server Actions support operations such as checkout and other protected mutations.
+
+A Server Action is an entry point that must be treated as callable by an untrusted client. Sensitive actions must check the current session, authorization, resource ownership, and input validity before modifying data.
+
+Order prices and ownership must be derived from trusted server-side information, not accepted from browser-submitted values.
+
+### Loading, Error, and Not-Found UI
+
+The application uses Next.js special files where implemented:
+
+- `loading.js` provides a loading state for its route segment.
+- `error.js` provides error handling for its route segment.
+- `not-found.js` provides not-found UI.
+
+An error boundary improves failure handling but does not replace validation or authorization.
+
+### Revalidation
+
+The application uses revalidation where configured to refresh data after an appropriate interval or supported mutation.
+
+Revalidation affects cached route data; it does not make in-memory application state persistent. Persistent users, sessions, and orders require a suitable storage architecture.
+
+### Authentication and Server Boundaries
+
+The proxy can provide early navigation redirects, but sensitive operations must verify the session and permissions on the server.
+
+The current session and user implementations use in-memory storage. They are not reliable across restarts or separate server instances. Production sign-in is still awaiting reliable end-to-end verification.
+
+### Day 47 Verification Checklist
+
+- [ ] Route classifications match the production build output.
+- [ ] Server Components fetch initial server-side data directly where appropriate.
+- [ ] Client Components are limited to features that require client-side interaction.
+- [ ] Route Handlers validate requests and protect private data.
+- [ ] Server Actions enforce authentication and authorization independently of the UI.
+- [ ] Order ownership is derived from the authenticated session.
+- [ ] Loading, error, and not-found states behave as expected.
+- [ ] Revalidation refreshes the intended data.
+- [ ] Production authentication and persistence limitations are documented.
+
+### Boundary Principle
+
+The browser can request an operation, but the server decides whether the operation is authorized.
+
+The goal is to keep server-only data and security checks on the server while sending only the information and interactive components the browser needs.
+
+
