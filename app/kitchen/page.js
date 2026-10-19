@@ -1,4 +1,5 @@
-﻿import { redirect } from "next/navigation";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getSession } from "../../lib/session";
 import { getAllOrders } from "../../lib/orders";
 import { updateOrderStatus } from "../actions";
@@ -63,12 +64,12 @@ export default async function KitchenPage() {
           <p className="mt-3 leading-7 text-stone-600">
             Your account does not have permission to access the kitchen dashboard.
           </p>
-          <a
+          <Link
             href="/"
             className="mt-6 inline-flex rounded-xl bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700"
           >
             Return home
-          </a>
+          </Link>
         </section>
       </main>
     );

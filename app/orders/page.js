@@ -1,4 +1,4 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "../../lib/session";
 import { getOrdersByUser } from "../../lib/orders";
@@ -69,10 +69,7 @@ export default async function OrdersPage({ searchParams }) {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <a
-              href="/api/orders/export"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-800 shadow-sm transition hover:border-violet-300 hover:text-violet-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-700"
-            >
+            <a href="/api/orders/export" download className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-800 shadow-sm transition hover:border-violet-300 hover:text-violet-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-700">
               <span aria-hidden="true">↓</span> Download CSV
             </a>
             <Link href="/menu" className="inline-flex items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-violet-800">
@@ -113,7 +110,7 @@ export default async function OrdersPage({ searchParams }) {
             <span className="text-4xl" aria-hidden="true">🛍️</span>
             <h2 className="mt-4 text-xl font-bold text-gray-950">Your next favourite meal starts here</h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">
-              You haven't placed an order yet. Explore the menu and your orders will appear here.
+              You haven&apos;t placed an order yet. Explore the menu and your orders will appear here.
             </p>
             <Link href="/menu" className="mt-6 inline-flex rounded-xl bg-violet-700 px-5 py-3 text-sm font-bold text-white hover:bg-violet-800">
               Explore the menu

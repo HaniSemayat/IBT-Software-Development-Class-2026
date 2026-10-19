@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -11,19 +11,17 @@ import FavoriteButton from "../../components/FavoriteButton";
 export default function SearchBox({ initialData, category = "All" }) {
   const [term, setTerm] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
-  const [page, setPage] = useState(1);
+  const [pageState, setPageState] = useState({ category, page: 1 });
+  const page = pageState.category === category ? pageState.page : 1;
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedTerm(term);
-      setPage(1);
+      setPageState({ category, page: 1 });
     }, 300);
     return () => clearTimeout(timer);
-  }, [term]);
+  }, [term, category]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [category]);
 
   const query = new URLSearchParams({
     q: debouncedTerm,
@@ -108,7 +106,7 @@ export default function SearchBox({ initialData, category = "All" }) {
             <button
               type="button"
               disabled={page <= 1}
-              onClick={() => setPage((current) => current - 1)}
+              onClick={() => setPageState({ category, page: page - 1 })}
               className="rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-40"
             >
               Previous
@@ -117,7 +115,7 @@ export default function SearchBox({ initialData, category = "All" }) {
             <button
               type="button"
               disabled={page >= totalPages}
-              onClick={() => setPage((current) => current + 1)}
+              onClick={() => setPageState({ category, page: page + 1 })}
               className="rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-40"
             >
               Next

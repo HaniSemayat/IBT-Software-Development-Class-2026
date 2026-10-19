@@ -1,4 +1,3 @@
-﻿import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
@@ -8,15 +7,7 @@ import CartNavLink from "../components/CartNavLink";
 import FavoritesNavLink from "../components/FavoritesNavLink";
 import { getSession } from "../lib/session";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
-const geistMono = Geist({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata = {
   metadataBase: new URL(
@@ -45,7 +36,7 @@ export default async function RootLayout({ children }) {
   const isStaff = session?.role === "staff";
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en">
       <body className="min-h-screen bg-gray-50 text-gray-900">
         <Providers>
           <header className="border-b bg-white">

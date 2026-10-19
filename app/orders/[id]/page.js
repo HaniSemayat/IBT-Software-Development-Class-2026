@@ -1,4 +1,5 @@
-﻿import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 import { getSession } from "../../../lib/session";
 import { getOrderForUser } from "../../../lib/orders";
 import OrderStatus from "./OrderStatus";
@@ -26,13 +27,13 @@ export default async function OrderPage({ params }) {
   return (
     <main className="min-h-screen bg-stone-50 px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto max-w-5xl">
-        <a
+        <Link
           href="/orders"
           className="inline-flex items-center gap-2 text-sm font-semibold text-orange-700 transition hover:text-orange-800"
         >
           <span aria-hidden="true">&larr;</span>
           Back to my orders
-        </a>
+        </Link>
 
         <header className="mb-8 mt-6">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-600">

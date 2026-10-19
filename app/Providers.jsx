@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   createContext,
@@ -31,6 +31,8 @@ export default function Providers({ children }) {
       const saved = localStorage.getItem("addiseats-favorites");
       if (saved) {
         const parsed = JSON.parse(saved);
+        // Intentional hydration: restore saved favorites from browser storage.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (Array.isArray(parsed)) setFavorites(parsed);
       }
     } catch {
