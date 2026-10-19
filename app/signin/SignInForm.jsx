@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useActionState } from "react";
 import { signIn } from "../actions";
@@ -39,7 +39,7 @@ export default function SignInForm({ next }) {
           type="email"
           placeholder="addistesfa@gmail.com"
           required
-          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
       </div>
 
@@ -55,9 +55,9 @@ export default function SignInForm({ next }) {
           id="password"
           name="password"
           type="password"
-          placeholder="123456"
+          placeholder="Enter your password"
           required
-          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
       </div>
 

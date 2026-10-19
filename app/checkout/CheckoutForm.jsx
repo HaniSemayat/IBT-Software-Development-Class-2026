@@ -37,7 +37,7 @@ export default function CheckoutForm() {
 
         <Link
           href="/menu"
-          className="mt-6 inline-block rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white"
+          className="mt-6 inline-block min-h-11 rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
         >
           Order More Food
         </Link>
@@ -107,13 +107,23 @@ export default function CheckoutForm() {
           <input
             id={field.name}
             name={field.name}
+            aria-invalid={Boolean(state.fieldErrors?.[field.name])}
+            aria-describedby={
+              state.fieldErrors?.[field.name]
+                ? `${field.name}-error`
+                : undefined
+            }
             type={field.type}
             placeholder={field.placeholder}
             defaultValue={field.defaultValue}
-            className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+            className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
           />
           {state.fieldErrors?.[field.name] && (
-            <p role="alert" className="mt-2 text-sm text-red-600">
+            <p
+              id={`${field.name}-error`}
+              role="alert"
+              className="mt-2 text-sm text-red-600"
+            >
               {state.fieldErrors[field.name]}
             </p>
           )}
@@ -132,7 +142,7 @@ export default function CheckoutForm() {
           name="notes"
           rows={4}
           placeholder="Any delivery instructions?"
-          className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+          className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
       </div>
 
