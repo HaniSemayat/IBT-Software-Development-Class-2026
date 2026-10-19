@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { signOut } from "./actions";
 
 export default function UserMenu({ session }) {
@@ -6,7 +6,7 @@ export default function UserMenu({ session }) {
     return (
       <Link
         href="/signin"
-        className="rounded-lg bg-orange-600 px-4 py-2 font-semibold text-white transition hover:bg-orange-700"
+        className="inline-flex min-h-11 items-center justify-center rounded-lg bg-orange-600 px-4 py-2 font-semibold text-white transition hover:bg-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
       >
         Sign In
       </Link>
@@ -36,7 +36,7 @@ export default function UserMenu({ session }) {
       <form action={signOut}>
         <button
           type="submit"
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-orange-500 hover:text-orange-600"
+          className="min-h-11 rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-orange-500 hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
         >
           Sign Out
         </button>

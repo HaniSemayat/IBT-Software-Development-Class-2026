@@ -59,7 +59,7 @@ export default function SearchBox({ initialData, category = "All" }) {
         value={term}
         onChange={(event) => setTerm(event.target.value)}
         placeholder="Search for a dish..."
-        className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+        className="mt-2 min-h-11 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
       />
 
       {isLoading && !data && <p className="mt-4 text-gray-600">Loading dishes...</p>}
@@ -107,7 +107,7 @@ export default function SearchBox({ initialData, category = "All" }) {
               type="button"
               disabled={page <= 1}
               onClick={() => setPageState({ category, page: page - 1 })}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-40"
+              className="min-h-11 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Previous
             </button>
@@ -116,7 +116,7 @@ export default function SearchBox({ initialData, category = "All" }) {
               type="button"
               disabled={page >= totalPages}
               onClick={() => setPageState({ category, page: page + 1 })}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-40"
+              className="min-h-11 rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Next
             </button>

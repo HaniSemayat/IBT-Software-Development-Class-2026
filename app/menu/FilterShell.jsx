@@ -9,7 +9,7 @@ export default function FilterShell({ children }) {
     <div>
       <button
         onClick={() => setShowDishes(!showDishes)}
-        className="mb-4 border px-3 py-1"
+        className="mb-4 min-h-11 rounded-lg border px-4 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
       >
         {showDishes ? "Hide Dishes" : "Show Dishes"}
       </button>

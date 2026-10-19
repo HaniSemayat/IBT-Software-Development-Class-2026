@@ -36,7 +36,7 @@ export default function CartPage() {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between rounded-xl border bg-white p-5 shadow-sm"
+                className="flex flex-col items-stretch justify-between gap-4 rounded-xl border bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:p-5"
               >
                 <div>
                   <h2 className="text-lg font-bold text-gray-900">
@@ -49,7 +49,7 @@ export default function CartPage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => decreaseQuantity(item.id)}
-                    className="rounded-lg border px-3 py-1 font-bold hover:bg-gray-100"
+                    className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border px-3 py-2 font-bold transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
                   >
                     -
                   </button>
@@ -58,7 +58,7 @@ export default function CartPage() {
                   </span>
                   <button
                     onClick={() => increaseQuantity(item.id)}
-                    className="rounded-lg border px-3 py-1 font-bold hover:bg-gray-100"
+                    className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border px-3 py-2 font-bold transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
                   >
                     +
                   </button>

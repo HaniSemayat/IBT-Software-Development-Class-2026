@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 const linkClass =
-  "whitespace-nowrap text-sm font-medium text-gray-700 transition hover:text-orange-600";
+  "inline-flex min-h-11 items-center whitespace-nowrap rounded-md px-1 text-sm font-medium text-gray-700 transition hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700";
 
 export default async function RootLayout({ children }) {
   const session = await getSession();
@@ -40,7 +40,7 @@ export default async function RootLayout({ children }) {
       <body className="min-h-screen bg-gray-50 text-gray-900">
         <Providers>
           <header className="border-b bg-white">
-            <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
+            <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:gap-4 sm:px-6">
               <Link href="/" className="text-xl font-bold text-orange-600">
                 Addis Eats
               </Link>

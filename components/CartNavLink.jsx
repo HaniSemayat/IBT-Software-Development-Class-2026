@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useCart } from "../app/Providers";
@@ -11,7 +11,7 @@ export default function CartNavLink() {
     <Link
       href="/cart"
       aria-label={`Cart, ${count} ${count === 1 ? "item" : "items"}`}
-      className="inline-flex items-center gap-2 text-gray-800 transition hover:text-orange-600"
+      className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-gray-800 transition hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
     >
       <span>Cart</span>
       {count > 0 && (
