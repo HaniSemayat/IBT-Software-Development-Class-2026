@@ -923,3 +923,126 @@ Next.js App Router
 The server remains responsible for trusted data and access control. The browser handles interaction and presentation. Rendering choices should be verified through the actual build and measured behavior.
 
 
+
+## Day 48 — Interaction and Submission Strategy
+
+### 1. Event Handling
+
+Client Components handle browser interactions such as cart updates, menu controls, and form submission.
+
+Use semantic HTML elements according to their purpose:
+
+- Use buttons for actions.
+- Use links for navigation.
+- Handle checkout through the form's `onSubmit` event rather than relying only on a button click.
+- Use `preventDefault()` when the browser's default form behavior must be prevented.
+- Use `stopPropagation()` only when an interaction must not reach an ancestor handler.
+- Use `target` to identify the event origin and `currentTarget` to identify the element whose handler is executing.
+
+Interactive controls should support keyboard use, visible focus, and accessible names. Do not rely on hover alone to communicate an action, and provide appropriately sized touch targets.
+
+### 2. Checkout Pending State
+
+The checkout form uses `useActionState` to connect the form to its Server Action and expose pending status.
+
+The intended flow is:
+
+```text
+User submits checkout
+        |
+        v
+Form invokes Server Action
+        |
+        v
+Pending state becomes active
+        |
+        v
+Submit button is disabled
+        |
+        v
+Server validates the order
+        |
+        v
+Action returns its result
+        |
+        v
+UI displays errors or success
+````
+
+The pending state provides immediate feedback and helps prevent accidental repeated clicks while a submission is in progress.
+
+Disabling a button is a user-interface safeguard, not a guarantee against repeated requests. The server must validate every submission independently.
+
+### 3. Duplicate-Submission Protection
+
+The checkout implementation includes a submission identifier and uses `lib/idempotent-orders.js` to demonstrate duplicate-submission protection.
+
+The current implementation stores submission records in a process-local in-memory `Map`. Its protection is limited by that storage model:
+
+- Records are not durable across process restarts.
+- Separate application instances do not share the same records.
+- In-memory lookup and order creation do not provide production-grade atomic guarantees under concurrent requests.
+
+A production implementation should use persistent, shared storage and an atomic uniqueness or transaction-based mechanism to prevent duplicate order creation. Retry behavior and identifier retention should also be defined.
+
+### 4. Server-Side Trust Boundary
+
+The client is responsible for collecting input and presenting interaction states. The server remains responsible for trusted operations.
+
+For every order submission, the server must:
+
+- Validate submitted fields, dish identifiers, and quantities.
+- Calculate totals from trusted server-side dish prices.
+- Derive order ownership from the authenticated session.
+- Enforce required authentication and authorization checks.
+- Reject invalid input.
+- Apply reliable duplicate-submission protection appropriate to the storage architecture.
+
+Client-side validation, disabled controls, hidden fields, and navigation restrictions must not replace server-side enforcement.
+
+### 5. Verification Strategy
+
+The following checks should be performed against the current implementation:
+
+- Verify that checkout displays pending feedback.
+- Confirm that the submit button is disabled while the action is pending.
+- Test invalid input through the server-side submission path.
+- Test repeated submissions using the same submission identifier.
+- Confirm that order totals and ownership are derived from trusted server-side data.
+- Test keyboard navigation and visible focus for interactive controls.
+- Confirm that interactive elements use appropriate semantic HTML.
+- Review the implementation's behavior across process restarts and separate instances before treating idempotency as production-ready.
+
+A passing build alone does not prove these behaviors. Mark each check complete only after the corresponding test has been performed.
+
+### 6. Day 48 Architectural Principle
+
+Day 48 extends the integrated application with clearer interaction behavior and duplicate-submission safeguards.
+
+The key separation remains:
+
+```
+Client interaction
+        |
+        v
+User input and pending feedback
+        |
+        v
+Server Action
+        |
+        v
+Validation and authorization
+        |
+        v
+Trusted data and price calculation
+        |
+        v
+Duplicate-submission protection
+        |
+        v
+Order creation and revalidation
+```
+
+Client-side controls improve usability. Server-side validation, authorization, ownership checks, and reliable order creation remain the responsibility of the server.
+
+The current in-memory idempotency implementation is a learning demonstration. Production-grade persistence and atomic duplicate protection remain separate follow-up tasks.
