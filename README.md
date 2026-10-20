@@ -297,3 +297,44 @@ Production Measurement
 The central security principle is that the browser controls the interface, but the server controls access.
 
 The central performance principle is to measure actual behavior before claiming an optimization has worked.
+
+## Interaction Quality and Submission Safety — Day 48
+
+Day 48 focuses on accessible interactions, correct event handling, and safe form submissions.
+
+### Event Handling and Accessibility
+
+- Use semantic buttons for actions and links for navigation.
+- Handle submissions with the form's `onSubmit` behavior rather than relying only on button clicks.
+- Use `preventDefault()` to prevent browser defaults when necessary.
+- Use `stopPropagation()` only when event bubbling must be stopped.
+- Understand the difference between `target` and `currentTarget`.
+- Provide keyboard-accessible interactions and visible focus indicators.
+- Do not rely on hover-only interactions.
+- Aim for interactive touch targets of approximately 44 × 44 CSS pixels where practical.
+
+### Form Submission Safety
+
+- Display pending feedback while submissions are running.
+- Disable submit buttons while pending or when submission is unavailable.
+- Display validation errors clearly and associate field errors with their inputs.
+- Treat client-side validation as a usability feature, not a security boundary.
+- Validate submitted data on the server and derive trusted prices and ownership from server-side data.
+- Protect order creation against duplicate submissions.
+
+### Idempotency Limitations
+
+Checkout uses a submission identifier and server-side idempotency helper to prevent repeated submissions from creating duplicate orders within the same running server process.
+
+The current in-memory implementation is a learning example, not production-ready idempotency. Records may disappear after restarts and are not shared across multiple server instances. Production use requires persistent, atomic idempotency storage and safe handling of concurrent requests.
+
+### Verification
+
+Run the relevant checks after interaction or form changes:
+
+- `npm run lint`
+- `git diff --check`
+
+Run `npm run build` when changes warrant a production-build check. Test important keyboard and form flows in the browser; a successful build alone does not prove every interaction works correctly.
+
+Deployment and live-environment verification remain separate follow-up tasks.
