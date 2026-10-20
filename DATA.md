@@ -405,5 +405,74 @@ A successful build does not by itself prove that authentication, ownership check
 Day 47 documents the integrated data architecture across Server Components, Client Components, Route Handlers, and Server Actions.
 
 The central rule remains: **the server must enforce authentication, authorization, validation, order ownership, and trusted price calculation.** Client-side behavior improves usability but cannot replace server-side enforcement.
+## Day 48 — Interactive Data and Submission Safety
 
+### Form Submission Flow
 
+Checkout submission follows this flow:
+
+```text
+Checkout form
+      |
+      v
+Client-side pending feedback
+      |
+      v
+Server Action
+      |
+      v
+Server-side validation
+      |
+      v
+Duplicate-submission protection
+      |
+      v
+Order creation
+      |
+      v
+Route revalidation
+````
+
+The checkout form uses `useActionState` to expose the Server Action's state and pending status. The submit button is disabled while submission is pending or when the cart is empty.
+
+Client-side pending state improves usability, but it is not a security boundary. The server must independently validate submitted data and protect against duplicate order creation.
+
+### Idempotency and Storage Limitations
+
+The current implementation uses `lib/idempotent-orders.js` to demonstrate duplicate-submission protection through a submission identifier.
+
+The idempotency store is process-local and in memory. It is not durable across restarts, is not shared across application instances, and does not provide production-grade atomic guarantees under concurrent requests.
+
+For production, use a persistent storage strategy with an atomic uniqueness constraint or equivalent transaction-based protection. Define how long submission identifiers remain valid and how retries return the original result.
+
+### Event Handling and Data Integrity
+
+Client-side event handlers control the form interaction, but they do not establish that submitted data is trustworthy.
+
+The server must continue to:
+
+- Validate the order fields and item quantities.
+- Resolve dish identifiers against trusted server-side data.
+- Calculate totals from trusted dish prices.
+- Derive order ownership from the authenticated session.
+- Reject invalid or unauthorized requests.
+- Protect order creation against duplicate submissions.
+
+Disabling a button alone does not prevent requests sent directly to a Route Handler or repeated requests from another client.
+
+### Day 48 Verification Checklist
+
+- Checkout displays pending feedback during submission.
+- The submit button is disabled while pending.
+- Empty-cart submission is unavailable in the UI.
+- Invalid data is rejected by server-side validation.
+- Repeated submissions with the same identifier do not create duplicate orders within the supported storage scope.
+- Order ownership and totals are determined by trusted server-side data.
+- In-memory idempotency limitations are documented.
+- Production-grade persistent and atomic idempotency remains a separate implementation task.
+
+### Summary
+
+Day 48 extends the data architecture to cover interactive submission behavior and duplicate-order protection.
+
+The key distinction is that client-side controls improve the user experience, while validation, authorization, trusted calculations, and reliable duplicate protection must be enforced on the server.
