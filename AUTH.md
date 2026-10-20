@@ -564,3 +564,18 @@ The following are outstanding until they are actually tested:
 This remains a learning project. Do not treat the current in-memory authentication implementation as production-ready.
 
 
+
+## Day 48 — Authentication Interaction Safety
+
+Authentication and registration forms must remain accessible and safe during submission.
+
+- Use semantic form controls and submit through the form's `onSubmit` behavior.
+- Provide visible keyboard focus indicators and associate validation errors with their fields.
+- Display pending feedback and prevent accidental repeated submissions while an action is running.
+- Validate credentials, registration data, and authorization requirements on the server.
+- Do not rely on disabled buttons, hidden links, client-side validation, or proxy redirects as the sole security boundary.
+- Validate post-sign-in redirect destinations and reject external or protocol-relative URLs.
+
+The current in-memory session and user stores have the persistence limitations documented above. Any in-memory duplicate-submission protection is also limited to the running server process and is not a substitute for persistent, atomic protection in production.
+
+Verification of these behaviors must be based on tests against the current implementation; documentation alone does not establish that they pass.
