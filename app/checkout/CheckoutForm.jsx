@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useCart } from "../Providers";
 import { placeOrder } from "../actions";
@@ -16,6 +16,16 @@ export default function CheckoutForm() {
 
   const [state, formAction, pending] =
     useActionState(placeOrder, initialState);
+  const submissionIdRef = useRef(null);
+
+  function handleSubmit(event) {
+    if (!submissionIdRef.current) {
+      submissionIdRef.current = crypto.randomUUID();
+    }
+
+    event.currentTarget.elements.submissionId.value =
+      submissionIdRef.current;
+  }
 
   useEffect(() => {
     if (state.success) {
@@ -46,7 +56,7 @@ export default function CheckoutForm() {
   }
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} onSubmit={handleSubmit} className="space-y-6">
       {state.error && (
         <p
           role="alert"
@@ -73,6 +83,17 @@ export default function CheckoutForm() {
           </p>
         </section>
       )}
+
+      <input
+        type="hidden"
+        name="submissionId"
+        ref={(element) => {
+          if (element && submissionIdRef.current) {
+            element.value = submissionIdRef.current;
+          }
+        }}
+        defaultValue=""
+      />
 
       <input
         type="hidden"

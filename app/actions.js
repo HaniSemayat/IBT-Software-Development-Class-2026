@@ -6,12 +6,8 @@ import { revalidatePath } from "next/cache";
 
 import { validateOrder, validateCartItems } from "../lib/schema";
 
-import {
-  createOrder,
-  getOrderForUser,
-  markCancelled,
-  setOrderStatus,
-} from "../lib/orders";
+import { getOrderForUser, markCancelled, setOrderStatus } from "../lib/orders";
+import { createOrderOnce } from "../lib/idempotent-orders";
 
 import {
   createSession,
@@ -117,6 +113,18 @@ export async function placeOrder(previousState, formData) {
     };
   }
 
+  const submissionId = formData.get("submissionId");
+
+  if (
+    typeof submissionId !== "string" ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submissionId)
+  ) {
+    return {
+      error: "This checkout session is invalid. Refresh the page and try again.",
+      fieldErrors: {},
+    };
+  }
+
   let submittedItems;
 
   try {
@@ -156,7 +164,16 @@ export async function placeOrder(previousState, formData) {
     };
   }
 
-  const createdOrder = await createOrder(order);
+  let createdOrder;
+
+  try {
+    createdOrder = await createOrderOnce(order, submissionId);
+  } catch {
+    return {
+      error: "We could not safely confirm this submission. Refresh checkout before trying again.",
+      fieldErrors: {},
+    };
+  }
 
   revalidatePath("/checkout");
   revalidatePath("/orders");
