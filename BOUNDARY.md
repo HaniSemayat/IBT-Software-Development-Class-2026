@@ -455,3 +455,72 @@ The browser can request an operation, but the server decides whether the operati
 The goal is to keep server-only data and security checks on the server while sending only the information and interactive components the browser needs.
 
 
+
+## Day 48 — Event Handling and Interactive Boundaries
+
+Day 48 reinforces the separation between server-side responsibilities and browser interaction.
+
+### Client-Side Event Handling
+
+Client Components handle browser events such as clicks, keyboard input, and form submissions.
+
+- Use semantic buttons for actions and links for navigation.
+- Handle form submission through the form's `onSubmit` behavior.
+- Use `preventDefault()` when the browser's default action must be prevented.
+- Use `stopPropagation()` only when an event should not reach ancestor handlers.
+- Understand `target` and `currentTarget` when handling events.
+- Provide visible focus indicators and keyboard-accessible controls.
+- Do not make essential interactions dependent on hover alone.
+- Provide practical touch targets of approximately 44 × 44 CSS pixels where appropriate.
+
+### Form and Server Action Boundary
+
+A Client Component can collect input, show pending feedback, and display validation errors. It must not be trusted to authorize a sensitive operation.
+
+The intended flow is:
+
+```text
+Client Component
+       |
+       v
+Form submission
+       |
+       v
+Server Action
+       |
+       v
+Authenticate and authorize
+       |
+       v
+Validate submitted data
+       |
+       v
+Perform the operation
+       |
+       v
+Return action state
+       |
+       v
+Update the interface
+````
+
+Server Actions must validate input and enforce authentication, permissions, and ownership independently of client-side checks. Duplicate-submission protection must be enforced on the server when an operation must not be repeated.
+
+### Checkout Submission Safety
+
+The checkout form uses `useActionState` to manage the Server Action's result and pending state.
+
+The submit button should communicate pending status and prevent ordinary repeated clicks while a submission is in progress. Server-side validation and idempotency remain necessary because client-side controls cannot prevent every repeated or concurrent request.
+
+The current idempotency helper uses process-local in-memory storage. It is a learning implementation and does not provide durable protection across server restarts or multiple server instances.
+
+### Verification
+
+After changing interaction or submission behavior, verify the relevant implementation and run:
+
+- `npm run lint`
+- `git diff --check`
+
+Test keyboard navigation, focus visibility, form errors, pending feedback, and repeated submissions where applicable. A successful lint or build does not prove that every interaction or security check works correctly.
+
+Deployment verification remains a separate follow-up task.
