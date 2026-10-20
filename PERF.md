@@ -433,3 +433,53 @@ The recorded Lighthouse experiments show mixed results. The image-priority exper
 Day 47's performance work is therefore to verify the integrated application, measure the current build, and document the results without claiming improvements that have not been demonstrated.
 
 
+
+## Day 48 — Interaction and Submission Performance
+
+### Scope
+
+Day 48 documents checkout interaction improvements, including pending feedback, disabled submission controls while an action is pending, and duplicate-submission protection.
+
+These changes improve interaction behavior and help prevent accidental repeated submissions. They do not establish that overall page performance has improved.
+
+### Performance Considerations
+
+- Pending UI should communicate submission progress without introducing unnecessary rendering work.
+- Disabling the submit button while pending helps prevent repeated user-triggered submissions, but does not eliminate repeated HTTP requests.
+- Server-side validation and idempotency protection add work to the order-submission path.
+- The current idempotency implementation uses process-local in-memory storage and does not provide production-grade atomic guarantees across instances or restarts.
+- Checkout submission responsiveness should be evaluated separately from initial menu loading performance.
+
+### Measurement Status
+
+No new Lighthouse measurements were collected specifically for Day 48.
+
+The latest historical local `/menu` measurement remains:
+
+| Metric | Latest recorded result |
+|---|---:|
+| Performance | 73 |
+| First Contentful Paint | 0.9 s |
+| Largest Contentful Paint | 3.4 s |
+| Total Blocking Time | 800 ms |
+| Cumulative Layout Shift | 0 |
+| Speed Index | 1.8 s |
+
+These are historical local measurements, not Day 48 measurements or deployed-site results.
+
+### Day 48 Verification Checklist
+
+- [ ] Run a production build after the current changes.
+- [ ] Measure the current `/menu` route using the established Lighthouse setup.
+- [ ] Measure checkout interaction responsiveness separately from initial page loading.
+- [ ] Verify that pending feedback appears during checkout submission.
+- [ ] Confirm that repeated submissions are handled as intended.
+- [ ] Check browser console and Network panel for errors or unexpected repeated requests.
+- [ ] Record new measurements separately from historical results.
+- [ ] Verify the deployed site independently after deployment.
+
+### Assessment
+
+Day 48 extends the documented interaction and submission behavior. No performance improvement is claimed without new measurements.
+
+Deployment and deployed-site performance verification remain separate follow-up tasks.
