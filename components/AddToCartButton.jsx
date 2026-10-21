@@ -1,4 +1,5 @@
-﻿"use client";
+﻿
+"use client";
 
 import { useEffect, useState } from "react";
 import { useCart } from "../app/Providers";
@@ -23,10 +24,14 @@ export default function AddToCartButton({ dish }) {
     <button
       type="button"
       onClick={handleAddToCart}
-      className="cursor-pointer rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700 active:scale-95"
+      className={`inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
+        added
+          ? "bg-success hover:bg-success"
+          : "bg-brand hover:bg-brand-hover"
+      }`}
       aria-live="polite"
     >
-      {added ? "Added to Cart ✓" : "Add to Cart"}
+      {added ? "Added to Cart" : "Add to Cart"}
     </button>
   );
 }

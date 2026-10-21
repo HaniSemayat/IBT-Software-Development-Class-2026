@@ -1,4 +1,5 @@
-﻿import Image from "next/image";
+﻿
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDish, getDishes } from "../../../lib/dishes";
@@ -33,6 +34,7 @@ export async function generateMetadata({ params }) {
       title,
       description,
       type: "website",
+      images: [dish.image],
     },
   };
 }
@@ -65,7 +67,7 @@ export default async function DishPage({ params }) {
   };
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
+    <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -73,47 +75,76 @@ export default async function DishPage({ params }) {
         }}
       />
 
-      <Link
-        href="/menu"
-        className="text-sm font-medium text-orange-600 hover:text-orange-700"
-      >
-        Back to Menu
-      </Link>
+      <nav aria-label="Breadcrumb" className="mb-8">
+        <Link
+          href="/menu"
+          className="inline-flex min-h-11 items-center rounded-lg text-sm font-semibold text-brand transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+        >
+          Back to Menu
+        </Link>
+      </nav>
 
-      <section className="mt-8 overflow-hidden rounded-2xl border bg-white shadow-sm">
-        <div className="relative aspect-[4/3] w-full bg-orange-50 sm:aspect-[16/9]">
-          <Image
-            src={dish.image}
-            alt={dish.imageAlt}
-            width={800}
-            height={600}
-            sizes="(max-width: 640px) calc(100vw - 3rem), 800px"
-            className="h-full w-full object-cover"
-          />
-        </div>
+      <article className="overflow-hidden rounded-3xl border border-border bg-surface">
+        <div className="grid md:grid-cols-2">
+          <div className="relative aspect-[4/3] overflow-hidden bg-brand-soft md:aspect-auto md:min-h-[440px]">
+            <Image
+              src={dish.image}
+              alt={dish.imageAlt || dish.name}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
 
-        <div className="p-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-orange-600">
-            Addis Eats
-          </p>
+          <div className="flex flex-col justify-center p-6 sm:p-9 lg:p-12">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-brand-soft px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-brand">
+                {dish.category}
+              </span>
 
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-gray-900">
-            {dish.name}
-          </h1>
+              <span className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted">
+                Made for Addis Ababa
+              </span>
+            </div>
 
-          <p className="mt-4 text-2xl font-bold text-gray-900">
-            {dish.price} ETB
-          </p>
+            <p className="mt-7 text-sm font-bold uppercase tracking-[0.18em] text-brand">
+              Addis Eats
+            </p>
 
-          <p className="mt-4 max-w-xl text-gray-600">
-            Freshly prepared and ready to order from Addis Eats.
-          </p>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+              {dish.name}
+            </h1>
 
-          <div className="mt-8">
-            <AddToCartButton dish={dish} />
+            <p className="mt-5 leading-7 text-muted">
+              Discover {dish.name}, available to order from Addis Eats.
+              Find your next favorite and enjoy a delicious meal.
+            </p>
+
+            <div className="mt-8 border-y border-border py-5">
+              <p className="text-sm font-medium text-muted">Price</p>
+              <p className="mt-1 text-3xl font-bold text-brand">
+                {dish.price} ETB
+              </p>
+            </div>
+
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <AddToCartButton dish={dish} />
+
+              <Link
+                href="/menu"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              >
+                Continue Browsing
+              </Link>
+            </div>
+
+            <p className="mt-5 text-xs leading-5 text-muted">
+              Prices are displayed in Ethiopian birr (ETB).
+            </p>
           </div>
         </div>
-      </section>
+      </article>
     </main>
   );
 }
