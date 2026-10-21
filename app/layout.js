@@ -135,7 +135,7 @@ export default async function RootLayout({ children }) {
                       href="/admin"
                       className="font-semibold text-brand hover:text-brand-hover"
                     >
-                      Admin Panel →
+                      Admin Panel
                     </Link>
                   </li>
                   <li className="leading-6">
