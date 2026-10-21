@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 const linkClass =
-  "inline-flex min-h-11 items-center whitespace-nowrap rounded-md px-1 text-sm font-medium text-gray-700 transition hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700";
+  "inline-flex min-h-11 items-center whitespace-nowrap rounded-md px-1 text-sm font-medium text-muted transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
 
 export default async function RootLayout({ children }) {
   const session = await getSession();
@@ -37,11 +37,11 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-50 text-gray-900">
+      <body className="min-h-screen bg-background text-foreground">
         <Providers>
-          <header className="border-b bg-white">
-            <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:gap-4 sm:px-6">
-              <Link href="/" className="text-xl font-bold text-orange-600">
+          <header className="border-b border-border bg-surface">
+            <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
+              <Link href="/" className="text-xl font-bold text-brand">
                 Addis Eats
               </Link>
 
@@ -86,54 +86,54 @@ export default async function RootLayout({ children }) {
 
           <main className="min-h-[calc(100vh-137px)]">{children}</main>
 
-          <footer className="mt-16 border-t bg-white">
+          <footer className="mt-16 border-t border-border bg-surface">
             <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <Link href="/" className="text-xl font-bold text-orange-600">
+                <Link href="/" className="text-xl font-bold text-brand">
                   Addis Eats
                 </Link>
-                <p className="mt-3 max-w-xs text-sm leading-6 text-gray-600">
+                <p className="mt-3 max-w-xs text-sm leading-6 text-muted">
                   Discover Ethiopian favorites, order fresh meals, and enjoy
                   great food delivered with care.
                 </p>
               </div>
 
               <div>
-                <h2 className="font-semibold text-gray-900">Explore</h2>
-                <ul className="mt-4 space-y-3 text-sm text-gray-600">
-                  <li><Link className="hover:text-orange-600" href="/">Home</Link></li>
-                  <li><Link className="hover:text-orange-600" href="/menu">Browse Menu</Link></li>
-                  <li><Link className="hover:text-orange-600" href="/favorites">Favorites</Link></li>
-                  <li><Link className="hover:text-orange-600" href="/cart">Shopping Cart</Link></li>
+                <h2 className="font-semibold text-foreground">Explore</h2>
+                <ul className="mt-4 space-y-3 text-sm text-muted">
+                  <li><Link className="hover:text-brand" href="/">Home</Link></li>
+                  <li><Link className="hover:text-brand" href="/menu">Browse Menu</Link></li>
+                  <li><Link className="hover:text-brand" href="/favorites">Favorites</Link></li>
+                  <li><Link className="hover:text-brand" href="/cart">Shopping Cart</Link></li>
                 </ul>
               </div>
 
               <div>
-                <h2 className="font-semibold text-gray-900">Your Account</h2>
-                <ul className="mt-4 space-y-3 text-sm text-gray-600">
+                <h2 className="font-semibold text-foreground">Your Account</h2>
+                <ul className="mt-4 space-y-3 text-sm text-muted">
                   {session ? (
                     <>
                       {session.role !== "staff" && (
-                        <li><Link className="hover:text-orange-600" href="/orders">My Orders</Link></li>
+                        <li><Link className="hover:text-brand" href="/orders">My Orders</Link></li>
                       )}
                       <li><span>Signed in as {session.name}</span></li>
                     </>
                   ) : (
                     <>
-                      <li><Link className="hover:text-orange-600" href="/signin">Sign In</Link></li>
-                      <li><Link className="hover:text-orange-600" href="/signup">Create Account</Link></li>
+                      <li><Link className="hover:text-brand" href="/signin">Sign In</Link></li>
+                      <li><Link className="hover:text-brand" href="/signup">Create Account</Link></li>
                     </>
                   )}
                 </ul>
               </div>
 
               <div>
-                <h2 className="font-semibold text-gray-900">Staff</h2>
-                <ul className="mt-4 space-y-3 text-sm text-gray-600">
+                <h2 className="font-semibold text-foreground">Staff</h2>
+                <ul className="mt-4 space-y-3 text-sm text-muted">
                   <li>
                     <Link
                       href="/admin"
-                      className="font-semibold text-orange-600 hover:text-orange-700"
+                      className="font-semibold text-brand hover:text-brand-hover"
                     >
                       Admin Panel →
                     </Link>
@@ -145,8 +145,8 @@ export default async function RootLayout({ children }) {
               </div>
             </div>
 
-            <div className="border-t bg-gray-50">
-              <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-5 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between">
+            <div className="border-t border-border bg-background">
+              <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-5 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
                 <p>© {new Date().getFullYear()} Addis Eats. All rights reserved.</p>
                 <p>Made for food lovers in Addis Ababa.</p>
               </div>
@@ -157,4 +157,3 @@ export default async function RootLayout({ children }) {
     </html>
   );
 }
-

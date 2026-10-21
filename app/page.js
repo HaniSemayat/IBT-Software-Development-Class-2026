@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
 export const metadata = {
   title: "Home",
@@ -12,7 +12,7 @@ export const metadata = {
 export default function HomePage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">
-      <section className="rounded-3xl bg-orange-50 px-8 py-16 text-center shadow-sm">
+      <section className="rounded-3xl bg-brand-soft px-8 py-16 text-center shadow-sm">
         <p className="text-sm font-semibold uppercase tracking-widest text-orange-600">
           Addis Ababa
         </p>
