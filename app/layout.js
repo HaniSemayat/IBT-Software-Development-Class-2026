@@ -39,7 +39,7 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body className="min-h-screen bg-background text-foreground">
         <Providers>
-          <header className="border-b border-border bg-surface">
+          <header className="sticky top-0 z-50 border-b border-border bg-surface shadow-sm">
             <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
               <Link href="/" className="text-xl font-bold text-brand">
                 Addis Eats
