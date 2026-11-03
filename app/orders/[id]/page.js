@@ -25,24 +25,25 @@ export default async function OrderPage({ params }) {
   }
 
   return (
-    <main className="min-h-screen bg-stone-50 px-4 py-8 sm:px-6 sm:py-12">
+    <main className="min-h-screen bg-background px-4 py-10 sm:px-6 sm:py-14">
       <div className="mx-auto max-w-5xl">
         <Link
           href="/orders"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-orange-700 transition hover:text-orange-800"
+          className="inline-flex items-center text-sm font-semibold text-brand transition-colors hover:text-brand-hover"
         >
-          <span aria-hidden="true">&larr;</span>
           Back to my orders
         </Link>
 
-        <header className="mb-8 mt-6">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-600">
+        <header className="mb-8 mt-7">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">
             Addis Eats / Order tracking
           </p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+
+          <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Your order, in progress
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600 sm:text-base">
+
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-muted sm:text-base">
             Follow your order status and check the delivery information below.
           </p>
         </header>

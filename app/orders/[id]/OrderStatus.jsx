@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import MapPanel from "../../../components/tracking/MapPanel";
@@ -41,7 +41,7 @@ function getStatusStyle(status) {
     cancelled: "bg-red-50 text-red-700 ring-red-200",
   };
 
-  return styles[status] || "bg-stone-100 text-stone-700 ring-stone-200";
+  return styles[status] || "bg-gray-100 text-gray-700 ring-gray-200";
 }
 
 export default function OrderStatus({ id, initial }) {
@@ -114,14 +114,14 @@ export default function OrderStatus({ id, initial }) {
 
   return (
     <section className="space-y-6">
-      <article className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-stone-100 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+      <article className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+        <div className="flex flex-col gap-4 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div>
-            <p className="text-sm font-medium text-stone-500">Order reference</p>
-            <h2 className="mt-1 text-2xl font-bold text-stone-900">
+            <p className="text-sm font-medium text-muted">Order reference</p>
+            <h2 className="mt-1 text-2xl font-bold text-foreground">
               #{order.id}
             </h2>
-            <p className="mt-1 text-sm text-stone-500">
+            <p className="mt-1 text-sm text-muted">
               Placed {formatDate(order.createdAt)}
             </p>
           </div>
@@ -134,10 +134,11 @@ export default function OrderStatus({ id, initial }) {
         </div>
 
         <div className="p-5 sm:p-7">
-          <h3 className="text-lg font-bold text-stone-900">
+          <h3 className="text-lg font-bold text-foreground">
             {cancelled ? "This order was cancelled" : "Order progress"}
           </h3>
-          <p className="mt-1 text-sm leading-6 text-stone-500">
+
+          <p className="mt-1 text-sm leading-6 text-muted">
             {cancelled
               ? "This order will not continue through the delivery process."
               : STEPS[currentStep]?.detail || "Your order status will appear here."}
@@ -156,18 +157,19 @@ export default function OrderStatus({ id, initial }) {
                       <span
                         className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
                           complete
-                            ? "bg-orange-600 text-white"
+                            ? "bg-brand text-white"
                             : active
-                              ? "bg-orange-100 text-orange-700 ring-2 ring-orange-500"
-                              : "bg-stone-100 text-stone-400"
+                              ? "bg-brand-soft text-brand ring-2 ring-brand"
+                              : "bg-background text-muted"
                         }`}
                       >
                         {complete ? "✓" : index + 1}
                       </span>
+
                       {index < STEPS.length - 1 && (
                         <span
                           className={`my-1 min-h-7 w-0.5 flex-1 ${
-                            complete ? "bg-orange-500" : "bg-stone-200"
+                            complete ? "bg-brand" : "bg-border"
                           }`}
                         />
                       )}
@@ -176,17 +178,19 @@ export default function OrderStatus({ id, initial }) {
                     <div className="pb-6 pt-1">
                       <p
                         className={`text-sm font-bold ${
-                          reached ? "text-stone-900" : "text-stone-400"
+                          reached ? "text-foreground" : "text-muted"
                         }`}
                       >
                         {step.label}
+
                         {active && (
-                          <span className="ml-2 text-xs font-semibold text-orange-600">
+                          <span className="ml-2 text-xs font-semibold text-brand">
                             Current
                           </span>
                         )}
                       </p>
-                      <p className="mt-1 text-sm text-stone-500">
+
+                      <p className="mt-1 text-sm text-muted">
                         {step.detail}
                       </p>
                     </div>
@@ -199,64 +203,69 @@ export default function OrderStatus({ id, initial }) {
       </article>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <article className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
-          <h3 className="text-lg font-bold text-stone-900">Delivery details</h3>
+        <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">
+          <h3 className="text-lg font-bold text-foreground">
+            Delivery details
+          </h3>
 
           <dl className="mt-5 space-y-4">
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+              <dt className="text-xs font-semibold uppercase tracking-wider text-muted">
                 Customer
               </dt>
-              <dd className="mt-1 font-medium text-stone-900">
+              <dd className="mt-1 font-medium text-foreground">
                 {order.name || "Not provided"}
               </dd>
             </div>
+
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+              <dt className="text-xs font-semibold uppercase tracking-wider text-muted">
                 Phone
               </dt>
-              <dd className="mt-1 font-medium text-stone-900">
+              <dd className="mt-1 font-medium text-foreground">
                 {order.phone || "Not provided"}
               </dd>
             </div>
+
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+              <dt className="text-xs font-semibold uppercase tracking-wider text-muted">
                 Delivery area
               </dt>
-              <dd className="mt-1 font-medium text-stone-900">
+              <dd className="mt-1 font-medium text-foreground">
                 {order.area || "Not provided"}
               </dd>
             </div>
+
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+              <dt className="text-xs font-semibold uppercase tracking-wider text-muted">
                 Last updated
               </dt>
-              <dd className="mt-1 font-medium text-stone-900">
+              <dd className="mt-1 font-medium text-foreground">
                 {formatDate(order.updatedAt)}
               </dd>
             </div>
           </dl>
         </article>
 
-        <article className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
-          <h3 className="text-lg font-bold text-stone-900">Your items</h3>
+        <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">
+          <h3 className="text-lg font-bold text-foreground">Your items</h3>
 
           {items.length === 0 ? (
-            <p className="mt-4 text-sm text-stone-500">
+            <p className="mt-4 text-sm text-muted">
               Item details are not available.
             </p>
           ) : (
-            <ul className="mt-4 divide-y divide-stone-100">
+            <ul className="mt-4 divide-y divide-border">
               {items.map((item, index) => (
                 <li
                   key={`${item.id ?? item.name ?? "item"}-${index}`}
                   className="flex items-start justify-between gap-4 py-3"
                 >
                   <div>
-                    <p className="font-medium text-stone-800">
+                    <p className="font-medium text-foreground">
                       {item.name || "Menu item"}
                     </p>
-                    <p className="mt-1 text-sm text-stone-500">
+                    <p className="mt-1 text-sm text-muted">
                       Quantity: {item.quantity ?? 1}
                     </p>
                   </div>
@@ -265,17 +274,17 @@ export default function OrderStatus({ id, initial }) {
             </ul>
           )}
 
-          <div className="mt-4 flex items-center justify-between border-t border-stone-200 pt-4">
-            <span className="font-semibold text-stone-600">Order total</span>
-            <span className="text-xl font-extrabold text-orange-700">
+          <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+            <span className="font-semibold text-muted">Order total</span>
+            <span className="text-xl font-bold text-brand">
               ETB {total.toLocaleString("en-ET")}
             </span>
           </div>
         </article>
       </div>
 
-      <div className="rounded-xl border border-stone-200 bg-white px-4 py-3 shadow-sm">
-        <p aria-live="polite" className="flex items-center gap-2 text-sm text-stone-600">
+      <div className="rounded-xl border border-border bg-surface px-4 py-3 shadow-sm">
+        <p aria-live="polite" className="flex items-center gap-2 text-sm text-muted">
           <span
             className={`h-2.5 w-2.5 rounded-full ${
               connection === "connected"
@@ -283,12 +292,13 @@ export default function OrderStatus({ id, initial }) {
                 : connection === "reconnecting"
                   ? "bg-amber-500"
                   : connection === "complete"
-                    ? "bg-stone-400"
-                    : "bg-orange-500"
+                    ? "bg-gray-400"
+                    : "bg-brand"
             }`}
           />
           {connectionLabel}
         </p>
+
         {streamError && (
           <p role="status" className="mt-2 text-sm text-amber-700">
             {streamError}
