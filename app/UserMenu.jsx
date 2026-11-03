@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { signOut } from "./actions";
 
 export default function UserMenu({ session }) {
@@ -6,7 +6,7 @@ export default function UserMenu({ session }) {
     return (
       <Link
         href="/signin"
-        className="inline-flex min-h-11 items-center justify-center rounded-lg bg-orange-600 px-4 py-2 font-semibold text-white transition hover:bg-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
+        className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand px-4 py-2 font-semibold text-white transition-colors hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
       >
         Sign In
       </Link>
@@ -17,17 +17,16 @@ export default function UserMenu({ session }) {
 
   return (
     <div className="flex items-center gap-3">
-      <div className="flex items-center gap-2">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 font-bold text-orange-700">
+      <div className="flex min-w-0 items-center gap-2">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/10 font-bold text-brand ring-1 ring-brand/15">
           {initial}
         </div>
 
-        <div className="hidden text-left sm:block">
-          <p className="text-sm font-semibold text-gray-900">
+        <div className="hidden min-w-0 text-left sm:block">
+          <p className="truncate text-sm font-semibold text-foreground">
             {session.name}
           </p>
-
-          <p className="text-xs text-gray-500">
+          <p className="truncate text-xs text-muted">
             {session.email}
           </p>
         </div>
@@ -36,7 +35,7 @@ export default function UserMenu({ session }) {
       <form action={signOut}>
         <button
           type="submit"
-          className="min-h-11 rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-orange-500 hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700"
+          className="min-h-11 cursor-pointer rounded-xl border border-border px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:border-brand/40 hover:bg-brand/5 hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           Sign Out
         </button>
@@ -44,3 +43,4 @@ export default function UserMenu({ session }) {
     </div>
   );
 }
+
