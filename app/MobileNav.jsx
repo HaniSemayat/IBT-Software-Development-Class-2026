@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-import { signOut } from "./actions";
+import SignOutButton from "../components/SignOutButton";
 
 const linkClass =
   "block rounded-lg px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-brand/5 hover:text-brand";
@@ -81,14 +81,9 @@ export default function MobileNav({ session, isStaff }) {
                     {session.email}
                   </p>
                 </div>
-                <form action={signOut}>
-                  <button
-                    type="submit"
-                    className={`${linkClass} w-full cursor-pointer text-left text-danger hover:bg-danger/5 hover:text-danger`}
-                  >
-                    Sign Out
-                  </button>
-                </form>
+                <SignOutButton
+                  className={`${linkClass} w-full cursor-pointer text-left text-danger hover:bg-danger/5 hover:text-danger`}
+                />
               </>
             ) : (
               <Link
@@ -105,4 +100,5 @@ export default function MobileNav({ session, isStaff }) {
     </div>
   );
 }
+
 

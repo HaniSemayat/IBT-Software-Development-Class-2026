@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { signOut } from "./actions";
+import SignOutButton from "../components/SignOutButton";
 
 export default function UserMenu({ session }) {
   if (!session) {
@@ -34,14 +34,10 @@ export default function UserMenu({ session }) {
         </p>
       </div>
 
-      <form action={signOut} className="hidden lg:block">
-        <button
-          type="submit"
-          className="min-h-10 cursor-pointer rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:border-brand/40 hover:bg-brand/5 hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
-        >
-          Sign Out
-        </button>
-      </form>
+      <div className="hidden lg:block">
+        <SignOutButton className="min-h-10 cursor-pointer rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:border-brand/40 hover:bg-brand/5 hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2" />
+      </div>
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   createContext,
@@ -81,6 +81,8 @@ export default function Providers({ children }) {
 
   const clearCart = useCallback(() => setItems([]), []);
 
+  const clearFavorites = useCallback(() => setFavorites([]), []);
+
   const toggleFavorite = useCallback((dish) => {
     setFavorites((current) =>
       current.some((item) => item.id === dish.id)
@@ -104,10 +106,11 @@ export default function Providers({ children }) {
       value={{ items, addToCart, increaseQuantity, decreaseQuantity, total, clearCart }}
     >
       <FavoritesContext.Provider
-        value={{ favorites, toggleFavorite, isFavorite, favoritesReady }}
+        value={{ favorites, toggleFavorite, clearFavorites, isFavorite, favoritesReady }}
       >
         {children}
       </FavoritesContext.Provider>
     </CartContext.Provider>
   );
 }
+
