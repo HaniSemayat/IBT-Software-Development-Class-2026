@@ -41,7 +41,7 @@ export default async function RootLayout({ children }) {
       <body className="min-h-screen bg-background text-foreground">
         <Providers>
           <header className="sticky top-0 z-50 border-b border-border bg-surface shadow-sm">
-            <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
+            <nav className="mx-auto flex h-[76px] max-w-screen-2xl items-center justify-between gap-3 px-6 sm:px-10 lg:px-12">
               <Link href="/" className="shrink-0 text-xl font-bold text-brand">
                 Addis Eats
               </Link>
@@ -79,10 +79,10 @@ export default async function RootLayout({ children }) {
             </nav>
           </header>
 
-          <main className="min-h-[calc(100vh-137px)]">{children}</main>
+          <main className="min-h-[calc(100vh-137px)] px-3 sm:px-5 lg:px-8">{children}</main>
 
           <footer className="mt-16 border-t border-border bg-surface">
-            <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mx-auto grid max-w-screen-2xl gap-10 px-6 py-14 sm:px-10 lg:px-12 sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <Link href="/" className="text-xl font-bold text-brand">
                   Addis Eats
@@ -96,10 +96,10 @@ export default async function RootLayout({ children }) {
               <div>
                 <h2 className="font-semibold text-foreground">Explore</h2>
                 <ul className="mt-4 space-y-3 text-sm text-muted">
-                  <li><Link className="hover:text-brand" href="/">Home</Link></li>
-                  <li><Link className="hover:text-brand" href="/menu">Browse Menu</Link></li>
-                  <li><Link className="hover:text-brand" href="/favorites">Favorites</Link></li>
-                  <li><Link className="hover:text-brand" href="/cart">Shopping Cart</Link></li>
+                  <li><Link className="inline-flex items-center rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand/30 hover:bg-brand/5 hover:text-brand" href="/">Home</Link></li>
+                  <li><Link className="inline-flex items-center rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand/30 hover:bg-brand/5 hover:text-brand" href="/menu">Browse Menu</Link></li>
+                  <li><Link className="inline-flex items-center rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand/30 hover:bg-brand/5 hover:text-brand" href="/favorites">Favorites</Link></li>
+                  <li><Link className="inline-flex items-center rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand/30 hover:bg-brand/5 hover:text-brand" href="/cart">Shopping Cart</Link></li>
                 </ul>
               </div>
 
@@ -109,14 +109,14 @@ export default async function RootLayout({ children }) {
                   {session ? (
                     <>
                       {session.role !== "staff" && (
-                        <li><Link className="hover:text-brand" href="/orders">My Orders</Link></li>
+                        <li><Link className="inline-flex items-center rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand/30 hover:bg-brand/5 hover:text-brand" href="/orders">My Orders</Link></li>
                       )}
                       <li><span>Signed in as {session.name}</span></li>
                     </>
                   ) : (
                     <>
-                      <li><Link className="hover:text-brand" href="/signin">Sign In</Link></li>
-                      <li><Link className="hover:text-brand" href="/signup">Create Account</Link></li>
+                      <li><Link className="inline-flex items-center rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand/30 hover:bg-brand/5 hover:text-brand" href="/signin">Sign In</Link></li>
+                      <li><Link className="inline-flex items-center rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand/30 hover:bg-brand/5 hover:text-brand" href="/signup">Create Account</Link></li>
                     </>
                   )}
                 </ul>
@@ -128,7 +128,7 @@ export default async function RootLayout({ children }) {
                   <li>
                     <Link
                       href="/admin"
-                      className="font-semibold text-brand hover:text-brand-hover"
+                      className="inline-flex items-center rounded-lg border border-brand/20 bg-brand/5 px-3 py-2 text-sm font-semibold text-brand transition-colors hover:border-brand/40 hover:bg-brand/10 hover:text-brand-hover"
                     >
                       Admin Panel
                     </Link>
@@ -141,8 +141,8 @@ export default async function RootLayout({ children }) {
             </div>
 
             <div className="border-t border-border bg-background">
-              <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-5 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-                <p>Â© {new Date().getFullYear()} Addis Eats. All rights reserved.</p>
+              <div className="mx-auto flex max-w-screen-2xl flex-col gap-2 px-6 py-6 sm:px-10 lg:px-12 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+                <p>© {new Date().getFullYear()} Addis Eats. All rights reserved.</p>
                 <p>Made for food lovers in Addis Ababa.</p>
               </div>
             </div>
@@ -152,4 +152,8 @@ export default async function RootLayout({ children }) {
     </html>
   );
 }
+
+
+
+
 
