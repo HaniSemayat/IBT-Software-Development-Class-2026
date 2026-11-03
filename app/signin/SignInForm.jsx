@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useActionState } from "react";
 import { signIn } from "../actions";
@@ -7,6 +7,9 @@ const initialState = {
   error: "",
   success: false,
 };
+
+const inputClass =
+  "block min-h-12 w-full rounded-xl border border-border bg-surface px-4 py-3 text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
 
 export default function SignInForm({ next }) {
   const [state, formAction, pending] =
@@ -19,7 +22,7 @@ export default function SignInForm({ next }) {
       {state.error && (
         <p
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+          className="rounded-xl border border-danger/30 bg-danger/5 p-4 text-sm text-danger"
         >
           {state.error}
         </p>
@@ -28,7 +31,7 @@ export default function SignInForm({ next }) {
       <div>
         <label
           htmlFor="email"
-          className="mb-2 block text-sm font-semibold text-gray-800"
+          className="mb-2 block text-sm font-semibold text-foreground"
         >
           Email
         </label>
@@ -37,16 +40,17 @@ export default function SignInForm({ next }) {
           id="email"
           name="email"
           type="email"
-          placeholder="addistesfa@gmail.com"
+          placeholder="Enter your email"
+          autoComplete="email"
           required
-          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+          className={inputClass}
         />
       </div>
 
       <div>
         <label
           htmlFor="password"
-          className="mb-2 block text-sm font-semibold text-gray-800"
+          className="mb-2 block text-sm font-semibold text-foreground"
         >
           Password
         </label>
@@ -56,15 +60,16 @@ export default function SignInForm({ next }) {
           name="password"
           type="password"
           placeholder="Enter your password"
+          autoComplete="current-password"
           required
-          className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+          className={inputClass}
         />
       </div>
 
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl bg-brand px-5 py-3 font-semibold text-white transition-colors hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending ? "Signing in..." : "Sign In"}
       </button>
