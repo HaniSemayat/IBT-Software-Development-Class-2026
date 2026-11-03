@@ -21,24 +21,25 @@ export default async function CheckoutPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <div className="mb-8">
-        <p className="text-sm font-semibold uppercase tracking-widest text-orange-600">
+    <main className="mx-auto min-h-[60vh] max-w-4xl px-5 py-12 sm:px-8 sm:py-16">
+      <header className="mb-8">
+        <p className="text-sm font-bold uppercase tracking-[0.2em] text-brand">
           Addis Eats
         </p>
 
-        <h1 className="mt-2 text-4xl font-bold tracking-tight text-white">
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           Checkout
         </h1>
 
-        <p className="mt-3 text-gray-200">
-          Enter your delivery details to place your order.
+        <p className="mt-3 max-w-xl leading-7 text-muted">
+          You are almost there. Confirm your order and enter your delivery
+          details to enjoy your meal.
         </p>
-      </div>
+      </header>
 
-      <div className="rounded-2xl border bg-white p-6 shadow-sm sm:p-8">
+      <section className="rounded-3xl border border-border bg-surface p-5 shadow-sm sm:p-8">
         <CheckoutForm />
-      </div>
+      </section>
     </main>
   );
 }
