@@ -27,61 +27,82 @@ export default async function DashboardPage() {
   if (session.role !== "staff") {
     return (
       <main className="mx-auto max-w-4xl px-6 py-12">
-        <h1 className="text-3xl font-bold text-gray-950">Access denied</h1>
-        <p className="mt-3 text-gray-700">This dashboard is available to authorised staff only.</p>
-        <Link href="/" className="mt-5 inline-block font-semibold text-violet-700 underline">Return home</Link>
+        <div className="rounded-2xl border border-border bg-surface p-8">
+          <p className="text-sm font-semibold text-brand">Restricted area</p>
+          <h1 className="mt-2 text-3xl font-bold text-foreground">Access denied</h1>
+          <p className="mt-3 text-muted">
+            This dashboard is available to authorised staff only.
+          </p>
+          <Link
+            href="/"
+            className="mt-5 inline-flex rounded-lg font-semibold text-brand underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          >
+            Return home
+          </Link>
+        </div>
       </main>
     );
   }
 
   const analytics = await getDashboardAnalytics();
-  const cancelled = analytics.statusBreakdown.find((item) => item.status === "cancelled")?.count ?? 0;
-  const delivered = analytics.statusBreakdown.find((item) => item.status === "delivered")?.count ?? 0;
+  const cancelled =
+    analytics.statusBreakdown.find((item) => item.status === "cancelled")?.count ?? 0;
+  const delivered =
+    analytics.statusBreakdown.find((item) => item.status === "delivered")?.count ?? 0;
   const active = analytics.totalOrders - cancelled - delivered;
 
   return (
-    <main className="min-h-[70vh] bg-gray-50/70">
+    <main className="min-h-[70vh] bg-background">
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-700">Addis Eats · Staff</p>
-            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-gray-950 sm:text-4xl">Analytics overview</h1>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">
+              Addis Eats · Staff
+            </p>
+            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+              Analytics overview
+            </h1>
+            <p className="mt-2 text-sm text-muted">
               Welcome, {session.name}. Order activity from {analytics.dateRange.start} to {analytics.dateRange.end} (UTC).
             </p>
           </div>
-          <Link href="/kitchen" className="inline-flex items-center justify-center rounded-xl bg-gray-950 px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-gray-800">
-            Open kitchen <span className="ml-2" aria-hidden="true">→</span>
+          <Link
+            href="/kitchen"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+          >
+            Open kitchen
           </Link>
         </header>
 
         <section aria-label="Key performance indicators" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-semibold text-gray-500">Total orders</p>
-            <p className="mt-3 text-3xl font-extrabold tabular-nums text-gray-950">{analytics.totalOrders}</p>
-            <p className="mt-2 text-xs text-gray-500">All order statuses</p>
+          <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+            <p className="text-sm font-semibold text-muted">Total orders</p>
+            <p className="mt-3 text-3xl font-extrabold tabular-nums text-foreground">{analytics.totalOrders}</p>
+            <p className="mt-2 text-xs text-muted">All order statuses</p>
           </article>
-          <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-semibold text-gray-500">Revenue</p>
-            <p className="mt-3 text-3xl font-extrabold tabular-nums text-gray-950">{formatETB(analytics.totalRevenue)}</p>
-            <p className="mt-2 text-xs text-gray-500">Excludes cancelled orders</p>
+          <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+            <p className="text-sm font-semibold text-muted">Revenue</p>
+            <p className="mt-3 text-3xl font-extrabold tabular-nums text-foreground">{formatETB(analytics.totalRevenue)}</p>
+            <p className="mt-2 text-xs text-muted">Excludes cancelled orders</p>
           </article>
-          <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-semibold text-gray-500">In progress</p>
-            <p className="mt-3 text-3xl font-extrabold tabular-nums text-violet-700">{active}</p>
-            <p className="mt-2 text-xs text-gray-500">Not delivered or cancelled</p>
+          <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+            <p className="text-sm font-semibold text-muted">In progress</p>
+            <p className="mt-3 text-3xl font-extrabold tabular-nums text-brand">{active}</p>
+            <p className="mt-2 text-xs text-muted">Not delivered or cancelled</p>
           </article>
-          <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-semibold text-gray-500">Delivered</p>
-            <p className="mt-3 text-3xl font-extrabold tabular-nums text-emerald-700">{delivered}</p>
-            <p className="mt-2 text-xs text-gray-500">Successfully completed</p>
+          <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+            <p className="text-sm font-semibold text-muted">Delivered</p>
+            <p className="mt-3 text-3xl font-extrabold tabular-nums text-success">{delivered}</p>
+            <p className="mt-2 text-xs text-muted">Successfully completed</p>
           </article>
         </section>
 
         {analytics.totalOrders === 0 && (
-          <section className="rounded-2xl border border-dashed border-gray-300 bg-white p-6">
-            <h2 className="text-lg font-bold text-gray-950">Waiting for the first order</h2>
-            <p className="mt-2 text-sm text-gray-600">The charts below show the current seven-day activity. Real order data will appear as customers place orders.</p>
+          <section className="rounded-2xl border border-dashed border-border bg-surface p-6">
+            <h2 className="text-lg font-bold text-foreground">Waiting for the first order</h2>
+            <p className="mt-2 text-sm text-muted">
+              The charts below show the current seven-day activity. Real order data will appear as customers place orders.
+            </p>
           </section>
         )}
 
@@ -91,7 +112,9 @@ export default async function DashboardPage() {
           <StatusBreakdownChart data={analytics.statusBreakdown} />
         </section>
 
-        <p className="text-xs text-gray-400">Analytics use current in-memory order data. Orders may be lost when the development server restarts.</p>
+        <p className="text-xs text-muted">
+          Analytics use current in-memory order data. Orders may be lost when the development server restarts.
+        </p>
       </div>
     </main>
   );
