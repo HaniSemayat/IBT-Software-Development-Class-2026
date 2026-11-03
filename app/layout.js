@@ -1,8 +1,9 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import Providers from "./Providers";
 import UserMenu from "./UserMenu";
+import MobileNav from "./MobileNav";
 import CartNavLink from "../components/CartNavLink";
 import FavoritesNavLink from "../components/FavoritesNavLink";
 import { getSession } from "../lib/session";
@@ -40,29 +41,19 @@ export default async function RootLayout({ children }) {
       <body className="min-h-screen bg-background text-foreground">
         <Providers>
           <header className="sticky top-0 z-50 border-b border-border bg-surface shadow-sm">
-            <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-4">
-              <Link href="/" className="text-xl font-bold text-brand">
+            <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
+              <Link href="/" className="shrink-0 text-xl font-bold text-brand">
                 Addis Eats
               </Link>
 
-              <div className="flex flex-wrap items-center gap-4">
+              <div className="hidden items-center gap-3 lg:flex xl:gap-4">
                 {isStaff ? (
                   <>
-                    <Link href="/admin" className={linkClass}>
-                      Admin Panel
-                    </Link>
-                    <Link href="/dashboard" className={linkClass}>
-                      Dashboard
-                    </Link>
-                    <Link href="/admin/orders" className={linkClass}>
-                      All Orders
-                    </Link>
-                    <Link href="/kitchen" className={linkClass}>
-                      Kitchen
-                    </Link>
-                    <Link href="/menu" className={linkClass}>
-                      Customer Menu
-                    </Link>
+                    <Link href="/admin" className={linkClass}>Admin Panel</Link>
+                    <Link href="/dashboard" className={linkClass}>Dashboard</Link>
+                    <Link href="/admin/orders" className={linkClass}>All Orders</Link>
+                    <Link href="/kitchen" className={linkClass}>Kitchen</Link>
+                    <Link href="/menu" className={linkClass}>Customer Menu</Link>
                   </>
                 ) : (
                   <>
@@ -72,14 +63,18 @@ export default async function RootLayout({ children }) {
                     <CartNavLink />
                     <Link href="/checkout" className={linkClass}>Checkout</Link>
                     {session && (
-                      <Link href="/orders" className={linkClass}>
-                        My Orders
-                      </Link>
+                      <Link href="/orders" className={linkClass}>My Orders</Link>
                     )}
                   </>
                 )}
+              </div>
 
+              <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                {!isStaff && <div className="lg:hidden"><CartNavLink /></div>}
                 <UserMenu session={session} />
+                <div className="lg:hidden">
+                  <MobileNav session={session} isStaff={isStaff} />
+                </div>
               </div>
             </nav>
           </header>
@@ -147,7 +142,7 @@ export default async function RootLayout({ children }) {
 
             <div className="border-t border-border bg-background">
               <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-5 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-                <p>© {new Date().getFullYear()} Addis Eats. All rights reserved.</p>
+                <p>Â© {new Date().getFullYear()} Addis Eats. All rights reserved.</p>
                 <p>Made for food lovers in Addis Ababa.</p>
               </div>
             </div>
@@ -157,3 +152,4 @@ export default async function RootLayout({ children }) {
     </html>
   );
 }
+
