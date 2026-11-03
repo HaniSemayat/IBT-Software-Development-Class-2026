@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { formatETB } from "../../lib/format";
 
 const columns = [
@@ -35,35 +35,47 @@ export default function OrderTable({ orders, sort, dir, page, totalPages }) {
 
   return (
     <>
-      <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
+      <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
           <div>
-            <h2 className="font-bold text-gray-950">Order history</h2>
-            <p className="mt-1 text-sm text-gray-500">Select a column to sort your orders.</p>
+            <h2 className="font-bold text-foreground">Order history</h2>
+            <p className="mt-1 text-sm text-muted">
+              Select a column to sort your orders.
+            </p>
           </div>
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">{orders.length} on this page</span>
+
+          <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-muted">
+            {orders.length} on this page
+          </span>
         </div>
 
         {orders.length === 0 ? (
           <div className="px-6 py-12 text-center">
-            <p className="font-semibold text-gray-800">No orders on this page</p>
-            <p className="mt-1 text-sm text-gray-500">Try another page or place an order from the menu.</p>
+            <p className="font-semibold text-foreground">No orders on this page</p>
+            <p className="mt-1 text-sm text-muted">
+              Try another page or place an order from the menu.
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[650px] border-collapse text-left text-sm">
-              <thead className="bg-gray-50/80">
+              <thead className="bg-background">
                 <tr>
                   {columns.map((column) => (
                     <th
                       key={column.key}
                       scope="col"
                       aria-sort={sort === column.key ? (dir === "asc" ? "ascending" : "descending") : "none"}
-                      className={`border-b border-gray-200 px-5 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 ${column.key === "total" ? "text-right" : ""}`}
+                      className={`border-b border-border px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted ${
+                        column.key === "total" ? "text-right" : ""
+                      }`}
                     >
-                      <Link href={sortHref(column.key)} className="inline-flex items-center gap-1 hover:text-violet-700">
+                      <Link
+                        href={sortHref(column.key)}
+                        className="inline-flex items-center gap-1 transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                      >
                         {column.label}
-                        <span aria-hidden="true" className="text-violet-600">
+                        <span aria-hidden="true" className="text-brand">
                           {sort === column.key ? (dir === "asc" ? "↑" : "↓") : "↕"}
                         </span>
                       </Link>
@@ -71,21 +83,37 @@ export default function OrderTable({ orders, sort, dir, page, totalPages }) {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+
+              <tbody className="divide-y divide-border">
                 {orders.map((order) => (
-                  <tr key={order.id} className="transition-colors hover:bg-violet-50/40">
+                  <tr
+                    key={order.id}
+                    className="transition-colors hover:bg-brand-soft/40"
+                  >
                     <th scope="row" className="whitespace-nowrap px-5 py-5 font-semibold">
-                      <Link href={`/orders/${order.id}`} className="text-violet-700 hover:text-violet-900 hover:underline">
+                      <Link
+                        href={`/orders/${order.id}`}
+                        className="text-brand transition-colors hover:text-brand-hover hover:underline"
+                      >
                         #{order.id}
                       </Link>
                     </th>
-                    <td className="px-5 py-5 text-gray-700">{order.area || "—"}</td>
+
+                    <td className="px-5 py-5 text-foreground">
+                      {order.area || "—"}
+                    </td>
+
                     <td className="px-5 py-5">
-                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${statusStyles[order.status] || "bg-gray-100 text-gray-700 ring-gray-300"}`}>
+                      <span
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${
+                          statusStyles[order.status] || "bg-gray-100 text-gray-700 ring-gray-300"
+                        }`}
+                      >
                         {statusLabel(order.status)}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-5 text-right font-semibold tabular-nums text-gray-950">
+
+                    <td className="whitespace-nowrap px-5 py-5 text-right font-semibold tabular-nums text-foreground">
                       {formatETB(Number(order.total || 0))}
                     </td>
                   </tr>
@@ -96,18 +124,42 @@ export default function OrderTable({ orders, sort, dir, page, totalPages }) {
         )}
       </div>
 
-      <nav aria-label="Order pages" className="mt-5 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-gray-500">Page <span className="font-semibold text-gray-800">{page}</span> of <span className="font-semibold text-gray-800">{totalPages}</span></p>
+      <nav
+        aria-label="Order pages"
+        className="mt-5 flex flex-wrap items-center justify-between gap-3"
+      >
+        <p className="text-sm text-muted">
+          Page <span className="font-semibold text-foreground">{page}</span> of{" "}
+          <span className="font-semibold text-foreground">{totalPages}</span>
+        </p>
+
         <div className="flex gap-2">
           {page > 1 ? (
-            <Link href={pageHref(page - 1)} rel="prev" className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50">← Previous</Link>
+            <Link
+              href={pageHref(page - 1)}
+              rel="prev"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-background"
+            >
+              Previous
+            </Link>
           ) : (
-            <span className="cursor-not-allowed rounded-xl border border-gray-100 px-4 py-2.5 text-sm text-gray-300">← Previous</span>
+            <span className="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-xl border border-border px-4 py-2.5 text-sm text-muted/50">
+              Previous
+            </span>
           )}
+
           {page < totalPages ? (
-            <Link href={pageHref(page + 1)} rel="next" className="rounded-xl bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800">Next →</Link>
+            <Link
+              href={pageHref(page + 1)}
+              rel="next"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
+            >
+              Next
+            </Link>
           ) : (
-            <span className="cursor-not-allowed rounded-xl border border-gray-100 px-4 py-2.5 text-sm text-gray-300">Next →</span>
+            <span className="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-xl border border-border px-4 py-2.5 text-sm text-muted/50">
+              Next
+            </span>
           )}
         </div>
       </nav>

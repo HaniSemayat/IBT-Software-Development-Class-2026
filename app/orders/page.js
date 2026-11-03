@@ -58,69 +58,106 @@ export default async function OrdersPage({ searchParams }) {
   const visibleOrders = sortedOrders.slice((page - 1) * pageSize, page * pageSize);
 
   return (
-    <main className="min-h-[70vh] bg-gray-50/70">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <main className="min-h-[70vh] bg-background">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-700">Your account</p>
-            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-gray-950 sm:text-4xl">My orders</h1>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-gray-600">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">
+              Your account
+            </p>
+
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              My orders
+            </h1>
+
+            <p className="mt-3 max-w-xl text-sm leading-7 text-muted">
               Welcome, {session.name}. Follow your deliveries and review your order history.
             </p>
           </div>
+
           <div className="flex flex-wrap gap-3">
-            <a href="/api/orders/export" download className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-800 shadow-sm transition hover:border-violet-300 hover:text-violet-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-700">
-              <span aria-hidden="true">↓</span> Download CSV
+            <a
+              href="/api/orders/export"
+              download
+              className="inline-flex min-h-12 items-center justify-center rounded-xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            >
+              Download CSV
             </a>
-            <Link href="/menu" className="inline-flex items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-violet-800">
-              Browse menu <span className="ml-2" aria-hidden="true">→</span>
+
+            <Link
+              href="/menu"
+              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            >
+              Browse menu
             </Link>
           </div>
         </header>
 
-        <section aria-label="Order summary" className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-gray-500">Total orders</p>
-              <span className="rounded-xl bg-violet-50 p-2 text-lg" aria-hidden="true">▤</span>
-            </div>
-            <p className="mt-4 text-3xl font-extrabold tabular-nums text-gray-950">{allOrders.length}</p>
-            <p className="mt-1 text-xs text-gray-500">All-time order history</p>
+        <section
+          aria-label="Order summary"
+          className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        >
+          <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+            <p className="text-sm font-medium text-muted">Total orders</p>
+            <p className="mt-4 text-3xl font-bold tabular-nums text-foreground">
+              {allOrders.length}
+            </p>
+            <p className="mt-1 text-xs text-muted">All-time order history</p>
           </article>
-          <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-gray-500">In progress</p>
-              <span className="rounded-xl bg-amber-50 p-2 text-lg" aria-hidden="true">◷</span>
-            </div>
-            <p className="mt-4 text-3xl font-extrabold tabular-nums text-gray-950">{activeOrders}</p>
-            <p className="mt-1 text-xs text-gray-500">Orders not yet completed</p>
+
+          <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+            <p className="text-sm font-medium text-muted">In progress</p>
+            <p className="mt-4 text-3xl font-bold tabular-nums text-foreground">
+              {activeOrders}
+            </p>
+            <p className="mt-1 text-xs text-muted">Orders not yet completed</p>
           </article>
-          <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:col-span-2 xl:col-span-1">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-gray-500">Non-cancelled total</p>
-              <span className="rounded-xl bg-emerald-50 p-2 text-lg" aria-hidden="true">₿</span>
-            </div>
-            <p className="mt-4 text-3xl font-extrabold tabular-nums text-gray-950">{formatETB(eligibleTotal)}</p>
-            <p className="mt-1 text-xs text-gray-500">{deliveredOrders} delivered {deliveredOrders === 1 ? "order" : "orders"}</p>
+
+          <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm sm:col-span-2 xl:col-span-1">
+            <p className="text-sm font-medium text-muted">Non-cancelled total</p>
+            <p className="mt-4 text-3xl font-bold tabular-nums text-foreground">
+              {formatETB(eligibleTotal)}
+            </p>
+            <p className="mt-1 text-xs text-muted">
+              {deliveredOrders} delivered {deliveredOrders === 1 ? "order" : "orders"}
+            </p>
           </article>
         </section>
 
         {allOrders.length === 0 ? (
-          <section className="mt-8 rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-14 text-center">
-            <span className="text-4xl" aria-hidden="true">🛍️</span>
-            <h2 className="mt-4 text-xl font-bold text-gray-950">Your next favourite meal starts here</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">
+          <section className="mt-8 rounded-3xl border border-dashed border-border bg-surface px-6 py-14 text-center sm:px-10">
+            <p className="text-sm font-semibold uppercase tracking-[0.15em] text-brand">
+              Addis Eats
+            </p>
+
+            <h2 className="mt-4 text-xl font-bold text-foreground">
+              Your next favourite meal starts here
+            </h2>
+
+            <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-muted">
               You haven&apos;t placed an order yet. Explore the menu and your orders will appear here.
             </p>
-            <Link href="/menu" className="mt-6 inline-flex rounded-xl bg-violet-700 px-5 py-3 text-sm font-bold text-white hover:bg-violet-800">
+
+            <Link
+              href="/menu"
+              className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            >
               Explore the menu
             </Link>
           </section>
         ) : (
-          <OrderTable orders={visibleOrders} sort={sort} dir={dir} page={page} totalPages={totalPages} />
+          <OrderTable
+            orders={visibleOrders}
+            sort={sort}
+            dir={dir}
+            page={page}
+            totalPages={totalPages}
+          />
         )}
 
-        <p className="mt-6 text-xs text-gray-400">Order information is associated with your signed-in account.</p>
+        <p className="mt-6 text-xs text-muted">
+          Order information is associated with your signed-in account.
+        </p>
       </div>
     </main>
   );
