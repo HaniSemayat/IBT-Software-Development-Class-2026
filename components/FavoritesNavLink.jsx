@@ -11,12 +11,12 @@ export default function FavoritesNavLink() {
     <Link
       href="/favorites"
       aria-label={`Favorites, ${count} saved dishes`}
-      className="inline-flex items-center gap-1.5 text-gray-800 transition hover:text-orange-600"
+      className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-foreground transition-colors hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
     >
-      <span aria-hidden="true" className="text-rose-600">♡</span>
+      <span aria-hidden="true" className="text-brand">♡</span>
       Favorites
       {favoritesReady && count > 0 && (
-        <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-rose-600 px-1.5 py-0.5 text-xs font-bold leading-none text-white">
+        <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-brand px-1.5 py-0.5 text-xs font-bold leading-none text-white">
           {count}
         </span>
       )}
