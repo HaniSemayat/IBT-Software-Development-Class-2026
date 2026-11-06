@@ -6,8 +6,8 @@ This repository contains my assignments, exercises, and projects completed durin
 
 - Module 01 - Python, OOP, DSA
 - Module 02 - HTML-CSS-JavaScript
-- Module 03 - Backend Development
-- Module 04 - react-nextjs
+- Module 03 - react-nextjs
+- Module 04 - Backend Development
 - Module 05 - Databases
 - Module 06 - QA-Testing
 - Module 07 - DevOps-ci-cd
