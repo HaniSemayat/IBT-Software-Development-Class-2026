@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+
+  --background: #FAF8F4;
+  --surface: #FFFFFF;
+  --foreground: #292721;
+  --muted: #6B665E;
+  --border: #E8E1D7;
+
+  --brand: #A94F36;
+  --brand-hover: #8F402C;
+  --brand-soft: #F5E9E3;
+
+  --success: #28734A;
+  --success-soft: #EAF5ED;
+  --danger: #B42318;
+  --danger-soft: #FEF0EE;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "Cascadia Code", Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+  color-scheme: light;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--brand-soft);
+  color: var(--foreground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+/* Day 47: custom Leaflet delivery markers */
+.delivery-map-marker-wrapper {
+  background: transparent;
+  border: 0;
+}
+
+.delivery-map-marker {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 35%);
+}
+
+.delivery-map-courier {
+  background: #2563eb;
+}
+
+.delivery-map-destination {
+  background: #ea580c;
+}

@@ -1,0 +1,1048 @@
+﻿# Addis Eats â€” Rendering, Authentication & Authorization Strategy
+
+## Overview
+
+Day 45 integrates the architecture developed throughout Days 42â€“44.
+
+- **Day 42:** Authentication, sessions, authorization, protected routes, and order ownership.
+- **Day 43:** Server-rendered menu data, image optimization, and Lighthouse measurement.
+- **Day 44:** Metadata, social previews, structured data, sitemap, and crawler directives.
+- **Day 45:** Integration, security verification, data flow, live updates, and performance reporting.
+
+The central principle is to enforce each concern at the correct boundary. User identity, authorization, validation, and trusted data belong on the server. Interactive behavior belongs in Client Components where needed.
+
+## 1. Authentication Strategy
+
+Addis Eats uses a server-side session model.
+
+When a user signs in:
+
+1. The server checks the submitted credentials.
+2. It creates a random session identifier.
+3. The identifier is associated with the user's session on the server.
+4. The browser receives the session identifier in an HTTP-only cookie.
+5. The user is redirected to an appropriate internal destination.
+
+```text
+Credentials
+    |
+    v
+Verify user
+    |
+    v
+Create session
+    |
+    v
+Set session cookie
+    |
+    v
+Identify user on later requests
+```
+
+The browser stores the session identifier, not the authoritative session data.
+
+The current learning implementation uses in-memory session storage. This demonstrates the authentication flow but is not sufficient for a reliable production deployment.
+
+## 2. Session Cookie Strategy
+
+The session cookie uses settings similar to:
+
+```js
+{
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+  maxAge: 60 * 60 * 24 * 7,
+  path: "/",
+}
+```
+
+- `httpOnly` prevents ordinary browser JavaScript from reading the cookie.
+- `secure` restricts cookie transmission to HTTPS in production.
+- `sameSite` helps mitigate certain cross-site request scenarios.
+- `maxAge` sets a seven-day lifetime.
+- `path` makes the cookie available across application routes.
+
+Cookie settings help protect the session, but they do not replace server-side authentication, authorization, or appropriate CSRF protections.
+
+## 3. Authentication and Authorization
+
+Authentication answers:
+
+**Who is the current user?**
+
+Authorization answers:
+
+**What is that user allowed to do?**
+
+The server retrieves the current session with the project's session helper:
+
+```js
+const session = await getSession();
+```
+
+The application uses the session to identify the current user and determine their role.
+
+Customer access and staff access are different. Being signed in does not automatically grant permission to access staff-only features.
+
+## 4. Route Protection Strategy
+
+Public routes include:
+
+```text
+/
+/menu
+/menu/[id]
+/signin
+```
+
+Protected routes include:
+
+```text
+/checkout
+/orders
+/orders/[id]
+```
+
+The staff-only route is:
+
+```text
+/kitchen
+```
+
+The root `proxy.js` provides an early navigation guard for selected routes. Its configured matcher includes:
+
+```js
+export const config = {
+  matcher: ["/checkout", "/orders/:path*", "/kitchen"],
+};
+```
+
+The proxy can redirect visitors who lack a session cookie to the sign-in page with a `next` parameter.
+
+However, cookie presence does not prove that the session is valid or that the user is authorized to perform an operation.
+
+**The proxy is a navigation guard, not the final security boundary.**
+
+Protected pages, Server Actions, and Route Handlers must perform their own appropriate server-side checks.
+
+## 5. Order Ownership
+
+A signed-in user must only be able to access orders they are authorized to view or modify.
+
+The application uses helpers such as:
+
+```js
+getOrderForUser(orderId, userId)
+```
+
+The server checks the requested order against the authenticated user's ID.
+
+```text
+Request order
+     |
+     v
+Get current session
+     |
+     v
+Identify current user
+     |
+     v
+Find order and verify ownership
+     |
+     v
+Return authorized data or reject
+```
+
+Changing an order ID in a URL must not reveal another customer's order.
+
+When creating an order, the server derives ownership from the authenticated session instead of trusting a user ID supplied by the browser.
+
+```js
+userId: session.id
+```
+
+Ownership must also be verified before sensitive operations such as cancellation.
+
+## 6. Staff Authorization
+
+The `/kitchen` route requires staff authorization.
+
+The server checks the authenticated user's role:
+
+```js
+session.role === "staff"
+```
+
+A customer must not gain access by entering the route directly or modifying browser-side state.
+
+Hiding a navigation link is not authorization. The server must enforce the permission check.
+
+## 7. Safe Redirect Strategy
+
+The sign-in flow can accept an internal destination such as:
+
+```text
+/signin?next=/checkout
+```
+
+After successful authentication, the application can return the user to the requested page.
+
+The redirect target must be validated. External URLs, protocol-relative URLs such as `//evil.com`, and other unsafe destinations must not be accepted as internal redirects.
+
+Invalid destinations should fall back to a safe internal route to prevent open redirects.
+
+## 8. Rendering Strategy
+
+Rendering behavior is selected according to each route's data and interaction requirements.
+
+### Public landing page
+
+The landing page can use static rendering because it does not depend on the current user's session.
+
+### Menu
+
+The menu Server Component reads initial dish data directly from the shared server-side data source.
+
+```text
+Menu Server Component
+          |
+          v
+Read initial dishes
+          |
+          v
+Pass initial data as props
+          |
+          v
+Render initial menu
+          |
+          v
+Client-side interactions
+```
+
+This avoids an unnecessary request from a Server Component to the application's own API for its initial data.
+
+Client-side behavior supports interactive search and pagination through API requests. Search input is debounced to avoid sending a request for every keystroke.
+
+### Individual dish pages
+
+The `/menu/[id]` route uses the project's static-generation strategy where applicable. Unknown dishes use the not-found behavior.
+
+### Cart
+
+The cart uses client-side state for quantity changes, item removal, and the running ETB total.
+
+### Checkout and user-specific pages
+
+These pages depend on the current session or other request-specific information and must be protected accordingly.
+
+The objective is not to make every route static. It is to choose an appropriate rendering strategy while preserving correct behavior and security.
+
+## 9. Server and Client Boundaries
+
+Server Components are the default.
+
+Client Components are used when browser interaction, event handlers, or client-side state is needed.
+
+```text
+Server Components
+    |
+    +-- Read initial data
+    +-- Access server-side resources
+    +-- Render request-dependent content
+    +-- Enforce page-level checks
+    |
+    v
+Client Components
+    |
+    +-- Handle interaction
+    +-- Manage interactive state
+    +-- Display pending and error states
+    +-- Update the interface
+```
+
+Client Components should not receive private server secrets or become the authority for user identity and permissions.
+
+Sensitive Server Actions and Route Handlers must independently enforce authorization.
+
+## 10. Data and Order Strategy
+
+The application separates dish, user, session, order, and validation logic into shared modules under `lib/`.
+
+The primary responsibilities are:
+
+| Module | Responsibility |
+|---|---|
+| `lib/dishes.js` | Dish catalogue and menu data |
+| `lib/users.js` | Demo user lookup |
+| `lib/session.js` | Session creation, lookup, and deletion |
+| `lib/orders.js` | Order creation, retrieval, and updates |
+| `lib/schema.js` | Server-side input validation |
+
+### Trusted order calculation
+
+Order data received from the browser is untrusted.
+
+The server must validate submitted items, retrieve trusted dish prices, calculate the total, and associate the order with the current session.
+
+Client-submitted prices and user IDs must not determine the authoritative order total or ownership.
+
+### In-memory limitations
+
+The current learning implementation uses process-local in-memory storage for users, sessions, and orders where implemented that way.
+
+This means:
+
+- Data can be lost when the server process restarts.
+- Separate application instances do not automatically share state.
+- Changes are not durably persisted.
+- In-memory storage is not suitable for reliable production orders or sessions.
+
+A production application requires persistent storage, secure credential handling, and appropriate session management.
+
+## 11. Live Data Strategy
+
+### Debounced menu search
+
+The menu's initial data is rendered on the server. Subsequent searches and pagination use the API through the client-side data-fetching layer.
+
+Debouncing waits briefly after the user stops typing before sending the search request.
+
+The browser Network panel should be used to verify that requests occur after pauses rather than on every keystroke.
+
+### Order status polling
+
+The order detail page retrieves the authorized order on the server and supplies it as initial data to the client status component.
+
+The client uses SWR to poll the order endpoint periodically, with a five-second refresh interval.
+
+This allows periodic status updates without making the initial page depend on an empty client-side loading state.
+
+The order API must still authenticate the request and enforce ownership on every poll.
+
+## 12. Performance Strategy
+
+The project measures actual loading behavior instead of assuming that an optimization is successful.
+
+The work includes:
+
+- Rendering initial menu data on the server.
+- Passing initial data into the interactive interface.
+- Using local WebP images with Next.js `Image`.
+- Providing image dimensions and responsive sizing.
+- Prioritizing the first appropriate menu image.
+- Using `next/font` for font optimization.
+- Recording production-build Lighthouse measurements.
+- Documenting findings and outstanding work in `PERF.md`.
+
+### Latest recorded local results
+
+| Metric | Baseline | Latest recorded run |
+|---|---:|---:|
+| Performance score | 88 | 73 |
+| First Contentful Paint | 0.8 s | 0.9 s |
+| Largest Contentful Paint | 2.6 s | 3.4 s |
+| Total Blocking Time | 350 ms | 800 ms |
+| Cumulative Layout Shift | 0 | 0 |
+| Speed Index | 1.3 s | 1.8 s |
+
+The measurements show mixed results, not a consistent overall improvement. The latest recorded LCP remains above 2.5 seconds, and the performance score remains below the Day 45 target of 90.
+
+The observed resource-load delay decreased in one image-priority experiment, but that alone does not establish a better overall user experience.
+
+### Day 45 targets
+
+- Mobile throttled LCP under 2.5 seconds.
+- CLS below 0.1.
+- First Load JS for `/menu` below 120 kB.
+- Largest delivered image below 150 kB.
+- Lighthouse Performance score of at least 90.
+
+These are targets, not achieved results. Bundle-size checks, image-size verification, and deployed Lighthouse measurements must be recorded separately when completed.
+
+See `PERF.md` for the complete measurements and verification plan.
+
+## 13. Environment Configuration
+
+Local configuration belongs in:
+
+```text
+.env.local
+```
+
+The repository includes:
+
+```text
+.env.example
+```
+
+as a template for environment variables.
+
+Example placeholders may include:
+
+```text
+DATABASE_URL=
+TELEBIRR_SECRET=
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_MAP_KEY=
+```
+
+These placeholders do not by themselves mean every integration is implemented or active.
+
+The local environment file must remain untracked. Server secrets must not be exposed to the browser or committed to Git. Variables prefixed with `NEXT_PUBLIC_` are intended to be exposed to browser code and must not contain secrets.
+
+## 14. SEO and Metadata Strategy
+
+Day 44 adds search metadata and social-sharing support while keeping metadata generation connected to the application's actual content.
+
+### Root metadata and dish metadata
+
+The root layout defines shared metadata, including the title template and `metadataBase`.
+
+Individual routes provide appropriate titles and descriptions. Dish pages generate metadata from shared dish data to keep the page content and metadata consistent.
+
+### Social sharing and structured data
+
+The application includes:
+
+- Open Graph metadata for social sharing.
+- Generated Open Graph images for individual dish pages.
+- `MenuItem` JSON-LD structured data based on dish content.
+
+Structured data should describe the actual page content rather than introduce information users cannot see.
+
+### Sitemap, robots, and canonical URLs
+
+The generated `sitemap.xml` lists public pages and available dishes.
+
+The `robots.txt` file references the sitemap and guides compliant crawlers away from selected private paths.
+
+Canonical URLs identify preferred URLs for pages that may accept query parameters or alternate URL forms.
+
+Robots rules are crawler guidance, not access control. Authentication and authorization must continue to protect private pages and data.
+
+Local verification confirmed valid sitemap XML with 11 URLs, expected crawler rules, distinct metadata for the homepage, menu, and sampled dish pages, and working dish preview-image routes. Production-domain metadata and live social previews still require verification.
+
+## 15. Security Verification Strategy
+
+Security verification must test both the interface and the underlying server operations.
+
+### Test 1 â€” Signed-out order creation
+
+Send a `POST /api/orders` request without an authenticated session.
+
+Expected behavior: the server rejects the request with `401 Unauthorized`.
+
+A signed-out order-creation request returned `401` during local verification.
+
+### Test 2 â€” Order ownership
+
+Sign in as one customer and attempt to access or cancel another customer's order.
+
+Expected behavior: the server does not disclose or modify the other customer's order.
+
+The cross-user scenario still requires verification with two distinct users.
+
+### Test 3 â€” Open redirect
+
+Try an external or protocol-relative `next` value.
+
+Expected behavior: the unsafe destination is rejected and the user remains on a safe internal route.
+
+The external redirect scenario was checked locally.
+
+### Test 4 â€” Customer accessing the kitchen
+
+Sign in as a customer and visit `/kitchen`.
+
+Expected behavior: the server-side role check denies access.
+
+### Test 5 â€” Server-side validation
+
+Submit invalid order data directly to the API or Server Action.
+
+Expected behavior: the server rejects invalid input even when browser-side validation is bypassed.
+
+### Test 6 â€” Live data
+
+Verify that menu search sends requests after typing pauses and that the order page initially renders its server-provided order data before polling begins.
+
+Only mark a scenario complete after the relevant behavior has been tested.
+
+## 16. Final Architecture
+
+```text
+Browser
+   |
+   v
+Next.js application
+   |
+   +-------------------------+
+   |                         |
+   v                         v
+Public menu              Authentication
+   |                         |
+   v                         v
+Server-side dishes      Session cookie
+   |                         |
+   v                         v
+Initial menu            getSession()
+   |                         |
+   v                         v
+Client interactions     Authorization checks
+   |                         |
+   |                +--------+--------+
+   |                |                 |
+   |                v                 v
+   |          Customer orders    Staff features
+   |                |
+   |                v
+   |          Ownership checks
+   |
+   v
+Search and pagination API
+
+Order detail page
+   |
+   v
+Server-side authorized order
+   |
+   v
+Initial client data
+   |
+   v
+Periodic status polling
+
+All sensitive operations
+   |
+   v
+Server validation and authorization
+```
+
+## Final Principles
+
+1. Authentication identifies the user; authorization determines their permissions.
+2. The server, not the browser, decides who owns an order.
+3. Route guards improve navigation but do not replace server-side checks.
+4. Server Components can read initial data directly without calling the application's own API unnecessarily.
+5. Client Components should be used where interaction requires them.
+6. Sensitive Server Actions and Route Handlers must enforce authorization independently.
+7. Performance changes must be evaluated using measured results, not assumptions.
+8. In-memory stores are learning tools, not a substitute for production persistence.
+9. SEO directives do not protect private data.
+10. Production claims must be supported by production verification.
+---
+
+## Day 46 â€” Cart and Admin Dashboard Strategy
+
+### 1. Shared Cart State
+
+Day 46 introduces shared client-side cart state through `app/Providers.jsx`.
+
+The main components are:
+
+- `components/AddToCartButton.jsx` â€” adds a dish to the cart and displays temporary confirmation feedback.
+- `components/CartNavLink.jsx` â€” displays the total quantity of cart items in the navbar.
+- `app/menu/SearchBox.jsx` â€” renders the active interactive menu and its Add to Cart controls.
+- `app/cart/page.js` â€” provides the cart interface.
+
+The navbar count represents the sum of the quantities of all cart items, rather than the number of distinct dishes.
+
+For example, if a cart contains two dishes with quantities of 2 and 3, the navbar displays 5.
+
+The root `app/layout.js` wraps the application content in `Providers`, allowing client components within the shared layout to access the cart context.
+
+This does not require converting the entire root layout into a Client Component.
+
+### 2. Cart and Checkout Boundary
+
+The cart is client-side interaction state, while order creation is a server-side operation.
+
+```text
+Interactive menu
+       |
+       v
+AddToCartButton
+       |
+       v
+Shared cart state
+       |
+       v
+Cart interface
+       |
+       v
+Checkout submission
+       |
+       v
+Server-side validation
+       |
+       v
+Trusted dish prices
+       |
+       v
+Order creation
+````
+
+Client-side state improves usability, but it is not an authoritative record of an order.
+
+The server must validate submitted dish IDs and quantities, calculate totals using trusted dish prices, and derive order ownership from the authenticated session.
+
+The current cart state resets on page reload. Persistent cart storage is not part of this implementation.
+
+### 3. Admin Dashboard Strategy
+
+The Day 46 dashboard extends the application with order analytics and an interactive order table.
+
+The documented dashboard features include:
+
+- Order counts and status summaries
+- Revenue summaries
+- Revenue grouped by neighbourhood
+- Daily order counts
+- Sorting and pagination
+
+The dashboard depends on the application's order data. Since the demonstration uses in-memory order storage, its records are not durable across server restarts and are not automatically shared between application instances.
+
+The dashboard must be protected by server-side authorization appropriate to the application's staff roles.
+
+Hiding a dashboard link or restricting access in a Client Component is not sufficient. Direct navigation and requests for protected data must also be checked on the server.
+
+Verify the current dashboard page and its data-access helpers before treating particular role checks or authorization behavior as confirmed implementation details.
+
+### 4. Rendering and Client Boundaries
+
+Server Components remain the default.
+
+Client Components are used for features that need browser interaction or client-side state.
+
+Day 46 adds or uses these client-side components:
+
+- `app/Providers.jsx`
+- `components/AddToCartButton.jsx`
+- `components/CartNavLink.jsx`
+- `app/menu/SearchBox.jsx`
+- `app/cart/page.js`
+
+The existing menu search and filtering components continue to support interactive behavior.
+
+The server-rendered menu can provide initial dish data without making an unnecessary HTTP request to its own API. Client-side searches and pagination can continue to request updated results through the API.
+
+The dashboard's precise Server/Client boundary should be confirmed against its current source files.
+
+### 5. Data and Security Principles
+
+The cart and dashboard do not change the application's core security requirements.
+
+- Client-submitted prices must not determine order totals.
+- Client-submitted user IDs must not determine order ownership.
+- Protected order data must be checked against the authenticated user's permissions.
+- Staff-only analytics must not be available to unauthorized customers.
+- Server Actions and Route Handlers must perform their own required authorization checks.
+- UI restrictions must not be treated as security boundaries.
+
+The current in-memory data model is appropriate for learning and local demonstrations, not durable production order processing.
+
+### 6. Performance Considerations
+
+Day 46 adds cart interaction and dashboard functionality, but no new Lighthouse measurements are recorded here.
+
+The menu, cart, and dashboard have different performance characteristics and should be measured separately where appropriate.
+
+The next verification should include:
+
+- Production-build Lighthouse measurements for `/menu`.
+- A separate performance assessment of the dashboard.
+- Verification of the `/menu` First Load JS size.
+- Inspection of delivered image sizes.
+- Investigation of long main-thread tasks if Total Blocking Time remains high.
+
+The latest recorded local menu result remains a Performance score of 73, FCP of 0.9 seconds, LCP of 3.4 seconds, TBT of 800 milliseconds, CLS of 0, and Speed Index of 1.8 seconds.
+
+These are earlier local measurements, not Day 46 or deployed results. The Day 45 performance targets remain unverified or unmet as documented in `PERF.md`.
+
+### 7. Day 46 Verification Checklist
+
+- Adding a dish updates shared cart state.
+- The navbar displays the total cart quantity.
+- Cart interactions work without a full-page reload.
+- Cart state resets on reload as expected.
+- Checkout validates submitted items on the server.
+- Order totals use trusted dish prices.
+- Order ownership comes from the authenticated session.
+- Dashboard analytics reflect the available order records.
+- Unauthorized users cannot access protected dashboard data.
+- Performance impact is measured separately from previous Lighthouse runs.
+- In-memory persistence limitations remain documented.
+
+### Day 46 Summary
+
+Day 46 brings cart interaction and administrative analytics into the existing architecture.
+
+The key boundary remains:
+
+```
+Client-side interaction
+          |
+          v
+Untrusted input
+          |
+          v
+Server-side validation
+          |
+          v
+Authentication and authorization
+          |
+          v
+Trusted data operation
+```
+
+The cart provides immediate browser feedback, while the server remains responsible for validating and creating orders. The dashboard presents operational data but must not bypass server-side access control.
+
+Performance improvements and security guarantees should only be claimed after the relevant behavior has been verified.
+
+## Day 47 — Next.js Integration Strategy
+
+Day 47 brings routing, rendering, server-side operations, interactive components, and authorization together in one Next.js App Router application.
+
+### 1. Routing Strategy
+
+The application uses file-based routing under `app/`.
+
+| Route | Intended strategy | Purpose |
+|---|---|---|
+| `/` | Static | Landing page |
+| `/menu` | Revalidated | Browse and search dishes |
+| `/menu/[id]` | Static generation | Individual dish pages |
+| `/cart` | Client interaction | Cart quantities and ETB total |
+| `/checkout` | Dynamic | Checkout and order submission |
+
+The application also includes authentication, order-management, kitchen, administrative, and API routes.
+
+These strategies describe the intended architecture. Confirm the actual route classifications in the latest `npm run build` output because data dependencies and route configuration can change the result.
+
+### 2. Server and Client Component Strategy
+
+Server Components are the default.
+
+Use Server Components for:
+- Reading server-side data
+- Rendering initial page content
+- Accessing server-only modules
+- Performing page-level authentication checks
+
+Use Client Components when browser capabilities are needed, including:
+- React state and event handlers
+- Interactive cart updates
+- Menu search and filtering
+- Form interaction and pending states
+- Interactive tables and status updates
+
+Keep the client boundary as narrow as practical. Passing data from a Server Component to a Client Component does not require making the parent layout a Client Component.
+
+### 3. Menu Data Strategy
+
+The menu Server Component reads its initial dish data directly from the shared data module rather than making an HTTP request to its own API.
+
+The intended flow is:
+
+```text
+Menu Server Component
+          |
+          v
+Shared dish data
+          |
+          v
+Initial dish props
+          |
+          v
+Interactive menu
+          |
+          v
+Search and pagination requests
+```
+
+The initial render can therefore include menu data without waiting for an additional browser request. Client-side search and pagination can use the API for subsequent requests.
+
+### 4. Static Generation and Revalidation
+
+The home page can be statically rendered when its content does not depend on request-specific information.
+
+The menu uses a revalidation strategy where configured. The intended interval is one hour.
+
+Individual dish pages use `generateStaticParams()` where configured, and unknown dish IDs use Next.js not-found handling.
+
+Revalidation refreshes cached route data. It does not make in-memory users, sessions, or orders persistent.
+
+### 5. Cart Strategy
+
+Cart interactions use client-side React state and the shared provider.
+
+The cart supports:
+- Adding dishes
+- Updating quantities
+- Removing items
+- Displaying the running ETB total
+- Showing the total item quantity in the navbar
+
+The cart is a client-side interface state, not an authoritative order record. Its contents currently reset when the application reloads.
+
+At checkout, the server must validate dish IDs and quantities, calculate totals from trusted dish prices, and derive order ownership from the authenticated session.
+
+### 6. Checkout and Server Actions
+
+Server Actions support mutations such as checkout and other protected operations.
+
+The expected checkout flow is:
+
+```text
+Checkout form
+      |
+      v
+Server Action
+      |
+      v
+Validate submitted data
+      |
+      v
+Check authenticated user
+      |
+      v
+Calculate trusted order values
+      |
+      v
+Create order
+      |
+      v
+Revalidate affected routes
+```
+
+A Server Action must not trust client-submitted prices, user IDs, roles, or other security-sensitive values.
+
+Server Actions execute on the server, but that does not make their inputs trustworthy. Every sensitive action must perform its own required authentication, authorization, ownership, and validation checks.
+
+### 7. Route Handler Strategy
+
+Route Handlers under `app/api/` provide HTTP access to dish and order operations.
+
+The dish endpoints support retrieving the menu and individual dishes.
+
+Order endpoints must validate requests and enforce authentication and ownership where required.
+
+The intended behavior includes:
+- `200 OK` for successful retrieval
+- `201 Created` for successful creation
+- `401 Unauthorized` when authentication is required
+- `404 Not Found` when a resource does not exist or must not be disclosed
+- `422 Unprocessable Entity` for invalid submitted data
+
+These are expected behaviors; re-run endpoint tests after implementation changes rather than assuming every case remains verified.
+
+### 8. Authentication and Authorization Strategy
+
+The application uses a session cookie and a server-side session lookup.
+
+The proxy provides an early navigation guard for configured protected routes. It is not the final authorization boundary.
+
+Protected pages, Server Actions, and Route Handlers must independently enforce the appropriate checks.
+
+For order operations:
+- The server identifies the current user from the session.
+- The server derives order ownership from that user.
+- The server verifies ownership before returning or modifying private order data.
+- Staff functionality requires an appropriate server-side role check.
+
+### 9. Data Persistence Limitation
+
+The current implementation uses in-memory storage for users, sessions, and orders where implemented that way.
+
+This is suitable for a learning demonstration but has important limitations:
+- Data can disappear after a process restart.
+- Separate application instances do not automatically share state.
+- Registered accounts and orders are not durable records.
+- A session created by one instance may not be available to another instance.
+
+The production sign-in flow has not yet been confirmed to work reliably.
+
+A production-ready design requires persistent storage, secure password hashing, appropriate session management, and testing against the deployed environment.
+
+### 10. Rendering and Error Handling
+
+The application uses Next.js special files where implemented:
+- `loading.js` for route-segment loading UI
+- `error.js` for route-segment error handling
+- `not-found.js` for missing resources
+
+These files improve user experience and failure handling. They do not replace validation, authentication, or authorization.
+
+### 11. Day 47 Verification Checklist
+
+- [ ] Actual route classifications match the production build output.
+- [ ] The home page renders without unnecessary request-specific dependencies.
+- [ ] The menu reads initial data directly on the server.
+- [ ] Interactive behavior is isolated to appropriate Client Components.
+- [ ] Static dish pages and not-found handling work as intended.
+- [ ] Cart quantities and ETB totals update correctly.
+- [ ] Checkout validates data and calculates trusted prices on the server.
+- [ ] Route Handlers enforce required access checks.
+- [ ] Server Actions enforce authorization independently of the UI.
+- [ ] Revalidation refreshes the intended route data.
+- [ ] Loading, error, and not-found UI behave as expected.
+- [ ] Production sign-in and session behavior are tested end to end.
+- [ ] Persistence limitations are addressed before real-world use.
+
+### 12. Day 47 Architectural Principle
+
+The architecture separates responsibilities rather than making every route or component use the same rendering model.
+
+```text
+Next.js App Router
+        |
+        +-- Static and revalidated pages
+        |
+        +-- Server Components
+        |       |
+        |       +-- Initial data
+        |       +-- Server-only operations
+        |
+        +-- Client Components
+        |       |
+        |       +-- Browser interaction
+        |       +-- Local UI state
+        |
+        +-- Route Handlers
+        |       |
+        |       +-- HTTP endpoints
+        |
+        +-- Server Actions
+                |
+                +-- Validated mutations
+                +-- Authorization checks
+                +-- Route revalidation
+```
+
+The server remains responsible for trusted data and access control. The browser handles interaction and presentation. Rendering choices should be verified through the actual build and measured behavior.
+
+
+
+## Day 48 — Interaction and Submission Strategy
+
+### 1. Event Handling
+
+Client Components handle browser interactions such as cart updates, menu controls, and form submission.
+
+Use semantic HTML elements according to their purpose:
+
+- Use buttons for actions.
+- Use links for navigation.
+- Handle checkout through the form's `onSubmit` event rather than relying only on a button click.
+- Use `preventDefault()` when the browser's default form behavior must be prevented.
+- Use `stopPropagation()` only when an interaction must not reach an ancestor handler.
+- Use `target` to identify the event origin and `currentTarget` to identify the element whose handler is executing.
+
+Interactive controls should support keyboard use, visible focus, and accessible names. Do not rely on hover alone to communicate an action, and provide appropriately sized touch targets.
+
+### 2. Checkout Pending State
+
+The checkout form uses `useActionState` to connect the form to its Server Action and expose pending status.
+
+The intended flow is:
+
+```text
+User submits checkout
+        |
+        v
+Form invokes Server Action
+        |
+        v
+Pending state becomes active
+        |
+        v
+Submit button is disabled
+        |
+        v
+Server validates the order
+        |
+        v
+Action returns its result
+        |
+        v
+UI displays errors or success
+````
+
+The pending state provides immediate feedback and helps prevent accidental repeated clicks while a submission is in progress.
+
+Disabling a button is a user-interface safeguard, not a guarantee against repeated requests. The server must validate every submission independently.
+
+### 3. Duplicate-Submission Protection
+
+The checkout implementation includes a submission identifier and uses `lib/idempotent-orders.js` to demonstrate duplicate-submission protection.
+
+The current implementation stores submission records in a process-local in-memory `Map`. Its protection is limited by that storage model:
+
+- Records are not durable across process restarts.
+- Separate application instances do not share the same records.
+- In-memory lookup and order creation do not provide production-grade atomic guarantees under concurrent requests.
+
+A production implementation should use persistent, shared storage and an atomic uniqueness or transaction-based mechanism to prevent duplicate order creation. Retry behavior and identifier retention should also be defined.
+
+### 4. Server-Side Trust Boundary
+
+The client is responsible for collecting input and presenting interaction states. The server remains responsible for trusted operations.
+
+For every order submission, the server must:
+
+- Validate submitted fields, dish identifiers, and quantities.
+- Calculate totals from trusted server-side dish prices.
+- Derive order ownership from the authenticated session.
+- Enforce required authentication and authorization checks.
+- Reject invalid input.
+- Apply reliable duplicate-submission protection appropriate to the storage architecture.
+
+Client-side validation, disabled controls, hidden fields, and navigation restrictions must not replace server-side enforcement.
+
+### 5. Verification Strategy
+
+The following checks should be performed against the current implementation:
+
+- Verify that checkout displays pending feedback.
+- Confirm that the submit button is disabled while the action is pending.
+- Test invalid input through the server-side submission path.
+- Test repeated submissions using the same submission identifier.
+- Confirm that order totals and ownership are derived from trusted server-side data.
+- Test keyboard navigation and visible focus for interactive controls.
+- Confirm that interactive elements use appropriate semantic HTML.
+- Review the implementation's behavior across process restarts and separate instances before treating idempotency as production-ready.
+
+A passing build alone does not prove these behaviors. Mark each check complete only after the corresponding test has been performed.
+
+### 6. Day 48 Architectural Principle
+
+Day 48 extends the integrated application with clearer interaction behavior and duplicate-submission safeguards.
+
+The key separation remains:
+
+```
+Client interaction
+        |
+        v
+User input and pending feedback
+        |
+        v
+Server Action
+        |
+        v
+Validation and authorization
+        |
+        v
+Trusted data and price calculation
+        |
+        v
+Duplicate-submission protection
+        |
+        v
+Order creation and revalidation
+```
+
+Client-side controls improve usability. Server-side validation, authorization, ownership checks, and reliable order creation remain the responsibility of the server.
+
+The current in-memory idempotency implementation is a learning demonstration. Production-grade persistence and atomic duplicate protection remain separate follow-up tasks.
