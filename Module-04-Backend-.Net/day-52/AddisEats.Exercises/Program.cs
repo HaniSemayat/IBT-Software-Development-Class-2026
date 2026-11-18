@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 Console.WriteLine("===== EXERCISE 2 =====");
 
-string studentName = "Addis Tesfa";
+string studentName = "Hani Tsehaye";
 DateTime today = DateTime.Today;
 
 Console.WriteLine($"Name: {studentName}");
