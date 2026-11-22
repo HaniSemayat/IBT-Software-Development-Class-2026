@@ -1,0 +1,16 @@
+﻿Exercise 2: Invalid overload experiment
+
+The following method cannot be added to Describer:
+
+public string Describe(int value)
+{
+    return "Invalid overload";
+}
+
+Compiler error:
+CS0111: Type 'Describer' already defines a member called 'Describe' with the same parameter types.
+
+Reason:
+A method signature includes its name and parameter types, but not its return type.
+Therefore, changing only the return type does not create a new overload.
+The invalid method is intentionally not included in the working project.
