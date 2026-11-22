@@ -100,3 +100,15 @@ The DTO remains the public response type.
 
 Swagger before-and-after screenshots should be captured from the running application as visual evidence.
 
+## Exercise 7 - OrdersController
+
+Created OrdersController with:
+
+- `GET /api/v1/orders/{id:int:min(1)}`
+- `POST /api/v1/orders`
+- `PATCH /api/v1/orders/{id:int:min(1)}/status`
+
+The POST endpoint returns 201 Created using CreatedAtAction and provides a Location header pointing to the GET endpoint.
+
+The order data is stored in an in-memory store.
+
