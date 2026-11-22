@@ -39,3 +39,14 @@ This is not a compile-time error because both names are valid C# identifiers. Th
 
 The correct implementation uses matching names.
 
+## Exercise 3 - RestaurantQuery
+
+Created a RestaurantQuery class with:
+
+- Area
+- MaxFeeEtb
+- Page
+- Limit
+
+The query is bound using `[FromQuery]` and passed to the restaurant service as one object.
+
