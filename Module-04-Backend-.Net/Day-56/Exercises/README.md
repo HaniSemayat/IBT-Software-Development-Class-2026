@@ -112,3 +112,29 @@ The POST endpoint returns 201 Created using CreatedAtAction and provides a Locat
 
 The order data is stored in an in-memory store.
 
+## Exercise 8 - JSON Serialization
+
+Configured JSON serialization in Program.cs:
+
+- camelCase property naming
+- omission of null properties
+- enum values serialized as strings
+
+The settings apply consistently to API responses.
+
+Example enum response:
+
+`"status": "Placed"`
+
+rather than a numeric enum value.
+
+A before-and-after response comparison can be captured from Swagger or the HTTP request file.
+
+---
+
+## Submission
+
+Exercises: [Day 56 Exercises](./)
+
+Mini-project: [Permanent Addis Eats API](../../Project/AddisEats.Api/)
+
