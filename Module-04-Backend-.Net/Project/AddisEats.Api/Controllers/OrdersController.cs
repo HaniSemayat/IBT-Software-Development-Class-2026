@@ -41,6 +41,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPatch("{id:int:min(1)}/status")]
+    [HttpPatch("{id:int:min(1)}/status")]
     public ActionResult<OrderDto> UpdateStatus(
         int id,
         [FromBody] UpdateOrderStatusRequest request)
