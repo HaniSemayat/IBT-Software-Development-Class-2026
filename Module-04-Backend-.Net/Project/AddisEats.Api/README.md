@@ -1,19 +1,28 @@
 # Addis Eats API
 
-A RESTful ASP.NET Core Web API built with C# and .NET 8 for the Addis Eats food delivery application.
+Permanent capstone project for the IBT Software Development .NET (C#) Backend Track.
+
+Built using ASP.NET Core Web API and .NET 8.
 
 ## Features
 
-- Restaurant listing and searching
-- Area filtering
+- Attribute-based routing
+- Route constraints
+- Restaurant search and filtering
+- Multi-value area filtering
+- Nullable maximum delivery fee filtering
 - Pagination
-- Restaurant details
-- Restaurant menu endpoints
-- DTO mapping to protect internal data
+- Typed API responses
+- Orders GET, POST and PATCH endpoints
+- CreatedAtAction and HTTP 201 responses
+- Consistent paged collection responses
+- camelCase JSON serialization
+- Null property omission
+- String enum serialization
 - Dependency injection
-- In-memory data storage
-- CORS configuration for the frontend
-- Swagger API documentation
+- In-memory data stores
+- CORS for the React frontend
+- Swagger documentation
 
 ## Project Structure
 
@@ -21,26 +30,29 @@ A RESTful ASP.NET Core Web API built with C# and .NET 8 for the Addis Eats food 
 AddisEats.Api/
 +-- Controllers/
 ¦   +-- RestaurantsController.cs
+¦   +-- OrdersController.cs
 +-- Data/
 ¦   +-- RestaurantStore.cs
 ¦   +-- MenuStore.cs
+¦   +-- OrderStore.cs
 +-- Models/
 ¦   +-- Restaurant.cs
 ¦   +-- MenuItem.cs
+¦   +-- Order.cs
+¦   +-- Queries/
+¦   ¦   +-- RestaurantQuery.cs
 ¦   +-- Dtos/
 ¦       +-- RestaurantDto.cs
+¦       +-- OrderDto.cs
+¦       +-- PagedResult.cs
 ¦       +-- MappingExtensions.cs
 +-- Services/
-¦   +-- IRestaurantService.cs
-¦   +-- RestaurantService.cs
-¦   +-- IMenuService.cs
-¦   +-- MenuService.cs
 +-- Program.cs
 +-- AddisEats.Api.http
 +-- README.md
 ```
 
-## Run the API
+## Run the project
 
 Requirements: .NET 8 SDK.
 
@@ -49,84 +61,173 @@ dotnet restore
 dotnet run --no-launch-profile --urls http://localhost:5217
 ```
 
-Swagger UI:
+Swagger:
 
 `http://localhost:5217/swagger`
 
-## API Endpoints
+## Route Table
 
-### 1. Get restaurants
+| Method | Route | Constraints | Success | Failure |
+|---|---|---|---|---|
+| GET | `/api/v1/restaurants` | None | 200 | 400 for invalid query binding |
+| GET | `/api/v1/restaurants/{id}` | `int`, `min(1)` | 200 | 404 |
+| GET | `/api/v1/restaurants/{id}/menu` | `int`, `min(1)` | 200 | 404 |
+| GET | `/api/v1/orders/{id}` | `int`, `min(1)` | 200 | 404 |
+| POST | `/api/v1/orders` | Request body | 201 | 400 for invalid body binding |
+| PATCH | `/api/v1/orders/{id}/status` | `int`, `min(1)` | 200 | 404 |
 
-`GET /api/v1/restaurants`
+## Restaurant Query Parameters
 
-Returns active restaurants.
+The collection endpoint accepts a RestaurantQuery object using `[FromQuery]`.
 
-Success: `200 OK`
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| area | string? | null | Filter by one area |
+| areas | List<string> | Empty list | Filter by multiple areas |
+| maxFeeEtb | decimal? | null | Maximum delivery fee |
+| page | int | 1 | Page number |
+| limit | int | 20 | Results per page |
 
-### 2. Search and paginate restaurants
+Examples:
 
-`GET /api/v1/restaurants?area=Bole&page=1&limit=5`
+`GET /api/v1/restaurants?area=Bole`
 
-Query parameters:
+`GET /api/v1/restaurants?areas=Bole&areas=Piassa`
 
-| Parameter | Description | Default |
-|---|---|---|
-| area | Optional restaurant area filter | None |
-| page | Page number, minimum 1 | 1 |
-| limit | Number of results, between 1 and 100 | 20 |
+`GET /api/v1/restaurants?maxFeeEtb=45`
 
-Success: `200 OK`
+`GET /api/v1/restaurants?areas=Bole&areas=Piassa&page=1&limit=5`
 
-### 3. Get restaurant by ID
+Repeated `areas` query keys are bound to a list. When no areas are supplied, the list filter is not applied.
 
-`GET /api/v1/restaurants/{id}`
+## Collection Response
 
-Success: `200 OK`
+Restaurant collections use the PagedResult envelope:
 
-Failure: `404 Not Found` if the restaurant does not exist or is inactive.
+```json
+{
+  "data": [],
+  "page": 1,
+  "pageSize": 20,
+  "total": 12
+}
+```
 
-### 4. Get restaurant menu
+Results are ordered alphabetically before pagination.
 
-`GET /api/v1/restaurants/{id}/menu`
+## Restaurant Endpoints
+
+### GET /api/v1/restaurants
+
+Returns restaurants with optional filtering and pagination.
+
+Success: `200 OK`.
+
+### GET /api/v1/restaurants/{id}
+
+Returns a single restaurant DTO.
+
+Success: `200 OK`.
+
+Failure: `404 Not Found` when the restaurant is not found or the route constraint fails.
+
+### GET /api/v1/restaurants/{id}/menu
+
+Returns menu items belonging to an existing restaurant.
 
 Success: `200 OK`, including an empty array when the restaurant exists but has no menu items.
 
-Failure: `404 Not Found` when the restaurant does not exist or is inactive.
+Failure: `404 Not Found` when the restaurant does not exist.
 
-## HTTP Status Codes
+## Order Endpoints
 
-| Status | Meaning |
-|---|---|
-| 200 | Request successful |
-| 404 | Restaurant not found |
+### GET /api/v1/orders/{id}
 
-## DTO and Data Protection
+Returns an order by ID.
 
-The public RestaurantDto contains only:
+Success: `200 OK`.
 
-- Id
-- Name
-- Area
-- DeliveryFeeEtb
+Failure: `404 Not Found`.
 
-Internal fields such as OwnerPhone and CommissionRate are never exposed by the restaurant endpoints.
+### POST /api/v1/orders
 
-## Pagination
+Creates an order.
 
-Results are sorted alphabetically by restaurant name before pagination. The API supports area filtering and limits page size to a maximum of 100.
+Example request:
+
+```json
+{
+  "restaurantId": 1,
+  "area": "Bole",
+  "qty": 2
+}
+```
+
+Success: `201 Created`.
+
+The response includes a Location header pointing to the new order resource using CreatedAtAction and nameof(GetOne).
+
+### PATCH /api/v1/orders/{id}/status
+
+Updates an existing order status.
+
+Example request:
+
+```json
+{
+  "status": "Preparing"
+}
+```
+
+Success: `200 OK`.
+
+Failure: `404 Not Found`.
+
+## JSON Serialization
+
+Program.cs explicitly configures:
+
+- camelCase property naming
+- omission of null properties
+- enums serialized as strings
+
+Example enum JSON value: `"Preparing"`.
+
+## Route Constraints
+
+All ID route segments use `:int:min(1)`.
+
+Invalid paths such as `/api/v1/restaurants/abc` and `/api/v1/orders/0` do not match their routes and return 404.
+
+Route constraints determine whether a URL can match an endpoint. They are not business-rule validation.
+
+## Ambiguous Routes
+
+Two routes such as `{id}` and `{slug}` have the same route shape and can produce an AmbiguousMatchException.
+
+Two solutions:
+
+1. Add a constraint, such as `{id:int}`.
+2. Use a distinct literal segment, such as `by-slug/{slug}`.
+
+The actual API uses constrained ID routes and distinct resource paths.
 
 ## CORS
 
-The `frontend` policy allows requests from:
+The `frontend` policy allows:
 
 `http://localhost:5173`
 
-It allows any HTTP header and method from that origin.
+Any HTTP header and method are permitted from that origin.
 
-## Data
+## Data Storage
 
-The API uses in-memory sample data. Restaurants and menu items are stored in the Data folder. Restaurant 12 intentionally has no menu items to demonstrate the empty-menu response.
+This capstone currently uses in-memory data stores. Data is reset when the application restarts.
 
-## Notes
+Restaurant 12 intentionally has no menu items to demonstrate the difference between a missing restaurant and an existing restaurant with an empty menu.
 
-This is the initial API implementation for the Addis Eats capstone. The data layer can be replaced with a database in later development days.
+The order store starts with order ID 1 for GET and PATCH demonstrations.
+
+## Future Development
+
+This is the permanent Addis Eats capstone project. Future backend track days will extend this same codebase.

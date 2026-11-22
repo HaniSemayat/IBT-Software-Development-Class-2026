@@ -1,25 +1,19 @@
 using AddisEats.Api.Data;
 using AddisEats.Api.Models;
+using AddisEats.Api.Models.Queries;
 
 namespace AddisEats.Api.Services;
 
 public class RestaurantService : IRestaurantService
 {
-    public IReadOnlyList<Restaurant> Search(string? area, int page, int limit)
+    public IReadOnlyList<Restaurant> Search(RestaurantQuery query)
     {
-        var query = RestaurantStore.Restaurants
-            .Where(r => r.IsActive);
+        var results = ApplyFilters(query);
 
-        if (!string.IsNullOrWhiteSpace(area))
-        {
-            query = query.Where(r =>
-                r.Area.Equals(area.Trim(), StringComparison.OrdinalIgnoreCase));
-        }
-
-        return query
+        return results
             .OrderBy(r => r.Name)
-            .Skip((page - 1) * limit)
-            .Take(limit)
+            .Skip((query.Page - 1) * query.Limit)
+            .Take(query.Limit)
             .ToList();
     }
 
@@ -29,17 +23,40 @@ public class RestaurantService : IRestaurantService
             .FirstOrDefault(r => r.Id == id && r.IsActive);
     }
 
-    public int CountAll(string? area)
+    public int CountAll(RestaurantQuery query)
     {
-        var query = RestaurantStore.Restaurants
+        return ApplyFilters(query).Count();
+    }
+
+    private static IQueryable<Restaurant> ApplyFilters(RestaurantQuery query)
+    {
+        var results = RestaurantStore.Restaurants
+            .AsQueryable()
             .Where(r => r.IsActive);
 
-        if (!string.IsNullOrWhiteSpace(area))
+        if (!string.IsNullOrWhiteSpace(query.Area))
         {
-            query = query.Where(r =>
-                r.Area.Equals(area.Trim(), StringComparison.OrdinalIgnoreCase));
+            results = results.Where(r =>
+                r.Area.Equals(
+                    query.Area.Trim(),
+                    StringComparison.OrdinalIgnoreCase));
         }
 
-        return query.Count();
+        if (query.Areas.Count > 0)
+        {
+            results = results.Where(r =>
+                query.Areas.Any(area =>
+                    area.Equals(
+                        r.Area,
+                        StringComparison.OrdinalIgnoreCase)));
+        }
+
+        if (query.MaxFeeEtb.HasValue)
+        {
+            results = results.Where(r =>
+                r.DeliveryFeeEtb <= query.MaxFeeEtb.Value);
+        }
+
+        return results;
     }
 }

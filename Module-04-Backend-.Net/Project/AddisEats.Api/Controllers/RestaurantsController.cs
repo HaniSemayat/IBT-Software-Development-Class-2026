@@ -1,11 +1,12 @@
 using AddisEats.Api.Models.Dtos;
+using AddisEats.Api.Models.Queries;
 using AddisEats.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AddisEats.Api.Controllers;
 
 [ApiController]
-[Route("api/v1/restaurants")]
+[Route("api/v1/[controller]")]
 public class RestaurantsController : ControllerBase
 {
     private readonly IRestaurantService _restaurantService;
@@ -20,40 +21,36 @@ public class RestaurantsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetRestaurants(
-        [FromQuery] string? area,
-        [FromQuery] int page = 1,
-        [FromQuery] int limit = 20)
+    public ActionResult<PagedResult<RestaurantDto>> GetAll(
+        [FromQuery] RestaurantQuery q)
     {
-        page = Math.Max(1, page);
-        limit = Math.Clamp(limit, 1, 100);
-
         var results = _restaurantService
-            .Search(area, page, limit)
+            .Search(q)
             .Select(r => r.ToDto())
             .ToList();
 
-        return Ok(new
-        {
-            data = results,
-            page,
-            pageSize = limit,
-            total = _restaurantService.CountAll(area)
-        });
+        var response = new PagedResult<RestaurantDto>(
+            results,
+            q.Page,
+            q.Limit,
+            _restaurantService.CountAll(q)
+        );
+
+        return Ok(response);
     }
 
-    [HttpGet("{id:int}")]
-    public IActionResult GetRestaurant(int id)
+    [HttpGet("{id:int:min(1)}")]
+    public ActionResult<RestaurantDto> GetOne(int id)
     {
         var restaurant = _restaurantService.GetById(id);
 
         if (restaurant is null)
             return NotFound(new { message = $"Restaurant {id} was not found." });
 
-        return Ok(restaurant.ToDto());
+        return restaurant.ToDto();
     }
 
-    [HttpGet("{id:int}/menu")]
+    [HttpGet("{id:int:min(1)}/menu")]
     public IActionResult GetRestaurantMenu(int id)
     {
         var restaurant = _restaurantService.GetById(id);

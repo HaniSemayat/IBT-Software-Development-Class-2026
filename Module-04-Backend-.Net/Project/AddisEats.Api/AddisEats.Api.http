@@ -1,22 +1,69 @@
 @host = http://localhost:5217
 
-### 1. Get all restaurants
+### RESTAURANTS
+
+### 1. All restaurants
 GET {{host}}/api/v1/restaurants
 
-### 2. Filter and paginate restaurants
+### 2. Filter by one area
 GET {{host}}/api/v1/restaurants?area=Bole&page=1&limit=5
 
-### 3. Get one restaurant
+### 3. Filter by multiple areas
+GET {{host}}/api/v1/restaurants?areas=Bole&areas=Piassa
+
+### 4. Filter by maximum delivery fee
+GET {{host}}/api/v1/restaurants?maxFeeEtb=45
+
+### 5. Combine filters
+GET {{host}}/api/v1/restaurants?areas=Bole&areas=Piassa&maxFeeEtb=45&page=1&limit=5
+
+### 6. Get one restaurant
 GET {{host}}/api/v1/restaurants/1
 
-### 4. Test the 404 case
+### 7. Invalid ID route constraint - should return 404
+GET {{host}}/api/v1/restaurants/abc
+
+### 8. Zero ID route constraint - should return 404
+GET {{host}}/api/v1/restaurants/0
+
+### 9. Restaurant not found
 GET {{host}}/api/v1/restaurants/9999
 
-### 5. Get a restaurant menu
+### 10. Restaurant menu
 GET {{host}}/api/v1/restaurants/1/menu
 
-### 6. Existing restaurant with an empty menu
+### 11. Existing restaurant with empty menu
 GET {{host}}/api/v1/restaurants/12/menu
 
-### 7. Second page
+### 12. Second page
 GET {{host}}/api/v1/restaurants?page=2&limit=5
+
+### ORDERS
+
+### 13. Get existing order
+GET {{host}}/api/v1/orders/1
+
+### 14. Get missing order
+GET {{host}}/api/v1/orders/9999
+
+### 15. Create an order - expected 201 Created
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "area": "Bole",
+  "qty": 2,
+  "notes": null
+}
+
+### 16. Update order status - expected 200 OK
+PATCH {{host}}/api/v1/orders/1/status
+Content-Type: application/json
+
+{
+  "status": "Preparing"
+}
+
+### 17. Invalid order ID route constraint - expected 404
+GET {{host}}/api/v1/orders/abc

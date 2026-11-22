@@ -1,13 +1,29 @@
 using AddisEats.Api.Services;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy =
+            JsonNamingPolicy.CamelCase;
+
+        options.JsonSerializerOptions.DefaultIgnoreCondition =
+            JsonIgnoreCondition.WhenWritingNull;
+
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddCors(options =>
 {
