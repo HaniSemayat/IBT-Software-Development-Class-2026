@@ -62,3 +62,29 @@ The service returns restaurants matching either area.
 
 When no areas are provided, the area-list filter is not applied, so all otherwise matching restaurants remain available.
 
+## Exercise 5 - Ambiguous Routes
+
+Two route templates such as `{id}` and `{slug}` can both match the same URL shape.
+
+ASP.NET Core cannot select one action and reports an AmbiguousMatchException when the conflicting endpoints are registered.
+
+Two ways to fix the ambiguity:
+
+**Fix 1 - Route constraint**
+
+```csharp
+[HttpGet("{id:int}")]
+```
+
+The route now only matches integer IDs.
+
+**Fix 2 - Distinct literal route**
+
+```csharp
+[HttpGet("by-slug/{slug}")]
+```
+
+The literal `by-slug` segment separates the route from the ID endpoint.
+
+The permanent controller uses constrained ID routes and avoids ambiguous templates.
+
