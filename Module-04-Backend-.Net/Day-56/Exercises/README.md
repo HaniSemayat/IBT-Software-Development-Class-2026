@@ -50,3 +50,15 @@ Created a RestaurantQuery class with:
 
 The query is bound using `[FromQuery]` and passed to the restaurant service as one object.
 
+## Exercise 4 - Multi-Area Filtering
+
+Added an Areas list to RestaurantQuery.
+
+Repeated query keys are supported:
+
+`?areas=Bole&areas=Piassa`
+
+The service returns restaurants matching either area.
+
+When no areas are provided, the area-list filter is not applied, so all otherwise matching restaurants remain available.
+
