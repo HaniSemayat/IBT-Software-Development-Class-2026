@@ -1,0 +1,22 @@
+@host = http://localhost:5217
+
+### 1. Get all restaurants
+GET {{host}}/api/v1/restaurants
+
+### 2. Filter and paginate restaurants
+GET {{host}}/api/v1/restaurants?area=Bole&page=1&limit=5
+
+### 3. Get one restaurant
+GET {{host}}/api/v1/restaurants/1
+
+### 4. Test the 404 case
+GET {{host}}/api/v1/restaurants/9999
+
+### 5. Get a restaurant menu
+GET {{host}}/api/v1/restaurants/1/menu
+
+### 6. Existing restaurant with an empty menu
+GET {{host}}/api/v1/restaurants/12/menu
+
+### 7. Second page
+GET {{host}}/api/v1/restaurants?page=2&limit=5
