@@ -1,4 +1,4 @@
-namespace AddisEats.Api.Models.Queries;
+﻿namespace AddisEats.Api.Models.Queries;
 
 public class RestaurantQuery
 {
@@ -11,4 +11,6 @@ public class RestaurantQuery
     public int Page { get; set; } = 1;
 
     public int Limit { get; set; } = 20;
+
+    public string? Sort { get; set; }
 }

@@ -1,4 +1,4 @@
-using AddisEats.Api.Data;
+﻿using AddisEats.Api.Data;
 using AddisEats.Api.Models;
 using AddisEats.Api.Models.Queries;
 
@@ -10,8 +10,16 @@ public class RestaurantService : IRestaurantService
     {
         var results = ApplyFilters(query);
 
-        return results
-            .OrderBy(r => r.Name)
+        IOrderedQueryable<Restaurant> ordered =
+            query.Sort?.Trim() switch
+            {
+                "-name" => results.OrderByDescending(r => r.Name),
+                "deliveryFeeEtb" => results.OrderBy(r => r.DeliveryFeeEtb),
+                "-deliveryFeeEtb" => results.OrderByDescending(r => r.DeliveryFeeEtb),
+                _ => results.OrderBy(r => r.Name)
+            };
+
+        return ordered
             .Skip((query.Page - 1) * query.Limit)
             .Take(query.Limit)
             .ToList();
