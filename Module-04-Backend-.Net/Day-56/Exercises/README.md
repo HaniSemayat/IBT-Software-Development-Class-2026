@@ -88,3 +88,15 @@ The literal `by-slug` segment separates the route from the ID endpoint.
 
 The permanent controller uses constrained ID routes and avoids ambiguous templates.
 
+## Exercise 6 - ActionResult<T>
+
+Changed the restaurant detail action to:
+
+`ActionResult<RestaurantDto>`
+
+The generic return type documents the successful response shape for Swagger while allowing the action to return NotFound when the restaurant is missing.
+
+The DTO remains the public response type.
+
+Swagger before-and-after screenshots should be captured from the running application as visual evidence.
+
