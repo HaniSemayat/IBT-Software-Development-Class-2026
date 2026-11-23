@@ -1,4 +1,5 @@
 ﻿using AddisEats.Api.Errors;
+using AddisEats.Api.Filters;
 using AddisEats.Api.Middleware;
 using AddisEats.Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -7,8 +8,14 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// MVC controllers and the global audit action filter.
+builder.Services.AddScoped<AuditActionFilter>();
+
 builder.Services
-    .AddControllers()
+    .AddControllers(options =>
+    {
+        options.Filters.AddService<AuditActionFilter>();
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy =
@@ -73,8 +80,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// FIRST middleware: catches exceptions from everything registered after it.
+// 1. Outermost: catches exceptions from all downstream middleware.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+// 2. Assign the correlation ID before downstream logging begins.
+app.UseMiddleware<CorrelationIdMiddleware>();
+
+// 3. Measures the complete downstream request and final response.
+app.UseMiddleware<RequestTimingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -82,15 +95,25 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// 4. Select the endpoint before endpoint-aware middleware.
 app.UseRouting();
 
+// 5. CORS must run after routing and before authorization.
+app.UseCors("frontend");
+
+// Existing Day 58 query validation middleware.
 app.UseMiddleware<QueryParameterValidationMiddleware>();
 
-app.UseCors("frontend");
+// Future Day 63: register AddRateLimiter before enabling this.
+// app.UseRateLimiter();
+
+// Future Day 61: register authentication services first.
+// app.UseAuthentication();
+
+// Future Day 62:
 app.UseAuthorization();
 
-// Gives unmatched routes a consistent 404 ProblemDetails response.
-// Existing controller ProblemDetails responses are not replaced.
+// Consistent ProblemDetails response for unmatched routes.
 app.UseStatusCodePages(async statusContext =>
 {
     var context = statusContext.HttpContext;
@@ -106,6 +129,21 @@ app.UseStatusCodePages(async statusContext =>
     }
 });
 
+// Day 59 demonstration branch.
+// /admin is handled here and does not continue to MVC controllers.
+app.Map("/admin", admin =>
+{
+    admin.UseMiddleware<ApiKeyMiddleware>();
+
+    admin.Run(async context =>
+    {
+        context.Response.ContentType = "text/plain";
+        await context.Response.WriteAsync("Admin branch reached.");
+    });
+});
+
+// Controllers are the final endpoint execution stage.
 app.MapControllers();
 
 app.Run();
+
