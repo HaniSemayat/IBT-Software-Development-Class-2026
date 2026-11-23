@@ -1,63 +1,142 @@
-@host = http://localhost:5217
+﻿@host = http://localhost:5059
 
 ### RESTAURANTS
 
-### 1. All restaurants
+### List restaurants
 GET {{host}}/api/v1/restaurants
 
-### 2. Filter by one area
-GET {{host}}/api/v1/restaurants?area=Bole&page=1&limit=5
-
-### 3. Filter by multiple areas
-GET {{host}}/api/v1/restaurants?areas=Bole&areas=Piassa
-
-### 4. Filter by maximum delivery fee
-GET {{host}}/api/v1/restaurants?maxFeeEtb=45
-
-### 5. Combine filters
-GET {{host}}/api/v1/restaurants?areas=Bole&areas=Piassa&maxFeeEtb=45&page=1&limit=5
-
-### 6. Get one restaurant
+### Get restaurant
 GET {{host}}/api/v1/restaurants/1
 
-### 7. Invalid ID route constraint - should return 404
-GET {{host}}/api/v1/restaurants/abc
-
-### 8. Zero ID route constraint - should return 404
-GET {{host}}/api/v1/restaurants/0
-
-### 9. Restaurant not found
-GET {{host}}/api/v1/restaurants/9999
-
-### 10. Restaurant menu
+### Get menu
 GET {{host}}/api/v1/restaurants/1/menu
 
-### 11. Existing restaurant with empty menu
-GET {{host}}/api/v1/restaurants/12/menu
+### Restaurant not found
+GET {{host}}/api/v1/restaurants/99999
 
-### 12. Second page
-GET {{host}}/api/v1/restaurants?page=2&limit=5
+### Invalid route identifier
+GET {{host}}/api/v1/restaurants/abc
+
+### Unknown query parameter
+GET {{host}}/api/v1/restaurants?arrea=Bole
+
+### Invalid maximum delivery fee
+GET {{host}}/api/v1/restaurants?maxFeeEtb=-10
 
 ### ORDERS
 
-### 13. Get existing order
-GET {{host}}/api/v1/orders/1
-
-### 14. Get missing order
-GET {{host}}/api/v1/orders/9999
-
-### 15. Create an order - expected 201 Created
+### Create a valid multi-item order
 POST {{host}}/api/v1/orders
 Content-Type: application/json
 
 {
   "restaurantId": 1,
   "area": "Bole",
-  "qty": 2,
-  "notes": null
+  "phone": "0911234567",
+  "items": [
+    { "menuItemId": 1, "qty": 2 },
+    { "menuItemId": 2, "qty": 1 }
+  ],
+  "notes": "Day 58 runtime test"
 }
 
-### 16. Update order status - expected 200 OK
+### Invalid phone - validation failure
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "area": "Bole",
+  "phone": "0611234567",
+  "items": [
+    { "menuItemId": 1, "qty": 2 }
+  ]
+}
+
+### Missing scheduled time - IValidatableObject failure
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "area": "Bole",
+  "phone": "0911234567",
+  "items": [
+    { "menuItemId": 1, "qty": 1 }
+  ],
+  "isScheduled": true
+}
+
+### Invalid item quantity
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "area": "Bole",
+  "phone": "0911234567",
+  "items": [
+    { "menuItemId": 1, "qty": 51 }
+  ]
+}
+
+### Restaurant not found - Result failure
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 99999,
+  "area": "Bole",
+  "phone": "0911234567",
+  "items": [
+    { "menuItemId": 1, "qty": 1 }
+  ]
+}
+
+### Restaurant 12 is closed - Result failure
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 12,
+  "area": "Megenagna",
+  "phone": "0911234567",
+  "items": [
+    { "menuItemId": 67, "qty": 1 }
+  ]
+}
+
+### Menu item 7 belongs to restaurant 2, not restaurant 1
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "area": "Bole",
+  "phone": "0911234567",
+  "items": [
+    { "menuItemId": 7, "qty": 1 }
+  ]
+}
+
+### Client tries to submit a total of 1 ETB - must be rejected
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "area": "Bole",
+  "phone": "0911234567",
+  "items": [
+    { "menuItemId": 1, "qty": 2 }
+  ],
+  "totalEtb": 1
+}
+
+### Retrieve an order
+GET {{host}}/api/v1/orders/1
+
+### Update order status
 PATCH {{host}}/api/v1/orders/1/status
 Content-Type: application/json
 
@@ -65,5 +144,27 @@ Content-Type: application/json
   "status": "Preparing"
 }
 
-### 17. Invalid order ID route constraint - expected 404
-GET {{host}}/api/v1/orders/abc
+### Invalid order status
+PATCH {{host}}/api/v1/orders/1/status
+Content-Type: application/json
+
+{
+  "status": "Flying"
+}
+
+### DEVELOPMENT-ONLY EXCEPTION TESTS
+
+### 402 Payment declined
+GET {{host}}/api/v1/dev/errors/payment
+
+### 503 External service unavailable
+GET {{host}}/api/v1/dev/errors/gateway
+
+### 500 Unexpected exception - no stack trace should be returned
+GET {{host}}/api/v1/dev/errors/unexpected
+
+### 400 Argument exception
+GET {{host}}/api/v1/dev/errors/argument
+
+### 403 Forbidden exception
+GET {{host}}/api/v1/dev/errors/forbidden

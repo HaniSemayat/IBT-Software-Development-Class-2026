@@ -1,4 +1,5 @@
-﻿using AddisEats.Api.Errors;
+﻿using AddisEats.Api.Common;
+using AddisEats.Api.Errors;
 using AddisEats.Api.Models.Dtos;
 using AddisEats.Api.Models.Queries;
 using AddisEats.Api.Services;
@@ -10,38 +11,22 @@ namespace AddisEats.Api.Controllers;
 [Route("api/v1/[controller]")]
 public class RestaurantsController : ControllerBase
 {
-    private readonly IRestaurantService _restaurantService;
-    private readonly IMenuService _menuService;
+    private readonly IRestaurantService _restaurants;
+    private readonly IMenuService _menu;
 
     public RestaurantsController(
-        IRestaurantService restaurantService,
-        IMenuService menuService)
+        IRestaurantService restaurants,
+        IMenuService menu)
     {
-        _restaurantService = restaurantService;
-        _menuService = menuService;
+        _restaurants = restaurants;
+        _menu = menu;
     }
 
     [HttpGet]
     public ActionResult<PagedResult<RestaurantDto>> GetAll(
-        [FromQuery] RestaurantQuery q)
+        [FromQuery] RestaurantQuery query)
     {
-        if (q.Page < 1)
-        {
-            return ApiProblems.Result(
-                HttpContext, 400, "VALIDATION_FAILED",
-                "Invalid page",
-                "Page must be 1 or greater.");
-        }
-
-        if (q.Limit < 1)
-        {
-            return ApiProblems.Result(
-                HttpContext, 400, "VALIDATION_FAILED",
-                "Invalid limit",
-                "Limit must be 1 or greater.");
-        }
-
-        if (q.MaxFeeEtb < 0)
+        if (query.MaxFeeEtb < 0)
         {
             return ApiProblems.Result(
                 HttpContext, 422, "AMOUNT_INVALID",
@@ -55,8 +40,8 @@ public class RestaurantsController : ControllerBase
             "deliveryFeeEtb", "-deliveryFeeEtb"
         };
 
-        if (!string.IsNullOrWhiteSpace(q.Sort)
-            && !allowedSorts.Contains(q.Sort.Trim(),
+        if (!string.IsNullOrWhiteSpace(query.Sort)
+            && !allowedSorts.Contains(query.Sort.Trim(),
                 StringComparer.OrdinalIgnoreCase))
         {
             return ApiProblems.Result(
@@ -65,57 +50,42 @@ public class RestaurantsController : ControllerBase
                 "Sort must be name, -name, deliveryFeeEtb, or -deliveryFeeEtb.");
         }
 
-        // A requested limit above 100 is capped at 100.
-        q.Limit = Math.Min(q.Limit, 100);
+        query.Limit = Math.Min(query.Limit, 100);
 
-        var results = _restaurantService
-            .Search(q)
+        var data = _restaurants.Search(query)
             .Select(r => r.ToDto())
             .ToList();
 
-        var response = new PagedResult<RestaurantDto>(
-            results,
-            q.Page,
-            q.Limit,
-            _restaurantService.CountAll(q));
-
-        return Ok(response);
+        return Ok(new PagedResult<RestaurantDto>(
+            data,
+            query.Page,
+            query.Limit,
+            _restaurants.CountAll(query)));
     }
 
     [HttpGet("{id:int:min(1)}")]
     public ActionResult<RestaurantDto> GetOne(int id)
     {
-        var restaurant = _restaurantService.GetById(id);
+        var result = _restaurants.GetById(id);
 
-        if (restaurant is null)
-        {
-            return ApiProblems.Result(
-                HttpContext, 404, "RESTAURANT_NOT_FOUND",
-                "Restaurant not found",
-                $"Restaurant {id} was not found.");
-        }
+        if (!result.IsSuccess)
+            return ApiProblems.Result(HttpContext, result.Error!);
 
-        return Ok(restaurant.ToDto());
+        return Ok(result.Value!.ToDto());
     }
 
     [HttpGet("{id:int:min(1)}/menu")]
-    public IActionResult GetRestaurantMenu(int id)
+    public IActionResult GetMenu(int id)
     {
-        var restaurant = _restaurantService.GetById(id);
+        var restaurant = _restaurants.GetById(id);
 
-        if (restaurant is null)
-        {
-            return ApiProblems.Result(
-                HttpContext, 404, "RESTAURANT_NOT_FOUND",
-                "Restaurant not found",
-                $"Restaurant {id} was not found.");
-        }
+        if (!restaurant.IsSuccess)
+            return ApiProblems.Result(HttpContext, restaurant.Error!);
 
-        var menu = _menuService
-            .GetByRestaurantId(id)
+        var items = _menu.GetByRestaurantId(id)
             .Select(item => item.ToDto())
             .ToList();
 
-        return Ok(menu);
+        return Ok(items);
     }
 }

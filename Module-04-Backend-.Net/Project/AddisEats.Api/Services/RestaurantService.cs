@@ -1,4 +1,5 @@
-﻿using AddisEats.Api.Data;
+﻿using AddisEats.Api.Common;
+using AddisEats.Api.Data;
 using AddisEats.Api.Models;
 using AddisEats.Api.Models.Queries;
 
@@ -25,10 +26,20 @@ public class RestaurantService : IRestaurantService
             .ToList();
     }
 
-    public Restaurant? GetById(int id)
+    public Result<Restaurant> GetById(int id)
     {
-        return RestaurantStore.Restaurants
+        var restaurant = RestaurantStore.Restaurants
             .FirstOrDefault(r => r.Id == id && r.IsActive);
+
+        if (restaurant is null)
+        {
+            return Result<Restaurant>.Fail(
+                "RESTAURANT_NOT_FOUND",
+                $"Restaurant {id} was not found.",
+                404);
+        }
+
+        return Result<Restaurant>.Ok(restaurant);
     }
 
     public int CountAll(RestaurantQuery query)
@@ -36,7 +47,8 @@ public class RestaurantService : IRestaurantService
         return ApplyFilters(query).Count();
     }
 
-    private static IQueryable<Restaurant> ApplyFilters(RestaurantQuery query)
+    private static IQueryable<Restaurant> ApplyFilters(
+        RestaurantQuery query)
     {
         var results = RestaurantStore.Restaurants
             .AsQueryable()

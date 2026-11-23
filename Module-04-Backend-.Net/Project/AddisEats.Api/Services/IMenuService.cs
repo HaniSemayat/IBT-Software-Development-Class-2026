@@ -1,3 +1,4 @@
+﻿using AddisEats.Api.Common;
 using AddisEats.Api.Models;
 
 namespace AddisEats.Api.Services;
@@ -5,4 +6,6 @@ namespace AddisEats.Api.Services;
 public interface IMenuService
 {
     IReadOnlyList<MenuItem> GetByRestaurantId(int restaurantId);
+
+    Result<MenuItem> GetById(int id);
 }

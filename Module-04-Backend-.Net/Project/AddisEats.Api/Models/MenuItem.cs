@@ -1,3 +1,6 @@
+﻿using AddisEats.Api.Validation;
+using System.ComponentModel.DataAnnotations;
+
 namespace AddisEats.Api.Models;
 
 public record MenuItem(
@@ -5,7 +8,7 @@ public record MenuItem(
     int RestaurantId,
     string Name,
     string Description,
-    decimal PriceEtb,
+    [property: EtbAmount] decimal PriceEtb,
     string Category,
     bool IsAvailable
 );

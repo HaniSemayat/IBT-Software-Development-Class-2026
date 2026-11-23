@@ -1,4 +1,5 @@
-﻿using AddisEats.Api.Errors;
+﻿using AddisEats.Api.Common;
+using AddisEats.Api.Errors;
 using AddisEats.Api.Models;
 using AddisEats.Api.Models.Dtos;
 using AddisEats.Api.Services;
@@ -10,70 +11,34 @@ namespace AddisEats.Api.Controllers;
 [Route("api/v1/[controller]")]
 public class OrdersController : ControllerBase
 {
-    private readonly IOrderService _orderService;
-    private readonly IRestaurantService _restaurantService;
+    private readonly IOrderService _orders;
 
-    public OrdersController(
-        IOrderService orderService,
-        IRestaurantService restaurantService)
+    public OrdersController(IOrderService orders)
     {
-        _orderService = orderService;
-        _restaurantService = restaurantService;
+        _orders = orders;
     }
 
     [HttpGet("{id:int:min(1)}")]
     public ActionResult<OrderDto> GetOne(int id)
     {
-        var order = _orderService.GetById(id);
+        var result = _orders.GetById(id);
 
-        if (order is null)
-        {
-            return ApiProblems.Result(
-                HttpContext, 404, "ORDER_NOT_FOUND",
-                "Order not found",
-                $"Order {id} was not found.");
-        }
+        if (!result.IsSuccess)
+            return ApiProblems.Result(HttpContext, result.Error!);
 
-        return Ok(order.ToDto());
+        return Ok(result.Value!.ToDto());
     }
 
     [HttpPost]
     public ActionResult<OrderDto> Create(
-        [FromBody] CreateOrderRequest req)
+        [FromBody] CreateOrderRequest request)
     {
-        if (req.RestaurantId < 1)
-        {
-            return ApiProblems.Result(
-                HttpContext, 400, "VALIDATION_FAILED",
-                "Invalid restaurant ID",
-                "RestaurantId must be a positive integer.");
-        }
+        var result = _orders.Place(request);
 
-        if (string.IsNullOrWhiteSpace(req.Area))
-        {
-            return ApiProblems.Result(
-                HttpContext, 400, "VALIDATION_FAILED",
-                "Area is required",
-                "Provide the delivery area.");
-        }
+        if (!result.IsSuccess)
+            return ApiProblems.Result(HttpContext, result.Error!);
 
-        if (req.Qty < 1)
-        {
-            return ApiProblems.Result(
-                HttpContext, 422, "VALIDATION_FAILED",
-                "Invalid quantity",
-                "Quantity must be at least 1.");
-        }
-
-        if (_restaurantService.GetById(req.RestaurantId) is null)
-        {
-            return ApiProblems.Result(
-                HttpContext, 404, "RESTAURANT_NOT_FOUND",
-                "Restaurant not found",
-                $"Restaurant {req.RestaurantId} was not found.");
-        }
-
-        var order = _orderService.Create(req);
+        var order = result.Value!;
 
         return CreatedAtAction(
             nameof(GetOne),
@@ -86,44 +51,24 @@ public class OrdersController : ControllerBase
         int id,
         [FromBody] UpdateOrderStatusRequest request)
     {
-        var existing = _orderService.GetById(id);
-
-        if (existing is null)
+        if (!Enum.TryParse<OrderStatus>(
+                request.Status,
+                ignoreCase: false,
+                out var status))
         {
             return ApiProblems.Result(
-                HttpContext, 404, "ORDER_NOT_FOUND",
-                "Order not found",
-                $"Order {id} was not found.");
-        }
-
-        if (!Enum.IsDefined(typeof(OrderStatus), request.Status))
-        {
-            return ApiProblems.Result(
-                HttpContext, 400, "VALIDATION_FAILED",
+                HttpContext,
+                400,
+                "VALIDATION_FAILED",
                 "Invalid order status",
-                "The supplied order status is not supported.");
+                "Choose a supported order status.");
         }
 
-        if (existing.Status == OrderStatus.Delivered
-            && request.Status == OrderStatus.Cancelled)
-        {
-            return ApiProblems.Result(
-                HttpContext, 409, "ORDER_ALREADY_DELIVERED",
-                "Order cannot be cancelled",
-                "A delivered order cannot be cancelled.");
-        }
+        var result = _orders.UpdateStatus(id, status);
 
-        var updated = _orderService.UpdateStatus(id, request.Status);
+        if (!result.IsSuccess)
+            return ApiProblems.Result(HttpContext, result.Error!);
 
-        if (updated is null)
-        {
-            return ApiProblems.Result(
-                HttpContext, 404, "ORDER_NOT_FOUND",
-                "Order not found",
-                $"Order {id} was not found.");
-        }
-
-        // PATCH succeeded. No response body is returned.
         return NoContent();
     }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AddisEats.Api.Common;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace AddisEats.Api.Errors;
 
@@ -22,6 +24,7 @@ public static class ApiProblems
         };
 
         problem.Extensions["code"] = code;
+        problem.Extensions["traceId"] = context.TraceIdentifier;
 
         if (errors is not null && errors.Count > 0)
             problem.Extensions["errors"] = errors;
@@ -44,6 +47,18 @@ public static class ApiProblems
         };
     }
 
+    public static ObjectResult Result(
+        HttpContext context,
+        Error error)
+    {
+        return Result(
+            context,
+            error.Status,
+            error.Code,
+            error.Code.Replace("_", " "),
+            error.Message);
+    }
+
     public static async Task WriteAsync(
         HttpContext context,
         int status,
@@ -56,10 +71,9 @@ public static class ApiProblems
 
         var problem = Create(context, status, code, title, detail);
 
-        await System.Text.Json.JsonSerializer.SerializeAsync(
+        await JsonSerializer.SerializeAsync(
             context.Response.Body,
             problem,
-            new System.Text.Json.JsonSerializerOptions(
-                System.Text.Json.JsonSerializerDefaults.Web));
+            new JsonSerializerOptions(JsonSerializerDefaults.Web));
     }
 }

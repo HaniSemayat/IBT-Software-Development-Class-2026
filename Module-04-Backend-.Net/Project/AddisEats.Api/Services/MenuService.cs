@@ -1,3 +1,4 @@
+﻿using AddisEats.Api.Common;
 using AddisEats.Api.Data;
 using AddisEats.Api.Models;
 
@@ -11,5 +12,20 @@ public class MenuService : IMenuService
             .Where(item => item.RestaurantId == restaurantId)
             .OrderBy(item => item.Id)
             .ToList();
+    }
+
+    public Result<MenuItem> GetById(int id)
+    {
+        var item = MenuStore.Items.FirstOrDefault(x => x.Id == id);
+
+        if (item is null)
+        {
+            return Result<MenuItem>.Fail(
+                "MENU_ITEM_NOT_FOUND",
+                $"Menu item {id} was not found.",
+                404);
+        }
+
+        return Result<MenuItem>.Ok(item);
     }
 }

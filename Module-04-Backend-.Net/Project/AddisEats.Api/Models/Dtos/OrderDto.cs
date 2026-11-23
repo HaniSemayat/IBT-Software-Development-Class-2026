@@ -1,25 +1,28 @@
-using AddisEats.Api.Models;
+﻿using AddisEats.Api.Models;
 
 namespace AddisEats.Api.Models.Dtos;
+
+public record OrderLineDto(
+    int MenuItemId,
+    string Name,
+    int Qty,
+    decimal UnitPriceEtb,
+    decimal LineTotalEtb
+);
 
 public record OrderDto(
     int Id,
     int RestaurantId,
     string Area,
-    int Qty,
+    string Phone,
+    IReadOnlyList<OrderLineDto> Items,
+    decimal SubtotalEtb,
+    decimal DeliveryFeeEtb,
+    decimal TotalEtb,
+    bool IsScheduled,
+    DateTime? ScheduledFor,
     OrderStatus Status,
     string? Notes
-);
-
-public record CreateOrderRequest(
-    int RestaurantId,
-    string Area,
-    int Qty,
-    string? Notes
-);
-
-public record UpdateOrderStatusRequest(
-    OrderStatus Status
 );
 
 public static class OrderMapping
@@ -30,7 +33,19 @@ public static class OrderMapping
             order.Id,
             order.RestaurantId,
             order.Area,
-            order.Qty,
+            order.Phone,
+            order.Items.Select(item => new OrderLineDto(
+                item.MenuItemId,
+                item.Name,
+                item.Qty,
+                item.UnitPriceEtb,
+                item.LineTotalEtb
+            )).ToList(),
+            order.SubtotalEtb,
+            order.DeliveryFeeEtb,
+            order.TotalEtb,
+            order.IsScheduled,
+            order.ScheduledFor,
             order.Status,
             order.Notes
         );

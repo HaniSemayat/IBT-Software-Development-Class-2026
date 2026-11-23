@@ -1,4 +1,4 @@
-using AddisEats.Api.Models;
+﻿using AddisEats.Api.Models;
 
 namespace AddisEats.Api.Data;
 
@@ -11,8 +11,16 @@ public static class OrderStore
             Id = 1,
             RestaurantId = 1,
             Area = "Bole",
-            Qty = 2,
-            Status = OrderStatus.Placed
+            Phone = "0911000999",
+            Items = new List<OrderLine>
+            {
+                new(1, "Special Firfir", 2, 180m, 360m)
+            },
+            SubtotalEtb = 360m,
+            DeliveryFeeEtb = 45m,
+            TotalEtb = 405m,
+            Status = OrderStatus.Placed,
+            Notes = "Seed order"
         }
     };
 }

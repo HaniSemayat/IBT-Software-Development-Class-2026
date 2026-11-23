@@ -1,3 +1,4 @@
+﻿using AddisEats.Api.Common;
 using AddisEats.Api.Models;
 using AddisEats.Api.Models.Queries;
 
@@ -7,7 +8,7 @@ public interface IRestaurantService
 {
     IReadOnlyList<Restaurant> Search(RestaurantQuery query);
 
-    Restaurant? GetById(int id);
+    Result<Restaurant> GetById(int id);
 
     int CountAll(RestaurantQuery query);
 }

@@ -1,4 +1,4 @@
-namespace AddisEats.Api.Models;
+﻿namespace AddisEats.Api.Models;
 
 public enum OrderStatus
 {
@@ -9,6 +9,14 @@ public enum OrderStatus
     Cancelled
 }
 
+public record OrderLine(
+    int MenuItemId,
+    string Name,
+    int Qty,
+    decimal UnitPriceEtb,
+    decimal LineTotalEtb
+);
+
 public class Order
 {
     public int Id { get; set; }
@@ -17,9 +25,21 @@ public class Order
 
     public string Area { get; set; } = "";
 
-    public int Qty { get; set; }
+    public string Phone { get; set; } = "";
 
-    public OrderStatus Status { get; set; } = OrderStatus.Placed;
+    public List<OrderLine> Items { get; set; } = new();
+
+    public decimal SubtotalEtb { get; set; }
+
+    public decimal DeliveryFeeEtb { get; set; }
+
+    public decimal TotalEtb { get; set; }
+
+    public bool IsScheduled { get; set; }
+
+    public DateTime? ScheduledFor { get; set; }
 
     public string? Notes { get; set; }
+
+    public OrderStatus Status { get; set; } = OrderStatus.Placed;
 }
